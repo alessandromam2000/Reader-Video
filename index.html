@@ -504,6 +504,28 @@ body.theater.nolist .panes { grid-template-rows: minmax(0, 1fr); }
 
 .dirstate { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 6px 10px; margin: 6px 0; border-radius: 4px; background: var(--surface-2); font-size: 14px; }
 
+/* montaggio */
+.dlg.mon { z-index: 100000; }
+.monbar { height: 10px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+#mon-fill { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.dlg-foot { display: flex; justify-content: flex-end; gap: 8px; }
+.dlg-foot [hidden] { display: none; }
+#mon-open { margin-left: auto; }
+
+.monopt { display: flex; flex-direction: column; gap: 10px; }
+.monopt[hidden] { display: none; }
+.monchk { display: flex; align-items: center; gap: 8px; font-size: 15px; }
+.monttl { display: flex; flex-direction: column; gap: 4px; }
+.monrow { display: flex; gap: 8px; }
+.monrow .field { flex: 1; min-width: 0; }
+
+.monpill { position: fixed; left: 14px; bottom: 14px; z-index: 100001; display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.35); font-size: 14px; }
+.monpill[hidden] { display: none; }
+.monpill .monbar { width: 120px; }
+#mp-fill { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.monttl[hidden] { display: none; }
+.ver { font: 500 11px var(--f-mono); color: var(--muted); margin-left: 6px; vertical-align: middle; }
+
 </style>
 </head><body>
 <div id="gate" style="position:fixed;inset:0;z-index:99999;background:#0D1619;color:#E4EDF0;display:none;align-items:center;justify-content:center;font-family:system-ui,sans-serif">
@@ -526,7 +548,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video</h1>
+      <h1>Reader scout video <small class="ver">v52</small></h1>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -710,6 +732,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <div class="count"><b id="cnt">0</b><span id="cnt-label" class="label">azioni</span></div>
         <div class="dist" id="dist" aria-hidden="true"></div>
         <div class="legend" id="legend"></div>
+        <button class="btn small" id="mon-open" type="button" title="Crea un video unico con le azioni della lista">🎬 Montaggio</button>
       </div>
       <div class="stats" id="stats" aria-live="polite"></div>
       <div class="list-scroll"><ul class="list" id="list"></ul></div>
@@ -717,6 +740,22 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
   </div>
 </div>
 <button class="btn small" id="t-show" type="button">☰ Pannello</button>
+<div class="monpill" id="mon-pill" hidden role="status"><span id="mp-text"></span><div class="monbar"><div id="mp-fill"></div></div><button class="btn small" id="mp-stop" type="button">Interrompi</button></div>
+<div class="dlg mon" id="dlg-mon" hidden>
+  <div class="dlg-card" role="dialog" aria-modal="true" aria-labelledby="mon-title">
+    <div class="dlg-head"><h2 id="mon-title">Montaggio video</h2></div>
+    <p id="mon-text"></p>
+    <div class="monopt" id="mon-opt">
+      <label class="monchk"><input type="checkbox" id="mon-score" checked> Mostra il punteggio</label>
+      <label class="monchk"><input type="checkbox" id="mon-intro"> Pagina con il titolo all’inizio</label>
+      <label class="monttl" id="mon-ttlbox" hidden><span class="label">Titolo</span>
+        <span class="monrow"><input type="text" class="field" id="mon-ttl" maxlength="60" placeholder="es. Attacchi · Rossi">
+        <button class="btn small" type="button" id="mon-auto" title="Scrive il titolo dai filtri attivi">Dai filtri</button></span></label>
+    </div>
+    <p class="hint" id="mon-hint"></p>
+    <div class="dlg-foot"><button class="btn" id="mon-cancel" type="button">Annulla</button><button class="btn primary" id="mon-go" type="button">Avvia</button></div>
+  </div>
+</div>
 <div class="dlg" id="dlg-rm" hidden>
   <div class="dlg-card" role="dialog" aria-modal="true" aria-labelledby="rm-title">
     <div class="dlg-head"><h2 id="rm-title">Togli scout dalla libreria</h2><button class="btn small" id="rm-close" type="button">Chiudi</button></div>
@@ -914,10 +953,10 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
     { v: 'rally3', l: 'Fine scambio +3 s' }
   ];
   var SPD_OPTS = [0.5, 0.75, 1, 1.5, 2];
-  var STOP_OPTS = [{ v: 'stop', l: 'Fermati' }, { v: 'go', l: 'Continua' }];
+  var STOP_OPTS = [{ v: 'next', l: 'Passa alla successiva' }, { v: 'stop', l: 'Fermati' }, { v: 'go', l: 'Continua' }];
   var LS_KEY = 'reader-scout-video-settings';
 
-  var S = { pre: 3, dur: '5', spd: 1, stop: 'stop', all: false };
+  var S = { pre: 3, dur: '5', spd: 1, stop: 'next', all: false };
   var F = { team: '', who: 'team', player: '', skills: {}, evals: {}, sets: {}, phases: {}, rots: {}, zs: {}, ze: {}, conds: [], marks: {}, text: '' };
   var LIB = [], ALL = [], seq = 0, sampleEntry = null, pendingEntry = null, queue = [], cur = -1, clip = null, timer = null, ended = false;
   var savedDir = null;
@@ -925,10 +964,10 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
 
   try {
     var saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
-    if (saved) { S.pre = saved.pre; S.dur = saved.dur; S.spd = saved.spd; S.stop = saved.stop; }
+    if (saved) { S.pre = saved.pre; S.dur = saved.dur; S.spd = saved.spd; S.stop = saved.v2 ? saved.stop : (saved.stop === 'stop' ? 'next' : saved.stop); }
   } catch (e) {}
   function saveSettings() {
-    try { localStorage.setItem(LS_KEY, JSON.stringify({ pre: S.pre, dur: S.dur, spd: S.spd, stop: S.stop })); } catch (e) {}
+    try { localStorage.setItem(LS_KEY, JSON.stringify({ pre: S.pre, dur: S.dur, spd: S.spd, stop: S.stop, v2: 1 })); } catch (e) {}
   }
 
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -1502,10 +1541,10 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
   function tick() {
     if (!clip) return;
     var t = vid.currentTime; updateBar(t);
-    if (S.stop === 'stop' && t >= clip.end) clipEnded();
+    if ((S.stop === 'stop' || S.stop === 'next') && t >= clip.end) clipEnded();
   }
   function clipEnded() {
-    if (S.all && cur < queue.length - 1) { select(cur + 1, true); return; }
+    if ((S.all || S.stop === 'next') && cur < queue.length - 1) { select(cur + 1, true); return; }
     vid.pause(); ended = true; S.all = false; syncAllBtn(); setPlayLabel();
   }
   vid.addEventListener('play', function () { ended = false; clearInterval(timer); timer = setInterval(tick, 80); setPlayLabel(); });
@@ -1525,7 +1564,7 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
     if (!queue.length) return;
     if (cur < 0) { select(0, true); return; }
     if (!vid.paused) { vid.pause(); return; }
-    if (ended || (clip && S.stop === 'stop' && vid.currentTime >= clip.end)) { select(cur, true); return; }
+    if (ended || (clip && S.stop !== 'go' && vid.currentTime >= clip.end)) { select(cur, true); return; }
     if (!vid.getAttribute('src')) { select(cur, true); return; }
     play();
   }
@@ -1947,6 +1986,196 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
     if (b.id === 't-hide') { document.body.classList.add('nolist'); poke(); }
     else if (b.getAttribute('data-tab')) setTab(b.getAttribute('data-tab'));
   });
+  /* ---------- montaggio: registra le azioni della lista in un unico video ---------- */
+  var mon = null, monAudio = null, monAbort = false;
+  function fmtDur(s) { s = Math.round(s); return Math.floor(s / 60) + ' min ' + (s % 60) + ' s'; }
+  function monMime() {
+    var l = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+    for (var i = 0; i < l.length; i++) if (MediaRecorder.isTypeSupported(l[i])) return l[i];
+    return '';
+  }
+  function saveBlob(name, blob) {
+    if (window.claude && window.claude.use) {
+      return window.claude.use('downloads').then(function (d) { return d.save({ filename: name, data: blob }); });
+    }
+    var u = URL.createObjectURL(blob), l = document.createElement('a');
+    l.href = u; l.download = name; document.body.appendChild(l); l.click(); l.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 5000); return Promise.resolve();
+  }
+  function monAutoTitle() {
+    var parts = [], sk = Object.keys(F.skills).filter(function (k) { return F.skills[k]; });
+    if (sk.length) parts.push(sk.map(function (k) { return SKILLS[k]; }).join(' / '));
+    if (F.player) { var o = $('f-player').selectedOptions && $('f-player').selectedOptions[0]; if (o) parts.push(o.textContent.replace(/\s*\(.*$/, '').trim()); }
+    return parts.join(' · ');
+  }
+  $('mon-intro').addEventListener('change', function () { $('mon-ttlbox').hidden = !this.checked; if (this.checked) $('mon-ttl').focus(); });
+  $('mon-auto').addEventListener('click', function () { $('mon-ttl').value = monAutoTitle(); });
+  function monClose() { $('dlg-mon').hidden = true; }
+  $('mon-open').addEventListener('click', function () {
+    if (mon) { toast('C’è già un montaggio in corso.'); return; }
+    if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { toast('Questo browser non sa creare il montaggio: usa Chrome o Edge.'); return; }
+    if (!queue.length) { toast('Nessuna azione nella lista.'); return; }
+    var ok = queue.filter(function (c) { return !!videoFor(c); }).length, per = S.pre + (isNaN(+S.dur) ? 6 : +S.dur);
+    $('mon-text').innerHTML = 'Creo un video unico con <b>' + ok + '</b> azioni' + (ok < queue.length ? ' (' + (queue.length - ok) + ' senza video collegato saltate)' : '') +
+      ', ognuna con i tempi impostati e il punteggio in alto a sinistra. Durata circa <b>' + fmtDur(ok * per) + '</b>.';
+    $('mon-hint').textContent = 'Il montaggio si registra in tempo reale, con un lettore tutto suo: nel frattempo puoi continuare a usare il programma e guardare altri video. Tieni aperta questa scheda.';
+    try { var so = JSON.parse(localStorage.getItem('reader-scout-video-mon') || 'null'); if (so) $('mon-score').checked = so.score !== false; } catch (e) {}
+    $('mon-hint').textContent += (window.showSaveFilePicker && !(window.claude && window.claude.use)) ? ' Dopo “Avvia” ti chiedo dove salvare il file.' : ' Questo browser salva il file nella cartella dei download, senza chiedere dove.';
+    $('mon-opt').hidden = false; $('mon-intro').checked = false; $('mon-ttlbox').hidden = true;
+    $('mon-go').hidden = !ok; $('mon-go').disabled = false; 
+    $('dlg-mon').hidden = false;
+  });
+  $('mon-cancel').addEventListener('click', monClose);
+  $('mon-go').addEventListener('click', function () { startMontage(); });
+  $('mp-stop').addEventListener('click', function () { monAbort = true; });
+  var monVid = null;
+  function startMontage() {
+    var n = queue.filter(function (c) { return !!videoFor(c); }).length, mimeX = monMime(), ext = /mp4/.test(mimeX) ? 'mp4' : 'webm';
+    var ttl = ($('mon-intro').checked ? $('mon-ttl').value.trim() : '').replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, '_').slice(0, 40);
+    var name = (ttl ? 'montaggio_' + ttl : 'montaggio_' + n + '_azioni') + '.' + ext;
+    if (window.showSaveFilePicker && !(window.claude && window.claude.use)) {
+      window.showSaveFilePicker({ suggestedName: name, types: [{ description: 'Video', accept: ext === 'mp4' ? { 'video/mp4': ['.mp4'] } : { 'video/webm': ['.webm'] } }] })
+        .then(function (h) { return h.createWritable().then(function (w) { runMontage({ w: w, name: h.name }); }); })
+        .catch(function (e) { if (!e || e.name !== 'AbortError') runMontage(null); });
+    } else runMontage(null);
+  }
+  function runMontage(wr) {
+    var showScore = $('mon-score').checked, title = $('mon-intro').checked ? $('mon-ttl').value.trim() : '';
+    try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore })); } catch (e) {}
+    var list = queue.filter(function (c) { return !!videoFor(c); });
+    var mime = monMime(), chunks = [], canvas = document.createElement('canvas'), ctx = canvas.getContext('2d');
+    monAbort = false; mon = { n: list.length };
+    if (!monVid) { monVid = document.createElement('video'); monVid.preload = 'auto'; monVid.playsInline = true; }
+    var mv = monVid, mvUrl = '';
+    try {
+      if (!monAudio) {
+        var AC = window.AudioContext || window.webkitAudioContext, ac = new AC(), src = ac.createMediaElementSource(mv), dest = ac.createMediaStreamDestination();
+        src.connect(dest); monAudio = { ac: ac, dest: dest };   // l'audio va solo nel file, non negli altoparlanti
+      }
+      monAudio.ac.resume();
+    } catch (e) { monAudio = null; }
+    $('dlg-mon').hidden = true;
+    var pill = $('mon-pill'); pill.hidden = false; $('mp-fill').style.width = '0'; $('mp-text').textContent = 'Montaggio in preparazione…';
+    var wq = Promise.resolve(), cw = 0, ch = 0, curC = null, curClip = null, wk = null, lock = null, drawT = null, mr = null, i = 0, guard = null, advancing = false;
+    function size() {
+      if (cw) return;
+      var w = mv.videoWidth || 1280, h = mv.videoHeight || 720, k = Math.min(1, 1280 / w);
+      cw = canvas.width = Math.round(w * k / 2) * 2; ch = canvas.height = Math.round(h * k / 2) * 2;
+    }
+    function badge() {
+      if (!curC) return;
+      var f = Math.round(ch / 22), x = f * 0.8, y = f * 0.8, hh = f * 2.2;
+      if (showScore) {
+        var tm = curC.e.M.teams, sc = curC.score.split('-'), pad = f * 0.6;
+        ctx.font = '700 ' + f + 'px system-ui, sans-serif'; ctx.textBaseline = 'middle';
+        var parts = [tm[0].code, sc[0], '–', sc[1], tm[1].code], gap = f * 0.7, wTot = 0, ws = parts.map(function (p) { var w = ctx.measureText(p).width; wTot += w; return w; });
+        wTot += gap * (parts.length - 1) + pad * 2;
+        ctx.fillStyle = 'rgba(0,0,0,.72)'; ctx.fillRect(x, y, wTot, hh);
+        ctx.fillStyle = '#3DB8C4'; ctx.fillRect(x, y, f * 0.25, hh);
+        var cx = x + pad + f * 0.25;
+        parts.forEach(function (p, k2) {
+          ctx.fillStyle = (k2 === 1 || k2 === 3) ? '#fff' : (k2 === 2 ? '#8CA2AA' : '#E4EDF0');
+          ctx.font = ((k2 === 1 || k2 === 3) ? '800 ' : '600 ') + (f * (k2 === 1 || k2 === 3 ? 1.15 : 1)) + 'px system-ui, sans-serif';
+          ctx.fillText(p, cx, y + hh / 2); cx += ws[k2] + gap;
+        });
+        ctx.font = '600 ' + Math.round(f * 0.7) + 'px system-ui, sans-serif'; ctx.fillStyle = '#E4EDF0';
+        ctx.fillText('Set ' + curC.set, x + wTot + f * 0.4, y + hh / 2);
+        y += hh + f * 0.4;
+      }
+    }
+    var introUntil = 0;
+    function drawIntro() {
+      var g = ctx.createLinearGradient(0, 0, cw, ch); g.addColorStop(0, '#0D1619'); g.addColorStop(1, '#14303A');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
+      var fs = Math.round(ch / 9), maxW = cw * 0.8, words = title.split(/\s+/), lines = [], line = '';
+      ctx.font = '800 ' + fs + 'px system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+      words.forEach(function (w) { var t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
+      if (line) lines.push(line);
+      var lh = fs * 1.25, y0 = ch / 2 - (lines.length - 1) * lh / 2;
+      ctx.fillStyle = '#3DB8C4'; ctx.fillRect(cw / 2 - cw * 0.08, y0 - lh * 0.95, cw * 0.16, Math.max(3, ch / 120));
+      ctx.fillStyle = '#fff'; lines.forEach(function (l, k) { ctx.fillText(l, cw / 2, y0 + k * lh); });
+      ctx.textAlign = 'left';
+    }
+    function draw() {
+      if (!cw) return;
+      if (introUntil && performance.now() < introUntil) { drawIntro(); return; }
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cw, ch);
+      var vw = mv.videoWidth, vh = mv.videoHeight;
+      if (vw && vh) { var k = Math.min(cw / vw, ch / vh), w = vw * k, h = vh * k; ctx.drawImage(mv, (cw - w) / 2, (ch - h) / 2, w, h); }
+      badge();
+    }
+    function tickMon() {
+      draw();
+      if (curClip && !advancing && mv.currentTime >= curClip.end) clipDone();
+    }
+    function clipDone() { if (advancing) return; advancing = true; clearTimeout(guard); setTimeout(nextClip, 150); }
+    function finish(save) {
+      clearInterval(drawT); if (wk) { wk.terminate(); wk = null; } if (lock) { try { lock.release(); } catch (e) {} lock = null; }
+      try { mv.pause(); } catch (e) {}
+      mon = null; pill.hidden = true; curClip = null;
+      if (mr && mr.state !== 'inactive') {
+        mr.onstop = function () {
+          if (wr) {
+            wq.then(function () { return save ? wr.w.close() : wr.w.abort(); })
+              .then(function () { toast(save ? 'Montaggio salvato: ' + wr.name : 'Montaggio interrotto.'); })
+              .catch(function () { toast('Non sono riuscito a salvare il montaggio.'); });
+          } else if (save && chunks.length) {
+            var ext = /mp4/.test(mime) ? 'mp4' : 'webm', name = 'montaggio_' + list.length + '_azioni.' + ext;
+            saveBlob(name, new Blob(chunks, { type: mime || 'video/webm' })).then(function () { toast('Montaggio pronto: ' + name); }).catch(function () { toast('Non sono riuscito a salvare il montaggio.'); });
+          } else toast('Montaggio interrotto.');
+        };
+        mr.stop();
+      } else if (wr) { try { wr.w.abort(); } catch (e) {} }
+    }
+    function startRec() {
+      var stream = canvas.captureStream(30);
+      if (monAudio) monAudio.dest.stream.getAudioTracks().forEach(function (t) { stream.addTrack(t); });
+      try { mr = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 6000000 } : { videoBitsPerSecond: 6000000 }); }
+      catch (e) { toast('Non riesco ad avviare la registrazione.'); finish(false); return false; }
+      mr.ondataavailable = function (ev) {
+        if (!ev.data || !ev.data.size) return;
+        if (wr) wq = wq.then(function () { return wr.w.write(ev.data); }).catch(function () {}); else chunks.push(ev.data);
+      };
+      mr.start(1000);
+      try {
+        wk = new Worker(URL.createObjectURL(new Blob(['setInterval(function(){postMessage(0)},33)'], { type: 'text/javascript' })));
+        wk.onmessage = tickMon;
+      } catch (e) { drawT = setInterval(tickMon, 33); }
+      try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function (l) { lock = l; }).catch(function () {}); } catch (e) {}
+      return true;
+    }
+    function nextClip() {
+      if (monAbort) { finish(false); return; }
+      if (i >= list.length) { setTimeout(function () { finish(true); }, 400); return; }
+      var c = list[i++], v = videoFor(c), cl = range(c);
+      $('mp-text').textContent = 'Montaggio: azione ' + i + ' di ' + list.length;
+      $('mp-fill').style.width = Math.round((i - 1) / list.length * 100) + '%';
+      advancing = true; curClip = null; curC = c;
+      function go() {
+        mv.currentTime = cl.start; mv.playbackRate = 1;
+        var onSeek = function () {
+          mv.removeEventListener('seeked', onSeek);
+          var delay = 0;
+          if (!cw) { size(); if (!startRec()) return; if (title) { delay = 3000; introUntil = performance.now() + delay; } }
+          setTimeout(function () {
+            if (monAbort) { clipDone(); return; }
+            curClip = cl; advancing = false;
+            var p = mv.play(); if (p && p.catch) p.catch(function () {});
+            guard = setTimeout(clipDone, ((cl.end - cl.start) + 10) * 1000);
+          }, delay);
+        };
+        mv.addEventListener('seeked', onSeek);
+      }
+      if (mvUrl === v.url) go();
+      else {
+        mvUrl = v.url; mv.src = v.url;
+        var onMeta = function () { mv.removeEventListener('loadedmetadata', onMeta); go(); };
+        mv.addEventListener('loadedmetadata', onMeta);
+      }
+    }
+    nextClip();
+  }
+
   var uiTimer = null;
   function poke() {
     if (!theater) return;
