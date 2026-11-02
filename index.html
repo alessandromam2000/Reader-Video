@@ -526,6 +526,46 @@ body.theater.nolist .panes { grid-template-rows: minmax(0, 1fr); }
 .monttl[hidden] { display: none; }
 .ver { font: 500 11px var(--f-mono); color: var(--muted); margin-left: 6px; vertical-align: middle; }
 
+/* maschere */
+.maskbar { grid-column: 1 / -1; }
+.maskrow { display: flex; gap: 6px; align-items: center; }
+.maskrow .field { flex: 1; min-width: 0; }
+.mask-card { width: min(720px, 100%); max-height: min(88vh, 760px); }
+.mk-new { display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); }
+.mk-form { display: flex; gap: 8px; flex-wrap: wrap; }
+.mk-form .field { flex: 1 1 180px; min-width: 0; }
+.mk-opts { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
+.mk-opts label { display: flex; align-items: center; gap: 6px; }
+.mk-list { overflow-y: auto; min-height: 120px; display: flex; flex-direction: column; gap: 6px; }
+.mk-folder > summary { cursor: pointer; font: 700 15px var(--f-display); padding: 6px 4px; display: flex; gap: 8px; align-items: baseline; }
+.mk-folder > summary small { color: var(--muted); font-weight: 500; }
+.mk-row { display: flex; gap: 6px; align-items: center; padding: 3px 0 3px 12px; border-top: 1px solid var(--line); }
+.mk-row .mk-go { flex: 1; min-width: 0; text-align: left; background: none; border: 0; color: inherit; cursor: pointer; display: flex; flex-direction: column; gap: 2px; padding: 6px 4px; }
+.mk-row .mk-go b { font-size: 15px; }
+.mk-row .mk-go small { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mk-row .mk-go:hover b { color: var(--accent); }
+.mk-row.edit .field { flex: 1; min-width: 0; }
+
+.maskrow { flex-wrap: wrap; }
+.maskstat { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 6px; padding: 6px 10px; border-radius: 6px; background: color-mix(in srgb, var(--accent) 14%, var(--surface)); font-size: 14px; }
+.maskstat.dirty { background: color-mix(in srgb, var(--ev-excl, #b07a00) 20%, var(--surface)); }
+.maskstat[hidden] { display: none; }
+.ms-f { display: flex; flex-direction: column; gap: 4px; }
+.ms-f[hidden] { display: none; }
+.ms-chk { display: flex; align-items: center; gap: 8px; font-size: 15px; padding: 2px 0; }
+.ms-sum { padding: 10px; border-radius: 8px; background: var(--surface-2); }
+.ms-sum p { margin: 4px 0 0; font-weight: 600; }
+.mk-top { display: flex; }
+.mk-row { align-items: center; }
+.mk-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 6px 4px; }
+.mk-info b { font-size: 15px; } .mk-info small { color: var(--muted); font-size: 12px; }
+.mk-act { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.mk-row.edit { flex-direction: column; align-items: stretch; gap: 8px; }
+.mk-ed { display: flex; gap: 8px; flex-wrap: wrap; } .mk-ed label { flex: 1 1 200px; display: flex; flex-direction: column; gap: 4px; }
+.monmode { display: flex; flex-direction: column; gap: 6px; }
+.monmode[hidden] { display: none; }
+.monmode small { color: var(--mut, #8CA2AA); font-size: 12px; }
+
 </style>
 </head><body>
 <div id="gate" style="position:fixed;inset:0;z-index:99999;background:#0D1619;color:#E4EDF0;display:none;align-items:center;justify-content:center;font-family:system-ui,sans-serif">
@@ -548,7 +588,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v52</small></h1>
+      <h1>Reader scout video <small class="ver">v57</small></h1>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -672,6 +712,15 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 
     <section class="browser" aria-label="Filtri e azioni">
       <div class="filters">
+        <div class="sgroup maskbar">
+          <label class="label" for="f-mask">Maschere di ricerca <small class="hint">filtri salvati con un nome</small></label>
+          <select class="field" id="f-mask"></select>
+          <div class="maskrow">
+            <button class="btn small" type="button" id="mask-save" title="Salva i filtri che hai impostato adesso">💾 Salva questi filtri</button>
+            <button class="btn small" type="button" id="mask-manage" title="Rinomina, sposta in cartelle, duplica, elimina">📁 Le mie maschere</button>
+          </div>
+          <div class="maskstat" id="mask-stat" hidden></div>
+        </div>
         <div class="sgroup">
           <label class="label" for="f-player">Giocatrice</label>
           <select class="field" id="f-player"></select>
@@ -746,6 +795,10 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
     <div class="dlg-head"><h2 id="mon-title">Montaggio video</h2></div>
     <p id="mon-text"></p>
     <div class="monopt" id="mon-opt">
+      <div class="monmode" id="mon-modebox"><span class="label">Modalità</span>
+        <label class="monchk"><input type="radio" name="mon-mode" value="fast" checked> Veloce <small>(consigliata: molto più rapida, senza audio)</small></label>
+        <label class="monchk"><input type="radio" name="mon-mode" value="real"> Normale <small>(in tempo reale, più lenta)</small></label>
+      </div>
       <label class="monchk"><input type="checkbox" id="mon-score" checked> Mostra il punteggio</label>
       <label class="monchk"><input type="checkbox" id="mon-intro"> Pagina con il titolo all’inizio</label>
       <label class="monttl" id="mon-ttlbox" hidden><span class="label">Titolo</span>
@@ -754,6 +807,35 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
     </div>
     <p class="hint" id="mon-hint"></p>
     <div class="dlg-foot"><button class="btn" id="mon-cancel" type="button">Annulla</button><button class="btn primary" id="mon-go" type="button">Avvia</button></div>
+  </div>
+</div>
+<div class="dlg" id="dlg-msave" hidden>
+  <div class="dlg-card mask-card" role="dialog" aria-modal="true" aria-labelledby="ms-title">
+    <div class="dlg-head"><h2 id="ms-title">Salva i filtri come maschera</h2></div>
+    <div class="ms-sum"><span class="label">Cosa viene salvato</span><p id="ms-cur"></p></div>
+    <label class="ms-f"><span class="label">Nome della maschera</span><input class="field" id="ms-name" type="text" maxlength="60" placeholder="es. Distribuzione dopo ricezione #+"></label>
+    <label class="ms-f"><span class="label">Cartella</span><select class="field" id="ms-folder"></select></label>
+    <label class="ms-f" id="ms-newbox" hidden><span class="label">Nome della nuova cartella</span><input class="field" id="ms-newfolder" type="text" maxlength="40" placeholder="es. Distribuzione per basi"></label>
+    <div class="ms-f"><span class="label">Salva anche (facoltativo)</span>
+      <label class="ms-chk"><input type="checkbox" id="ms-player"> la giocatrice scelta</label>
+      <label class="ms-chk"><input type="checkbox" id="ms-times"> i tempi della clip (secondi prima e dopo)</label>
+    </div>
+    <p class="hint">Squadra e partite non vengono salvate: la maschera vale per qualsiasi squadra.</p>
+    <div class="dlg-foot"><button class="btn" id="ms-cancel" type="button">Annulla</button><button class="btn" id="ms-upd" type="button" hidden>Aggiorna la maschera attiva</button><button class="btn primary" id="ms-ok" type="button">Salva come nuova</button></div>
+  </div>
+</div>
+<div class="dlg" id="dlg-mask" hidden>
+  <div class="dlg-card mask-card" role="dialog" aria-modal="true" aria-labelledby="mk-title">
+    <div class="dlg-head"><h2 id="mk-title">Le mie maschere</h2><button class="btn small" id="mk-close" type="button">Chiudi</button></div>
+    <p class="hint">Premi <b>Usa</b> per impostare subito i filtri. Con <b>Modifica</b> cambi nome o cartella.</p>
+    <div class="mk-top"><button class="btn primary" id="mk-new" type="button">＋ Nuova maschera dai filtri attuali</button></div>
+    <div class="mk-list" id="mk-list"></div>
+    <datalist id="mk-folders"></datalist>
+    <div class="dlg-foot">
+      <button class="btn small" id="mk-export" type="button" title="Salva tutte le maschere in un file">Esporta in un file</button>
+      <button class="btn small" id="mk-import" type="button" title="Carica maschere da un file">Importa da un file</button>
+      <input type="file" id="in-masks" accept=".json,application/json" hidden>
+    </div>
   </div>
 </div>
 <div class="dlg" id="dlg-rm" hidden>
@@ -900,13 +982,32 @@ function parseDvw(text) {
     all.push(ct);
   });
 
+  // fase di ogni contatto, per scambio:
+  //   C = cambio palla: ricezione + prima alzata + primo attacco della squadra che riceve (primo possesso)
+  //   F = freeball: la ricezione di freeball (F) e l'alzata/attacco che seguono nello stesso possesso
+  //   T = transizione / break point: tutto il resto
+  var byRally = {};
+  all.forEach(function (ct) { (byRally[ct.rally] = byRally[ct.rally] || []).push(ct); });
+  Object.keys(byRally).forEach(function (k) {
+    var R = byRally[k], srv = R[0].rallyRef.serveSide, i, j;
+    if (!srv) return;
+    R.forEach(function (ct) { ct.phase = 'T'; });
+    for (i = 0; i < R.length; i++) if (R[i].side !== srv) {
+      if (R[i].skill === 'R') { j = i; while (j < R.length && R[j].side === R[i].side && (j === i || R[j].skill === 'E' || R[j].skill === 'A')) { R[j].phase = 'C'; j++; } }
+      break;
+    }
+    for (i = 0; i < R.length; i++) if (R[i].skill === 'F') {
+      j = i; while (j < R.length && R[j].side === R[i].side && (j === i || R[j].skill === 'E' || R[j].skill === 'A')) { R[j].phase = 'F'; j++; }
+    }
+  });
+
   // rallyRef -> numeri semplici (inizio e fine scambio in secondi di video)
   all.forEach(function (ct) {
     ct.rallyStart = ct.rallyRef.start;
     ct.rallyEnd = ct.rallyRef.end;
     // fase: B = break (squadra che batte), C = cambio palla (squadra che riceve)
     var srv = ct.rallyRef.serveSide;
-    ct.phase = srv ? (ct.side === srv ? 'B' : 'C') : '';
+    if (ct.phase === undefined) ct.phase = '';
     delete ct.rallyRef;
   });
 
@@ -939,6 +1040,216 @@ function fmtTime(s) {
 }
 
 if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decodeDvw: decodeDvw, SKILLS: SKILLS, fmtTime: fmtTime, playerLabel: playerLabel };
+
+/* ---------- montaggio veloce: lettore MP4 + scrittore MP4 (la decodifica/codifica la fa il browser con WebCodecs) ---------- */
+var FastMon = (function () {
+  function typ(d, o) { return String.fromCharCode(d.getUint8(o), d.getUint8(o + 1), d.getUint8(o + 2), d.getUint8(o + 3)); }
+  function slice(blob, a, b) { return blob.slice(a, b).arrayBuffer(); }
+  function kids(d, a, b) {
+    var r = [], o = a;
+    while (o + 8 <= b) {
+      var s = d.getUint32(o), t = typ(d, o + 4), h = 8;
+      if (s === 1) { s = d.getUint32(o + 8) * 4294967296 + d.getUint32(o + 12); h = 16; } else if (s === 0) s = b - o;
+      if (s < h || o + s > b) break;
+      r.push({ t: t, a: o + h, b: o + s }); o += s;
+    }
+    return r;
+  }
+  function child(d, box, t) { var k = kids(d, box.a, box.b); for (var i = 0; i < k.length; i++) if (k[i].t === t) return k[i]; return null; }
+  function hex2(n) { return (n < 16 ? '0' : '') + n.toString(16); }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  function findMoov(blob) {
+    var n = blob.size;
+    function at(o) {
+      if (o + 8 > n) return Promise.resolve(null);
+      return slice(blob, o, Math.min(o + 16, n)).then(function (buf) {
+        var h = new DataView(buf), s = h.getUint32(0), t = typ(h, 4), hs = 8;
+        if (s === 1 && buf.byteLength >= 16) { s = h.getUint32(8) * 4294967296 + h.getUint32(12); hs = 16; } else if (s === 0) s = n - o;
+        if (t === 'moov') return slice(blob, o + hs, o + s);
+        if (s < hs) return null;
+        return at(o + s);
+      });
+    }
+    return at(0);
+  }
+
+  function parseMoov(buf, blob) {
+    var d = new DataView(buf), traks = kids(d, 0, buf.byteLength).filter(function (k) { return k.t === 'trak'; });
+    for (var ti = 0; ti < traks.length; ti++) {
+      var mdia = child(d, traks[ti], 'mdia'); if (!mdia) continue;
+      var hdlr = child(d, mdia, 'hdlr'); if (!hdlr || typ(d, hdlr.a + 8) !== 'vide') continue;
+      var mdhd = child(d, mdia, 'mdhd'), minf = child(d, mdia, 'minf'), stbl = minf && child(d, minf, 'stbl'), stsd = stbl && child(d, stbl, 'stsd');
+      if (!mdhd || !stbl || !stsd) continue;
+      var ts = d.getUint8(mdhd.a) === 1 ? d.getUint32(mdhd.a + 20) : d.getUint32(mdhd.a + 12);
+      var ent = kids(d, stsd.a + 8, stsd.b)[0]; if (!ent) continue;
+      var r = { blob: blob, timescale: ts, width: d.getUint16(ent.a + 24), height: d.getUint16(ent.a + 26), type: ent.t, codec: '', description: null, mediaTime: 0 };
+      var ek = kids(d, ent.a + 78, ent.b), i, k;
+      if (ent.t === 'avc1' || ent.t === 'avc3') {
+        for (i = 0; i < ek.length; i++) if (ek[i].t === 'avcC') {
+          r.codec = ent.t + '.' + hex2(d.getUint8(ek[i].a + 1)) + hex2(d.getUint8(ek[i].a + 2)) + hex2(d.getUint8(ek[i].a + 3));
+          r.description = new Uint8Array(buf.slice(ek[i].a, ek[i].b));
+        }
+      } else if (ent.t === 'vp09') {
+        for (i = 0; i < ek.length; i++) if (ek[i].t === 'vpcC') {
+          r.codec = 'vp09.' + pad2(d.getUint8(ek[i].a + 4)) + '.' + pad2(d.getUint8(ek[i].a + 5)) + '.' + pad2(d.getUint8(ek[i].a + 6) >> 4);
+        }
+      }
+      if (!r.codec) { r.unsupported = ent.t; return r; }
+      /* tabelle dei campioni */
+      var stts = child(d, stbl, 'stts'), ctts = child(d, stbl, 'ctts'), stsz = child(d, stbl, 'stsz'), stsc = child(d, stbl, 'stsc'),
+        stco = child(d, stbl, 'stco'), co64 = child(d, stbl, 'co64'), stss = child(d, stbl, 'stss');
+      if (!stts || !stsz || !stsc || !(stco || co64)) continue;
+      var n = d.getUint32(stsz.a + 8), fixed = d.getUint32(stsz.a + 4);
+      r.n = n; r.size = new Uint32Array(n); r.dts = new Float64Array(n); r.cts = new Float64Array(n); r.off = new Float64Array(n); r.sync = new Uint8Array(n);
+      for (i = 0; i < n; i++) r.size[i] = fixed || d.getUint32(stsz.a + 12 + i * 4);
+      var c = d.getUint32(stts.a + 4), o = stts.a + 8, s = 0, t = 0;
+      for (i = 0; i < c; i++) { var cnt = d.getUint32(o), dl = d.getUint32(o + 4); o += 8; for (k = 0; k < cnt && s < n; k++) { r.dts[s++] = t; t += dl; } }
+      for (i = 0; i < n; i++) r.cts[i] = r.dts[i];
+      if (ctts) {
+        c = d.getUint32(ctts.a + 4); o = ctts.a + 8; s = 0;
+        for (i = 0; i < c; i++) { var cc = d.getUint32(o), co = d.getInt32(o + 4); o += 8; for (k = 0; k < cc && s < n; k++) { r.cts[s] += co; s++; } }
+      }
+      if (stss) { c = d.getUint32(stss.a + 4); for (i = 0; i < c; i++) { var sn = d.getUint32(stss.a + 8 + i * 4) - 1; if (sn >= 0 && sn < n) r.sync[sn] = 1; } }
+      else r.sync.fill(1);
+      var nch = d.getUint32((stco || co64).a + 4), offs = [];
+      for (i = 0; i < nch; i++) offs.push(stco ? d.getUint32(stco.a + 8 + i * 4) : d.getUint32(co64.a + 8 + i * 8) * 4294967296 + d.getUint32(co64.a + 12 + i * 8));
+      var nrun = d.getUint32(stsc.a + 4), runs = [];
+      for (i = 0; i < nrun; i++) runs.push([d.getUint32(stsc.a + 8 + i * 12), d.getUint32(stsc.a + 12 + i * 12)]);
+      s = 0;
+      for (var ch = 0; ch < nch && s < n; ch++) {
+        var per = 0; for (i = 0; i < runs.length; i++) if (runs[i][0] <= ch + 1) per = runs[i][1];
+        var po = offs[ch];
+        for (k = 0; k < per && s < n; k++) { r.off[s] = po; po += r.size[s]; s++; }
+      }
+      /* lista di modifica: ritardo di presentazione (frame B) */
+      var edts = child(d, traks[ti], 'edts'), elst = edts && child(d, edts, 'elst');
+      if (elst) {
+        var ver = d.getUint8(elst.a), ne = d.getUint32(elst.a + 4), eo = elst.a + 8;
+        for (i = 0; i < ne; i++) {
+          var mt = ver === 1 ? d.getInt32(eo + 12) : d.getInt32(eo + 4);
+          if (mt >= 0) { r.mediaTime = mt; break; }
+          eo += ver === 1 ? 20 : 12;
+        }
+      }
+      return r;
+    }
+    return null;
+  }
+
+  function open(blob) {
+    return findMoov(blob).then(function (m) { return m ? parseMoov(m, blob) : null; });
+  }
+
+  /* quali campioni servono per [startS, endS] (secondi di video) */
+  function plan(r, startS, endS) {
+    var ts = r.timescale, a = startS * ts + r.mediaTime, b = endS * ts + r.mediaTime, i, i0 = -1, i1 = -1;
+    for (i = 0; i < r.n; i++) if (r.cts[i] >= a) { i0 = i; break; }
+    if (i0 < 0) return null;
+    while (i0 > 0 && !r.sync[i0]) i0--;
+    for (i = i0; i < r.n && r.dts[i] <= b; i++) i1 = i;
+    if (i1 < i0) i1 = i0;
+    return { i0: i0, i1: Math.min(r.n - 1, i1 + 3) };
+  }
+
+  /* legge i campioni da i0 a i1, a gruppi, chiamando cb(indice, Uint8Array) */
+  function readRange(r, i0, i1, cb, stop) {
+    var i = i0;
+    function next() {
+      if (i > i1 || (stop && stop())) return Promise.resolve();
+      var j = i, start = r.off[i];
+      while (j + 1 <= i1 && j - i < 150 && (r.off[j + 1] + r.size[j + 1] - start) < 16e6) j++;
+      return slice(r.blob, start, r.off[j] + r.size[j]).then(function (buf) {
+        var u = new Uint8Array(buf), k;
+        var p = Promise.resolve();
+        for (k = i; k <= j; k++) (function (k) {
+          p = p.then(function () { if (stop && stop()) return; return cb(k, u.subarray(r.off[k] - start, r.off[k] - start + r.size[k])); });
+        })(k);
+        return p;
+      }).then(function () { i = j + 1; return next(); });
+    }
+    return next();
+  }
+
+  /* ---------- scrittore MP4 (un solo flusso video) ---------- */
+  function cat(list) {
+    var n = 0, i; for (i = 0; i < list.length; i++) n += list[i].length;
+    var o = new Uint8Array(n), p = 0; for (i = 0; i < list.length; i++) { o.set(list[i], p); p += list[i].length; } return o;
+  }
+  function ascii(s) { var o = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) o[i] = s.charCodeAt(i); return o; }
+  function box(t, parts) { var body = cat(parts), o = new Uint8Array(8 + body.length), dv = new DataView(o.buffer); dv.setUint32(0, o.length); o.set(ascii(t), 4); o.set(body, 8); return o; }
+  function w32(list) { var o = new Uint8Array(list.length * 4), dv = new DataView(o.buffer); list.forEach(function (v, i) { dv.setUint32(i * 4, v >>> 0); }); return o; }
+  function z(n) { return new Uint8Array(n); }
+
+  /* sink: { write(u8), patch(pos, u8) } */
+  function Mp4Writer(sink, o) {
+    var TS = 90000, pos = 0, mdatStart, samples = [], self = this, desc = o.description || null;
+    function put(u8) { sink.write(u8); pos += u8.length; }
+    var ftyp = box('ftyp', [ascii('isom'), w32([512]), ascii('isom'), ascii('iso2'), ascii(o.codec === 'vp9' ? 'vp09' : 'avc1'), ascii('mp41')]);
+    put(ftyp);
+    mdatStart = pos;
+    var hdr = new Uint8Array(16); hdr.set([0, 0, 0, 1], 0); hdr.set(ascii('mdat'), 4); put(hdr);
+    self.setDescription = function (d) { if (d && !desc) desc = d; };
+    self.addSample = function (data, ptsUs, key) {
+      samples.push({ size: data.length, t: Math.round(ptsUs * TS / 1e6), key: key ? 1 : 0 });
+      put(data);
+    };
+    self.finish = function () {
+      var dataStart = mdatStart + 16, total = pos - mdatStart;
+      var h2 = new Uint8Array(16), dv = new DataView(h2.buffer); dv.setUint32(0, 1); h2.set(ascii('mdat'), 4); dv.setUint32(8, Math.floor(total / 4294967296)); dv.setUint32(12, total >>> 0);
+      sink.patch(mdatStart, h2);
+      var n = samples.length, t0 = n ? samples[0].t : 0, i;
+      for (i = 0; i < n; i++) samples[i].t -= t0;
+      for (i = 1; i < n; i++) if (samples[i].t <= samples[i - 1].t) samples[i].t = samples[i - 1].t + 1;
+      var durs = []; for (i = 0; i < n; i++) durs.push(i + 1 < n ? samples[i + 1].t - samples[i].t : (i ? durs[i - 1] : 3000));
+      var total90 = 0; durs.forEach(function (x) { total90 += x; });
+      var stts = [], k = 0;
+      while (k < n) { var j = k; while (j < n && durs[j] === durs[k]) j++; stts.push(j - k, durs[k]); k = j; }
+      var sync = []; samples.forEach(function (s, ix) { if (s.key) sync.push(ix + 1); });
+      var entry;
+      var vis = cat([z(6), new Uint8Array([0, 1]), z(16), new Uint8Array([o.width >> 8, o.width & 255, o.height >> 8, o.height & 255]), w32([0x00480000, 0x00480000, 0]), new Uint8Array([0, 1]), z(32), new Uint8Array([0, 0x18, 0xff, 0xff])]);
+      if (o.codec === 'vp9') {
+        entry = box('vp09', [vis, box('vpcC', [w32([0x01000000]), new Uint8Array([0, 40, 0x82, 1, 1, 1, 0, 0])])]);
+      } else {
+        entry = box('avc1', [vis, box('avcC', [desc || z(0)])]);
+      }
+      var co = dataStart > 4294967295 ? box('co64', [w32([0, 1, Math.floor(dataStart / 4294967296), dataStart >>> 0])]) : box('stco', [w32([0, 1, dataStart])]);
+      var stbl = box('stbl', [
+        box('stsd', [w32([0, 1]), entry]),
+        box('stts', [w32([0, stts.length / 2].concat(stts))]),
+        box('stsc', [w32([0, 1, 1, n, 1])]),
+        box('stsz', [w32([0, 0, n].concat(samples.map(function (s) { return s.size; })))]),
+        co,
+        box('stss', [w32([0, sync.length].concat(sync))])
+      ]);
+      var minf = box('minf', [box('vmhd', [w32([1, 0, 0])]), box('dinf', [box('dref', [w32([0, 1]), box('url ', [w32([1])])])]), stbl]);
+      var mdia = box('mdia', [box('mdhd', [w32([0, 0, 0, TS, total90]), new Uint8Array([0x55, 0xc4, 0, 0])]),
+        box('hdlr', [w32([0, 0]), ascii('vide'), z(12), ascii('VideoHandler'), z(1)]), minf]);
+      var matrix = w32([0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000]), ms = Math.round(total90 / TS * 1000);
+      var tkhd = box('tkhd', [w32([3, 0, 0, 1, 0, ms]), z(8), z(8), matrix, w32([o.width * 65536, o.height * 65536])]);
+      var mvhd = box('mvhd', [w32([0, 0, 0, 1000, ms, 0x00010000]), new Uint8Array([1, 0]), z(10), matrix, z(24), w32([2])]);
+      put(box('moov', [mvhd, box('trak', [tkhd, mdia])]));
+    };
+  }
+  function memorySink() {
+    var parts = [];
+    return {
+      write: function (u8) { parts.push(u8); },
+      patch: function (pos, u8) { var p = 0; for (var i = 0; i < parts.length; i++) { if (p === pos && parts[i].length === u8.length) { parts[i] = u8; return; } p += parts[i].length; } },
+      blob: function () { return new Blob(parts, { type: 'video/mp4' }); }
+    };
+  }
+  function fileSink(w) {
+    var q = Promise.resolve(), at = 0;
+    return {
+      write: function (u8) { var p = at; at += u8.length; q = q.then(function () { return w.write({ type: 'write', position: p, data: u8 }); }); },
+      patch: function (pos, u8) { q = q.then(function () { return w.write({ type: 'write', position: pos, data: u8 }); }); },
+      done: function () { return q; }
+    };
+  }
+  function supported() { return !!(window.VideoDecoder && window.VideoEncoder && window.EncodedVideoChunk && window.VideoFrame && window.Blob && Blob.prototype.arrayBuffer); }
+  return { open: open, plan: plan, readRange: readRange, Mp4Writer: Mp4Writer, memorySink: memorySink, fileSink: fileSink, supported: supported };
+})();
 
 // ---- Interfaccia: filtri, lista azioni, lettore video con clip regolabili ----
 (function () {
@@ -1173,7 +1484,7 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
     var act = LIB.filter(function (e) { return e.active; });
     toggleGroup($('f-skill'), SKILL_ORDER.filter(function (k) { return present[k]; }).map(function (k) { return { v: k, l: SKILLS[k] }; }), F.skills, '', resetBelow, true);
     toggleGroup($('f-eval'), EVALS.map(function (k) { return { v: k, l: '<i>' + k + '</i>' + EV_NAME[k].split(' / ')[0], c: EV_VAR[k], t: EV_NAME[k] }; }), F.evals, 'ev');
-    toggleGroup($('f-phase'), [{ v: 'C', l: 'Cambio palla', t: 'Squadra che riceve la battuta' }, { v: 'B', l: 'Break', t: 'Squadra che batte' }], F.phases, '');
+    toggleGroup($('f-phase'), [{ v: 'C', l: 'Cambio palla', t: 'Ricezione, prima alzata e primo attacco dopo la battuta avversaria' }, { v: 'T', l: 'Transizione', t: 'Tutto il resto: battuta, muro, difesa e le azioni dopo il primo attacco (break point)' }, { v: 'F', l: 'Freeball', t: 'Ricezione di freeball e relativa alzata e attacco' }], F.phases, '');
     toggleGroup($('f-set'), Object.keys(setsP).map(Number).sort(function (a, b) { return a - b; }).map(function (n) {
       var sc = act.length === 1 && act[0].M.setScores[n];
       return { v: n, l: n + (sc ? '<small>' + scoreText(sc) + '</small>' : '') };
@@ -1346,6 +1657,13 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
   function fillPlayers() {
     var sel = $('f-player'), seen = {};
     ALL.forEach(function (c) { if (scope(c)) seen[pkey(c)] = c; });
+    LIB.forEach(function (e) {
+      if (!e.active) return;
+      Object.keys(e.M.players || {}).forEach(function (k) {
+        var p = e.M.players[k], c = { e: e, side: p.side, num: p.num };
+        if (scope(c) && !seen[pkey(c)]) seen[pkey(c)] = c;
+      });
+    });
     var keys = Object.keys(seen).sort(function (x, y) {
       var a = seen[x], b = seen[y], ta = tc(a), tb = tc(b);
       return ta === tb ? a.num - b.num : (ta === F.team ? -1 : tb === F.team ? 1 : ta.localeCompare(tb));
@@ -1388,6 +1706,7 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
     if (keep && cur < 0) { vid.pause(); clip = null; ended = false; S.all = false; syncAllBtn(); updateNow(); updateBar(0); }
     renderList();
     renderStats();
+    if (typeof updateMaskStatus === 'function') updateMaskStatus();
   }
 
   /* ---------- lista ---------- */
@@ -1397,14 +1716,14 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
       var extra = [];
       if (c.combo) extra.push(esc(c.combo));
       if (c.startZ && c.endZ && (c.skill === 'A' || c.skill === 'S')) extra.push(c.startZ + '→' + c.endZ);
-      return '<li><button class="row" type="button" data-q="' + q + '" title="' + esc(tc(c) + ' vs ' + opp(c)) + ' · S' + c.set + ' · ' + scoreText(c.score) + ' · rotazione P' + c.rot + (c.phase === 'C' ? ' · cambio palla' : c.phase === 'B' ? ' · break' : '') + '"' + (q === cur ? ' aria-current="true"' : '') + '>' +
+      return '<li><button class="row" type="button" data-q="' + q + '" title="' + esc(tc(c) + ' vs ' + opp(c)) + ' · S' + c.set + ' · ' + scoreText(c.score) + ' · rotazione P' + c.rot + (c.phase ? ' · ' + (c.phase === 'C' ? 'cambio palla' : c.phase === 'T' ? 'transizione' : c.phase === 'F' ? 'freeball' : '') : '') + '"' + (q === cur ? ' aria-current="true"' : '') + '>' +
         '<span class="ev" style="--c:' + ev + '" title="' + esc(EV_NAME[c.eval] || '') + '">' + esc(c.eval) + '</span>' +
         '<span class="who"><span class="tm ' + (c.side === 'H' ? 'h' : 'a') + '">' + esc(tc(c)) + '</span>' + esc(pl(c)) + '<span class="mks">' + dots(c) + '</span>' +
         '<span class="sk">' + SKILLS[c.skill] + (extra.length ? ' · ' + extra.join(' · ') : '') + '</span></span>' +
         '<span class="when">' + fmtTime(c.t) + '</span>' +
         '<span class="code">' + esc(c.code) + '</span>' +
-        '<span class="meta" title="' + (c.phase === 'C' ? 'cambio palla' : c.phase === 'B' ? 'break' : '') + '">' + (multi() ? 'G' + (c.e.giornata != null ? c.e.giornata : '–') + ' vs ' + esc(opp(c)) + ' · ' : '') + 'S' + c.set + ' · ' + scoreText(c.score) + ' · P' + c.rot +
-        (c.phase === 'C' ? ' · CP' : c.phase === 'B' ? ' · BK' : '') + '</span></button></li>';
+        '<span class="meta" title="' + (c.phase === 'C' ? 'cambio palla' : c.phase === 'T' ? 'transizione' : c.phase === 'F' ? 'freeball' : '') + '">' + (multi() ? 'G' + (c.e.giornata != null ? c.e.giornata : '–') + ' vs ' + esc(opp(c)) + ' · ' : '') + 'S' + c.set + ' · ' + scoreText(c.score) + ' · P' + c.rot +
+        (c.phase === 'C' ? ' · CP' : c.phase === 'T' ? ' · TR' : c.phase === 'F' ? ' · FB' : '') + '</span></button></li>';
   }
   function renderMore(upTo) {
     if (rendered >= queue.length) return;
@@ -1601,7 +1920,7 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
     bits.push(c.eval + ' ' + (EV_NAME[c.eval] || ''));
     if (c.combo) bits.push('codice ' + c.combo);
     if (c.startZ && c.endZ && (c.skill === 'A' || c.skill === 'S')) bits.push('zone ' + c.startZ + '→' + c.endZ);
-    if (c.phase) bits.push(c.phase === 'C' ? 'cambio palla' : 'break');
+    if (c.phase) bits.push((c.phase === 'C' ? 'cambio palla' : c.phase === 'T' ? 'transizione' : c.phase === 'F' ? 'freeball' : ''));
     bits.push((multi() ? 'G' + (c.e.giornata != null ? c.e.giornata : '–') + ' vs ' + opp(c) + ' · ' : '') + 'Set ' + c.set + ' · ' + scoreText(c.score) + ' · rotazione P' + c.rot);
     $('now-who').textContent = tc(c) + ' · ' + pl(c);
     $('now-what').textContent = bits.join(' · ');
@@ -1631,6 +1950,7 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
   }
 
   /* ---------- impostazioni clip ---------- */
+  var radioRedraws = [];
   function radios(el, opts, get, set) {
     function draw() {
       el.innerHTML = '';
@@ -1641,7 +1961,7 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
         el.appendChild(b);
       });
     }
-    draw();
+    draw(); radioRedraws.push(draw);
   }
   function updateSetSum() {
     $('set-sum').textContent = (S.pre ? '−' + S.pre + ' s' : '0 s') + ' · ' + durText() + ' · ' + S.spd + '×';
@@ -1680,7 +2000,7 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
   }
   function attachFile(e, file, cam) {
     if (e.videos[cam]) { try { URL.revokeObjectURL(e.videos[cam].url); } catch (x) {} if (vid.dataset.url === e.videos[cam].url) vid.dataset.url = ''; }
-    e.videos[cam] = { name: file.name, url: URL.createObjectURL(file) };
+    e.videos[cam] = { name: file.name, url: URL.createObjectURL(file), file: file };
     updateVideoUI(); renderLib();
     if (cur >= 0 && queue[cur] && queue[cur].e === e) select(cur, false);
   }
@@ -1970,6 +2290,154 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
     $('f-code').value = ''; buildFilters(); applyFilters();
   });
 
+  /* ---------- maschere di ricerca (come in Data Volley: filtri salvati con un nome, in cartelle) ---------- */
+  var MKEY = 'reader-scout-video-masks', MASKS = [], mkEdit = '';
+  try { var mm = JSON.parse(localStorage.getItem(MKEY) || 'null'); if (mm && mm.length) MASKS = mm; } catch (e) {}
+  function saveMasks() { try { localStorage.setItem(MKEY, JSON.stringify(MASKS)); } catch (e) {} }
+  function cpOn(o) { var r2 = {}; for (var k in o) if (o[k]) r2[k] = true; return r2; }
+  function snapMask(withPlayer, withTimes) {
+    var f = { who: F.who, skills: cpOn(F.skills), evals: cpOn(F.evals), sets: cpOn(F.sets), phases: cpOn(F.phases), rots: cpOn(F.rots), zs: cpOn(F.zs), ze: cpOn(F.ze),
+      conds: JSON.parse(JSON.stringify(F.conds)), marks: cpOn(F.marks), text: F.text };
+    if (withPlayer && F.player) f.player = F.player;
+    var m = { f: f }; if (withTimes) m.t = { pre: S.pre, dur: S.dur };
+    return m;
+  }
+  function describeMask(m) {
+    var f = m.f, p = [];
+    var sk = Object.keys(f.skills || {}).map(function (k) { return SKILLS[k]; }); if (sk.length) p.push(sk.join(' / '));
+    var ev = Object.keys(f.evals || {}); if (ev.length) p.push('esito ' + ev.join(' '));
+    var rt = Object.keys(f.rots || {}); if (rt.length) p.push('P' + rt.join(' P'));
+    var st = Object.keys(f.sets || {}); if (st.length) p.push('set ' + st.join(','));
+    var ph = Object.keys(f.phases || {}).map(function (k) { return k === 'C' ? 'cambio palla' : k === 'F' ? 'freeball' : 'transizione'; }); if (ph.length) p.push(ph.join(' / '));
+    var zs = Object.keys(f.zs || {}), ze = Object.keys(f.ze || {}); if (zs.length) p.push('da z.' + zs.join(',')); if (ze.length) p.push('a z.' + ze.join(','));
+    if (f.conds && f.conds.length) p.push(f.conds.length + (f.conds.length === 1 ? ' condizione' : ' condizioni'));
+    if (f.player) p.push('giocatrice fissata'); if (m.t) p.push('tempi −' + m.t.pre + ' s / +' + m.t.dur);
+    return p.join(' · ') || 'nessun filtro';
+  }
+  function maskFolders() { var s = {}; MASKS.forEach(function (m) { if (m.folder) s[m.folder] = 1; }); return Object.keys(s).sort(function (a, b) { return a.localeCompare(b); }); }
+  var maskActive = null, maskBase = '';
+  function renderMaskSelect() {
+    var sel = $('f-mask'), h = '<option value="">' + (MASKS.length ? 'Scegli una maschera…' : 'Nessuna maschera salvata') + '</option>';
+    function opts(list) { return list.map(function (m) { return '<option value="' + m.id + '">' + esc(m.name) + '</option>'; }).join(''); }
+    maskFolders().forEach(function (f) { h += '<optgroup label="' + esc(f) + '">' + opts(MASKS.filter(function (m) { return m.folder === f; })) + '</optgroup>'; });
+    h += opts(MASKS.filter(function (m) { return !m.folder; }));
+    sel.innerHTML = h; sel.value = maskActive ? maskActive.id : '';
+  }
+  function baseOf(m) { return JSON.stringify(snapMask(!!m.f.player, false).f); }
+  function updateMaskStatus() {
+    var el = $('mask-stat'); if (!el) return;
+    if (!maskActive || MASKS.indexOf(maskActive) < 0) { maskActive = null; el.hidden = true; return; }
+    var dirty = baseOf(maskActive) !== maskBase;
+    el.hidden = false;
+    el.innerHTML = '<span>' + (dirty ? '✎ Hai modificato i filtri di <b>' + esc(maskActive.name) + '</b>' : '✓ In uso: <b>' + esc(maskActive.name) + '</b>') + '</span>' +
+      (dirty ? ' <button class="btn small" type="button" data-s="upd">Salva le modifiche</button>' : '') + ' <button class="btn small" type="button" data-s="off" title="Smetti di seguire questa maschera (i filtri restano)">Scollega</button>';
+    el.className = 'maskstat' + (dirty ? ' dirty' : '');
+  }
+  $('mask-stat').addEventListener('click', function (e) {
+    var b2 = e.target.closest('[data-s]'); if (!b2) return;
+    if (b2.dataset.s === 'off') { maskActive = null; renderMaskSelect(); updateMaskStatus(); }
+    else if (maskActive) { replaceMask(maskActive); toast('Maschera «' + maskActive.name + '» aggiornata.'); }
+  });
+  function replaceMask(m) {
+    var s2 = snapMask(!!m.f.player, !!m.t); m.f = s2.f; if (s2.t) m.t = s2.t;
+    saveMasks(); maskBase = baseOf(m); updateMaskStatus();
+  }
+  function applyMask(m) {
+    var f = m.f, tm = F.team, mapW = function (w) { if (tm) return w === 'same' ? 'team' : w === 'opp' ? 'oppteam' : w; return w === 'team' ? 'same' : w === 'oppteam' ? 'opp' : w; };
+    F = { team: tm, who: tm ? (f.who || F.who) : F.who, player: f.player || '', skills: cpOn(f.skills), evals: cpOn(f.evals), sets: cpOn(f.sets), phases: cpOn(f.phases && f.phases.B ? (function (o) { o = cpOn(o); o.T = true; delete o.B; return o; })(f.phases) : f.phases), rots: cpOn(f.rots),
+      zs: cpOn(f.zs), ze: cpOn(f.ze), conds: JSON.parse(JSON.stringify(f.conds || [])), marks: cpOn(f.marks), text: f.text || '' };
+    F.conds.forEach(function (k) { k.who = mapW(k.who); });
+    if (m.t) { S.pre = m.t.pre; S.dur = m.t.dur; radioRedraws.forEach(function (fn) { fn(); }); onSettingsChanged(false); }
+    $('f-code').value = F.text; buildFilters(); applyFilters(); renderHeader();
+    maskActive = m; maskBase = baseOf(m); renderMaskSelect(); updateMaskStatus();
+  }
+  $('f-mask').addEventListener('change', function () {
+    var m = MASKS.filter(function (x) { return x.id === $('f-mask').value; })[0];
+    if (m) applyMask(m); else { maskActive = null; updateMaskStatus(); }
+  });
+
+  /* finestra "Salva": un solo scopo, salvare i filtri di adesso */
+  function fillFolderSelect(sel, cur) {
+    var h = '<option value="">Nessuna cartella</option>' + maskFolders().map(function (f) { return '<option value="' + esc(f) + '">' + esc(f) + '</option>'; }).join('') + '<option value="__new">＋ Nuova cartella…</option>';
+    sel.innerHTML = h; sel.value = cur || '';
+  }
+  function openSaveDlg() {
+    $('ms-cur').textContent = describeMask(snapMask(false, false));
+    $('ms-name').value = ''; $('ms-newfolder').value = ''; $('ms-newbox').hidden = true; $('ms-player').checked = false; $('ms-times').checked = false;
+    fillFolderSelect($('ms-folder'), maskActive && maskActive.folder);
+    $('ms-upd').hidden = !maskActive; if (maskActive) $('ms-upd').textContent = 'Aggiorna «' + maskActive.name + '»';
+    $('dlg-msave').hidden = false; $('ms-name').focus();
+  }
+  $('ms-folder').addEventListener('change', function () { var nw = $('ms-folder').value === '__new'; $('ms-newbox').hidden = !nw; if (nw) $('ms-newfolder').focus(); });
+  $('ms-cancel').addEventListener('click', function () { $('dlg-msave').hidden = true; });
+  $('ms-upd').addEventListener('click', function () { if (!maskActive) return; var nm = maskActive.name; replaceMask(maskActive); $('dlg-msave').hidden = true; toast('Maschera «' + nm + '» aggiornata.'); });
+  $('ms-ok').addEventListener('click', function () {
+    var name = $('ms-name').value.trim(); if (!name) { toast('Scrivi un nome per la maschera.'); $('ms-name').focus(); return; }
+    var folder = $('ms-folder').value === '__new' ? $('ms-newfolder').value.trim() : $('ms-folder').value;
+    var m = snapMask($('ms-player').checked, $('ms-times').checked);
+    m.id = 'm' + Date.now() + Math.floor(Math.random() * 1000); m.name = name; m.folder = folder;
+    MASKS.push(m); saveMasks(); maskActive = m; maskBase = baseOf(m); renderMaskSelect(); updateMaskStatus();
+    $('dlg-msave').hidden = true; if (!$('dlg-mask').hidden) renderMaskDlg(); toast('Maschera «' + name + '» salvata.');
+  });
+  $('mask-save').addEventListener('click', openSaveDlg);
+
+  /* finestra "Le mie maschere": elenco e gestione */
+  function renderMaskDlg() {
+    $('mk-folders').innerHTML = maskFolders().map(function (f) { return '<option value="' + esc(f) + '">'; }).join('');
+    var box = $('mk-list'), h = '';
+    function row(m) {
+      if (mkEdit === m.id) {
+        return '<div class="mk-row edit" data-id="' + m.id + '"><div class="mk-ed"><label><span class="label">Nome</span><input class="field" data-r="name" value="' + esc(m.name) + '" maxlength="60"></label>' +
+          '<label><span class="label">Cartella</span><input class="field" data-r="folder" list="mk-folders" value="' + esc(m.folder || '') + '" placeholder="Nessuna cartella" maxlength="40"></label></div>' +
+          '<div class="mk-act"><button class="btn small primary" data-a="ok" type="button">Salva modifiche</button><button class="btn small" data-a="upd" type="button" title="Sostituisce i filtri di questa maschera con quelli impostati adesso">Usa i filtri attuali</button><button class="btn small" data-a="no" type="button">Annulla</button></div></div>';
+      }
+      return '<div class="mk-row" data-id="' + m.id + '"><div class="mk-info"><b>' + esc(m.name) + '</b><small>' + esc(describeMask(m)) + '</small></div>' +
+        '<div class="mk-act"><button class="btn small primary" data-a="go" type="button">Usa</button><button class="btn small" data-a="edit" type="button">Modifica</button><button class="btn small" data-a="dup" type="button">Duplica</button><button class="btn small" data-a="del" type="button">Elimina</button></div></div>';
+    }
+    if (!MASKS.length) h = '<p class="hint">Non hai ancora salvato nessuna maschera. Imposta i filtri nella pagina Analisi, poi premi <b>Salva questi filtri</b>.</p>';
+    maskFolders().forEach(function (f) {
+      h += '<details class="mk-folder" open><summary>📁 ' + esc(f) + '<small>' + MASKS.filter(function (m) { return m.folder === f; }).length + '</small></summary>' + MASKS.filter(function (m) { return m.folder === f; }).map(row).join('') + '</details>';
+    });
+    var loose = MASKS.filter(function (m) { return !m.folder; });
+    if (loose.length) h += '<details class="mk-folder" open><summary>Senza cartella<small>' + loose.length + '</small></summary>' + loose.map(row).join('') + '</details>';
+    box.innerHTML = h;
+  }
+  function openMaskDlg() { mkEdit = ''; renderMaskDlg(); $('dlg-mask').hidden = false; }
+  $('mask-manage').addEventListener('click', openMaskDlg);
+  $('mk-close').addEventListener('click', function () { $('dlg-mask').hidden = true; });
+  $('mk-new').addEventListener('click', function () { $('dlg-mask').hidden = true; openSaveDlg(); });
+  $('mk-list').addEventListener('click', function (e) {
+    var bt = e.target.closest('[data-a]'); if (!bt) return;
+    var rw = bt.closest('.mk-row'), id = rw.getAttribute('data-id'), m = MASKS.filter(function (x) { return x.id === id; })[0], a = bt.getAttribute('data-a'); if (!m) return;
+    if (a === 'go') { $('dlg-mask').hidden = true; applyMask(m); toast('Maschera «' + m.name + '» applicata.'); }
+    else if (a === 'upd') { replaceMask(m); mkEdit = ''; renderMaskDlg(); toast('Maschera aggiornata con i filtri attuali.'); }
+    else if (a === 'edit') { mkEdit = id; renderMaskDlg(); }
+    else if (a === 'no') { mkEdit = ''; renderMaskDlg(); }
+    else if (a === 'ok') {
+      var nm = rw.querySelector('[data-r=name]').value.trim(); if (nm) m.name = nm; m.folder = rw.querySelector('[data-r=folder]').value.trim();
+      mkEdit = ''; saveMasks(); renderMaskDlg(); renderMaskSelect(); updateMaskStatus();
+    }
+    else if (a === 'dup') { var c2 = JSON.parse(JSON.stringify(m)); c2.id = 'm' + Date.now() + Math.floor(Math.random() * 1000); c2.name = m.name + ' (copia)'; MASKS.splice(MASKS.indexOf(m) + 1, 0, c2); saveMasks(); renderMaskDlg(); renderMaskSelect(); }
+    else if (a === 'del') {
+      if (bt.dataset.sure) { MASKS.splice(MASKS.indexOf(m), 1); saveMasks(); renderMaskDlg(); renderMaskSelect(); updateMaskStatus(); }
+      else { bt.dataset.sure = '1'; bt.textContent = 'Sicuro?'; setTimeout(function () { if (bt.isConnected) { bt.textContent = 'Elimina'; delete bt.dataset.sure; } }, 2500); }
+    }
+  });
+  $('mk-export').addEventListener('click', function () {
+    if (!MASKS.length) { toast('Non ci sono maschere da esportare.'); return; }
+    saveBlob('maschere_reader.json', new Blob([JSON.stringify({ tipo: 'reader-scout-video-maschere', maschere: MASKS })], { type: 'application/json' })).then(function () { toast('Maschere salvate in un file.'); }).catch(function () {});
+  });
+  $('mk-import').addEventListener('click', function () { $('in-masks').click(); });
+  $('in-masks').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+    f.text().then(function (t) {
+      var d = JSON.parse(t); if (!d || !d.maschere) throw new Error('x');
+      d.maschere.forEach(function (m) { m.id = 'm' + Date.now() + Math.floor(Math.random() * 100000); MASKS.push(m); });
+      saveMasks(); renderMaskDlg(); renderMaskSelect(); toast(d.maschere.length + ' maschere importate.');
+    }).catch(function () { toast('Questo file non contiene maschere.'); });
+  });
+  renderMaskSelect();
+
   /* ---------- schermo intero: video grande e lista dei codici in piccolo a lato ---------- */
   var theater = false, setboxWasOpen = true;
   function setTab(t) {
@@ -2011,38 +2479,209 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
   $('mon-intro').addEventListener('change', function () { $('mon-ttlbox').hidden = !this.checked; if (this.checked) $('mon-ttl').focus(); });
   $('mon-auto').addEventListener('click', function () { $('mon-ttl').value = monAutoTitle(); });
   function monClose() { $('dlg-mon').hidden = true; }
-  $('mon-open').addEventListener('click', function () {
-    if (mon) { toast('C’è già un montaggio in corso.'); return; }
-    if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { toast('Questo browser non sa creare il montaggio: usa Chrome o Edge.'); return; }
-    if (!queue.length) { toast('Nessuna azione nella lista.'); return; }
-    var ok = queue.filter(function (c) { return !!videoFor(c); }).length, per = S.pre + (isNaN(+S.dur) ? 6 : +S.dur);
+  function monMode() { var r2 = document.querySelector('input[name="mon-mode"]:checked'); return r2 ? r2.value : 'real'; }
+  function refreshMonDlg() {
+    var ok = queue.filter(function (c) { return !!videoFor(c); }).length, per = S.pre + (isNaN(+S.dur) ? 6 : +S.dur), fast = monMode() === 'fast';
     $('mon-text').innerHTML = 'Creo un video unico con <b>' + ok + '</b> azioni' + (ok < queue.length ? ' (' + (queue.length - ok) + ' senza video collegato saltate)' : '') +
-      ', ognuna con i tempi impostati e il punteggio in alto a sinistra. Durata circa <b>' + fmtDur(ok * per) + '</b>.';
-    $('mon-hint').textContent = 'Il montaggio si registra in tempo reale, con un lettore tutto suo: nel frattempo puoi continuare a usare il programma e guardare altri video. Tieni aperta questa scheda.';
-    try { var so = JSON.parse(localStorage.getItem('reader-scout-video-mon') || 'null'); if (so) $('mon-score').checked = so.score !== false; } catch (e) {}
-    $('mon-hint').textContent += (window.showSaveFilePicker && !(window.claude && window.claude.use)) ? ' Dopo “Avvia” ti chiedo dove salvare il file.' : ' Questo browser salva il file nella cartella dei download, senza chiedere dove.';
+      ', ognuna con i tempi impostati. Durata del video finale circa <b>' + fmtDur(ok * per) + '</b>.';
+    var h = fast ? 'Modalità veloce: il video si crea molto più in fretta della sua durata, senza audio. Nel frattempo puoi continuare a usare il programma. Tieni aperta questa scheda.'
+      : 'Il montaggio si registra in tempo reale, con un lettore tutto suo: nel frattempo puoi continuare a usare il programma e guardare altri video. Tieni aperta questa scheda.';
+    h += (window.showSaveFilePicker && !(window.claude && window.claude.use)) ? ' Dopo “Avvia” ti chiedo dove salvare il file.' : ' Questo browser salva il file nella cartella dei download, senza chiedere dove.';
+    if (mon) h += ' Un montaggio è già in corso: questo parte appena finisce.';
+    $('mon-hint').textContent = h;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="mon-mode"]'), function (x) { x.addEventListener('change', refreshMonDlg); });
+  $('mon-open').addEventListener('click', function () {
+    var canFast = FastMon.supported(), canReal = !!(window.MediaRecorder && HTMLCanvasElement.prototype.captureStream);
+    if (!canFast && !canReal) { toast('Questo browser non sa creare il montaggio: usa Chrome o Edge.'); return; }
+    if (!queue.length) { toast('Nessuna azione nella lista.'); return; }
+    var ok = queue.filter(function (c) { return !!videoFor(c); }).length, mode = canFast ? 'fast' : 'real';
+    try { var so = JSON.parse(localStorage.getItem('reader-scout-video-mon') || 'null'); if (so) { $('mon-score').checked = so.score !== false; if (canFast && so.mode === 'real') mode = 'real'; } } catch (e) {}
+    document.querySelector('input[name="mon-mode"][value="fast"]').disabled = !canFast;
+    document.querySelector('input[name="mon-mode"][value="real"]').disabled = !canReal;
+    document.querySelector('input[name="mon-mode"][value="' + (canFast || !canReal ? mode : 'real') + '"]').checked = true;
+    $('mon-modebox').hidden = !(canFast && canReal);
+    refreshMonDlg();
     $('mon-opt').hidden = false; $('mon-intro').checked = false; $('mon-ttlbox').hidden = true;
-    $('mon-go').hidden = !ok; $('mon-go').disabled = false; 
+    $('mon-go').hidden = !ok; $('mon-go').disabled = false; $('mon-go').textContent = mon ? 'Metti in coda' : 'Avvia';
     $('dlg-mon').hidden = false;
   });
   $('mon-cancel').addEventListener('click', monClose);
   $('mon-go').addEventListener('click', function () { startMontage(); });
   $('mp-stop').addEventListener('click', function () { monAbort = true; });
   var monVid = null;
-  function startMontage() {
-    var n = queue.filter(function (c) { return !!videoFor(c); }).length, mimeX = monMime(), ext = /mp4/.test(mimeX) ? 'mp4' : 'webm';
-    var ttl = ($('mon-intro').checked ? $('mon-ttl').value.trim() : '').replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, '_').slice(0, 40);
-    var name = (ttl ? 'montaggio_' + ttl : 'montaggio_' + n + '_azioni') + '.' + ext;
-    if (window.showSaveFilePicker && !(window.claude && window.claude.use)) {
-      window.showSaveFilePicker({ suggestedName: name, types: [{ description: 'Video', accept: ext === 'mp4' ? { 'video/mp4': ['.mp4'] } : { 'video/webm': ['.webm'] } }] })
-        .then(function (h) { return h.createWritable().then(function (w) { runMontage({ w: w, name: h.name }); }); })
-        .catch(function (e) { if (!e || e.name !== 'AbortError') runMontage(null); });
-    } else runMontage(null);
+  function monBadge(ctx, cw, ch, curC, showScore) {
+    if (!curC) return;
+    var f = Math.round(ch / 22), x = f * 0.8, y = f * 0.8, hh = f * 2.2;
+    if (showScore) {
+      var tm = curC.e.M.teams, sc = curC.score.split('-'), pad = f * 0.6;
+      ctx.font = '700 ' + f + 'px system-ui, sans-serif'; ctx.textBaseline = 'middle';
+      var parts = [tm[0].code, sc[0], '–', sc[1], tm[1].code], gap = f * 0.7, wTot = 0, ws = parts.map(function (p) { var w = ctx.measureText(p).width; wTot += w; return w; });
+      wTot += gap * (parts.length - 1) + pad * 2;
+      ctx.fillStyle = 'rgba(0,0,0,.72)'; ctx.fillRect(x, y, wTot, hh);
+      ctx.fillStyle = '#3DB8C4'; ctx.fillRect(x, y, f * 0.25, hh);
+      var cx = x + pad + f * 0.25;
+      parts.forEach(function (p, k2) {
+        ctx.fillStyle = (k2 === 1 || k2 === 3) ? '#fff' : (k2 === 2 ? '#8CA2AA' : '#E4EDF0');
+        ctx.font = ((k2 === 1 || k2 === 3) ? '800 ' : '600 ') + (f * (k2 === 1 || k2 === 3 ? 1.15 : 1)) + 'px system-ui, sans-serif';
+        ctx.fillText(p, cx, y + hh / 2); cx += ws[k2] + gap;
+      });
+      ctx.font = '600 ' + Math.round(f * 0.7) + 'px system-ui, sans-serif'; ctx.fillStyle = '#E4EDF0';
+      ctx.fillText('Set ' + curC.set, x + wTot + f * 0.4, y + hh / 2);
+      y += hh + f * 0.4;
+    }
   }
-  function runMontage(wr) {
+  function monIntro(ctx, cw, ch, title) {
+    var g = ctx.createLinearGradient(0, 0, cw, ch); g.addColorStop(0, '#0D1619'); g.addColorStop(1, '#14303A');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
+    var fs = Math.round(ch / 9), maxW = cw * 0.8, words = title.split(/\s+/), lines = [], line = '';
+    ctx.font = '800 ' + fs + 'px system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+    words.forEach(function (w) { var t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
+    if (line) lines.push(line);
+    var lh = fs * 1.25, y0 = ch / 2 - (lines.length - 1) * lh / 2;
+    ctx.fillStyle = '#3DB8C4'; ctx.fillRect(cw / 2 - cw * 0.08, y0 - lh * 0.95, cw * 0.16, Math.max(3, ch / 120));
+    ctx.fillStyle = '#fff'; lines.forEach(function (l, k) { ctx.fillText(l, cw / 2, y0 + k * lh); });
+    ctx.textAlign = 'left';
+  }
+
+  var monJobs = [];
+  function startNextJob() { var x = monJobs.shift(); if (x) { if (x.job.fast) runFast(x.wr, x.job); else runMontage(x.wr, x.job); } else mon = null; }
+  function enqueueJob(job, wr) {
+    monJobs.push({ job: job, wr: wr });
+    if (!mon) { mon = { n: 0 }; startNextJob(); }
+    else { toast('Montaggio messo in coda (' + monJobs.length + ' in attesa).'); }
+  }
+  function startMontage() {
     var showScore = $('mon-score').checked, title = $('mon-intro').checked ? $('mon-ttl').value.trim() : '';
     try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore })); } catch (e) {}
-    var list = queue.filter(function (c) { return !!videoFor(c); });
+    var fast = monMode() === 'fast';
+    try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore, mode: fast ? 'fast' : 'real' })); } catch (e) {}
+    var job = { list: queue.filter(function (c) { return !!videoFor(c); }), showScore: showScore, title: title, fast: fast };
+    $('dlg-mon').hidden = true;
+    var n = job.list.length, mimeX = fast ? 'video/mp4' : monMime(), ext = /mp4/.test(mimeX) ? 'mp4' : 'webm';
+    var ttl = job.title.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, '_').slice(0, 40);
+    var name = (ttl ? 'montaggio_' + ttl : 'montaggio_' + n + '_azioni') + '.' + ext; job.name = name;
+    if (window.showSaveFilePicker && !(window.claude && window.claude.use)) {
+      window.showSaveFilePicker({ suggestedName: name, types: [{ description: 'Video', accept: ext === 'mp4' ? { 'video/mp4': ['.mp4'] } : { 'video/webm': ['.webm'] } }] })
+        .then(function (h) { return h.createWritable().then(function (w) { enqueueJob(job, { w: w, name: h.name }); }); })
+        .catch(function (e) { if (!e || e.name !== 'AbortError') enqueueJob(job, null); else $('dlg-mon').hidden = false; });
+    } else enqueueJob(job, null);
+  }
+  /* ---------- montaggio veloce: decodifica e codifica più veloce del tempo reale (WebCodecs), senza audio ---------- */
+  function waitDeq(a, b) {
+    return new Promise(function (res) {
+      var t = setTimeout(go, 250);
+      function go() { clearTimeout(t); a.removeEventListener('dequeue', go); b.removeEventListener('dequeue', go); res(); }
+      a.addEventListener('dequeue', go); b.addEventListener('dequeue', go);
+    });
+  }
+  function decCfg(r) { var c = { codec: r.codec, codedWidth: r.width, codedHeight: r.height }; if (r.description) c.description = r.description; return c; }
+  async function runFast(wr, job) {
+    var list = job.list, showScore = job.showScore, title = job.title, pill = $('mon-pill');
+    monAbort = false; mon = { n: list.length };
+    pill.hidden = false; $('mp-fill').style.width = '0'; $('mp-text').textContent = 'Montaggio veloce: controllo i video…';
+    var canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'), readers = {}, wrote = false, enc = null, encErr = null, writer = null, sink = null, cw = 0, ch = 0;
+    function fin() { pill.hidden = true; if (monJobs.length) { mon = { n: 0 }; setTimeout(startNextJob, 700); } else mon = null; }
+    function push(ts, dur, key) { var vf = new VideoFrame(canvas, { timestamp: ts, duration: dur }); try { enc.encode(vf, { keyFrame: !!key }); } finally { vf.close(); } }
+    try {
+      var uniq = {}; list.forEach(function (c) { var v = videoFor(c); uniq[v.url] = v; });
+      for (var u in uniq) {
+        if (!uniq[u].file) throw { fb: 1 };
+        var rd = await FastMon.open(uniq[u].file);
+        if (!rd || rd.unsupported || !rd.n) throw { fb: 1 };
+        var sp = await VideoDecoder.isConfigSupported(decCfg(rd));
+        if (!sp.supported) throw { fb: 1 };
+        readers[u] = rd;
+      }
+      var r0 = readers[videoFor(list[0]).url], k0 = Math.min(1, 1280 / r0.width);
+      cw = canvas.width = Math.round(r0.width * k0 / 2) * 2; ch = canvas.height = Math.round(r0.height * k0 / 2) * 2;
+      var cands = [['avc', 'avc1.640028'], ['avc', 'avc1.4d0028'], ['avc', 'avc1.42e028'], ['vp9', 'vp09.00.10.08']], chosen = null;
+      for (var ci = 0; ci < cands.length && !chosen; ci++) {
+        var cfg = { codec: cands[ci][1], width: cw, height: ch, bitrate: 6000000, framerate: 30 };
+        if (cands[ci][0] === 'avc') cfg.avc = { format: 'avc' };
+        var se = await VideoEncoder.isConfigSupported(cfg);
+        if (se.supported) chosen = { kind: cands[ci][0], cfg: cfg };
+      }
+      if (!chosen) throw { fb: 1 };
+      sink = wr ? FastMon.fileSink(wr.w) : FastMon.memorySink();
+      writer = new FastMon.Mp4Writer(sink, { codec: chosen.kind, width: cw, height: ch });
+      wrote = true;
+      enc = new VideoEncoder({
+        output: function (chunk, meta) {
+          var d = new Uint8Array(chunk.byteLength); chunk.copyTo(d);
+          if (meta && meta.decoderConfig && meta.decoderConfig.description) writer.setDescription(new Uint8Array(meta.decoderConfig.description instanceof ArrayBuffer ? meta.decoderConfig.description.slice(0) : new Uint8Array(meta.decoderConfig.description.buffer, meta.decoderConfig.description.byteOffset, meta.decoderConfig.description.byteLength).slice()));
+          writer.addSample(d, chunk.timestamp, chunk.type === 'key');
+        },
+        error: function (e) { encErr = e; }
+      });
+      enc.configure(chosen.cfg);
+      var outBase = 0;
+      if (title) {
+        for (var t = 0; t < 3000; t += 100) { monIntro(ctx, cw, ch, title); push(t * 1000, 100000, t === 0); }
+        outBase = 3000000;
+      }
+      async function doClip(c, idx) {
+        var v = videoFor(c), rd2 = readers[v.url], cl = range(c), pl = FastMon.plan(rd2, cl.start, cl.end);
+        if (!pl) return;
+        $('mp-text').textContent = 'Montaggio veloce: azione ' + (idx + 1) + ' di ' + list.length + (monJobs.length ? ' · altri ' + monJobs.length + ' in coda' : '');
+        $('mp-fill').style.width = Math.round(idx / list.length * 100) + '%';
+        var startUs = cl.start * 1e6, endUs = cl.end * 1e6, firstTs = null, lastOut = outBase - 1, derr = null, lastKey = -1e9,
+          fd = rd2.n > 1 ? Math.max(1000, (rd2.dts[1] - rd2.dts[0]) / rd2.timescale * 1e6) : 33333;
+        var dec = new VideoDecoder({
+          output: function (fr) {
+            try {
+              var ts = fr.timestamp;
+              if (ts < startUs - 1 || ts >= endUs || derr || encErr) return;
+              if (firstTs === null) firstTs = ts;
+              var out = outBase + (ts - firstTs);
+              ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cw, ch);
+              var vw = fr.displayWidth, vh = fr.displayHeight, k = Math.min(cw / vw, ch / vh), w = vw * k, h = vh * k;
+              ctx.drawImage(fr, (cw - w) / 2, (ch - h) / 2, w, h);
+              monBadge(ctx, cw, ch, c, showScore);
+              var key = lastKey < 0 || out - lastKey >= 2e6 || out === outBase;
+              if (key) lastKey = out;
+              push(out, fd, key); lastOut = out;
+            } finally { fr.close(); }
+          },
+          error: function (e) { derr = e; }
+        });
+        dec.configure(decCfg(rd2));
+        try {
+          await FastMon.readRange(rd2, pl.i0, pl.i1, async function (k, data) {
+            if (derr || encErr) throw derr || encErr;
+            while (dec.decodeQueueSize > 10 || enc.encodeQueueSize > 10) { await waitDeq(dec, enc); if (derr || encErr || monAbort) break; }
+            if (derr || encErr) throw derr || encErr;
+            dec.decode(new EncodedVideoChunk({ type: rd2.sync[k] ? 'key' : 'delta', timestamp: Math.round((rd2.cts[k] - rd2.mediaTime) * 1e6 / rd2.timescale), data: data }));
+          }, function () { return monAbort; });
+          if (!monAbort) await dec.flush();
+          if (derr) throw derr;
+        } finally { try { dec.close(); } catch (e) {} }
+        outBase = lastOut + fd;
+      }
+      for (var ix = 0; ix < list.length && !monAbort; ix++) await doClip(list[ix], ix);
+      if (monAbort) {
+        try { enc.close(); } catch (e) {}
+        if (wr) { try { await wr.w.abort(); } catch (e) {} }
+        toast('Montaggio interrotto.'); fin(); return;
+      }
+      await enc.flush(); if (encErr) throw encErr;
+      enc.close(); writer.finish();
+      if (wr) { await sink.done(); await wr.w.close(); toast('Montaggio salvato: ' + wr.name); }
+      else { await saveBlob(job.name || 'montaggio.mp4', sink.blob()); toast('Montaggio pronto: ' + (job.name || 'montaggio.mp4')); }
+      fin();
+    } catch (e) {
+      try { if (enc && enc.state !== 'closed') enc.close(); } catch (x) {}
+      if (!wrote && window.MediaRecorder && HTMLCanvasElement.prototype.captureStream) {
+        toast('Questi video non vanno bene per il montaggio veloce: uso quello normale (più lento).');
+        pill.hidden = true; runMontage(wr, job); return;
+      }
+      if (wr) { try { await wr.w.abort(); } catch (x) {} }
+      toast('Montaggio veloce non riuscito' + (e && e.message ? ': ' + e.message : '.'));
+      fin();
+    }
+  }
+  function runMontage(wr, job) {
+    var showScore = job.showScore, title = job.title, list = job.list;
     var mime = monMime(), chunks = [], canvas = document.createElement('canvas'), ctx = canvas.getContext('2d');
     monAbort = false; mon = { n: list.length };
     if (!monVid) { monVid = document.createElement('video'); monVid.preload = 'auto'; monVid.playsInline = true; }
@@ -2062,40 +2701,9 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
       var w = mv.videoWidth || 1280, h = mv.videoHeight || 720, k = Math.min(1, 1280 / w);
       cw = canvas.width = Math.round(w * k / 2) * 2; ch = canvas.height = Math.round(h * k / 2) * 2;
     }
-    function badge() {
-      if (!curC) return;
-      var f = Math.round(ch / 22), x = f * 0.8, y = f * 0.8, hh = f * 2.2;
-      if (showScore) {
-        var tm = curC.e.M.teams, sc = curC.score.split('-'), pad = f * 0.6;
-        ctx.font = '700 ' + f + 'px system-ui, sans-serif'; ctx.textBaseline = 'middle';
-        var parts = [tm[0].code, sc[0], '–', sc[1], tm[1].code], gap = f * 0.7, wTot = 0, ws = parts.map(function (p) { var w = ctx.measureText(p).width; wTot += w; return w; });
-        wTot += gap * (parts.length - 1) + pad * 2;
-        ctx.fillStyle = 'rgba(0,0,0,.72)'; ctx.fillRect(x, y, wTot, hh);
-        ctx.fillStyle = '#3DB8C4'; ctx.fillRect(x, y, f * 0.25, hh);
-        var cx = x + pad + f * 0.25;
-        parts.forEach(function (p, k2) {
-          ctx.fillStyle = (k2 === 1 || k2 === 3) ? '#fff' : (k2 === 2 ? '#8CA2AA' : '#E4EDF0');
-          ctx.font = ((k2 === 1 || k2 === 3) ? '800 ' : '600 ') + (f * (k2 === 1 || k2 === 3 ? 1.15 : 1)) + 'px system-ui, sans-serif';
-          ctx.fillText(p, cx, y + hh / 2); cx += ws[k2] + gap;
-        });
-        ctx.font = '600 ' + Math.round(f * 0.7) + 'px system-ui, sans-serif'; ctx.fillStyle = '#E4EDF0';
-        ctx.fillText('Set ' + curC.set, x + wTot + f * 0.4, y + hh / 2);
-        y += hh + f * 0.4;
-      }
-    }
+    function badge() { monBadge(ctx, cw, ch, curC, showScore); }
     var introUntil = 0;
-    function drawIntro() {
-      var g = ctx.createLinearGradient(0, 0, cw, ch); g.addColorStop(0, '#0D1619'); g.addColorStop(1, '#14303A');
-      ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
-      var fs = Math.round(ch / 9), maxW = cw * 0.8, words = title.split(/\s+/), lines = [], line = '';
-      ctx.font = '800 ' + fs + 'px system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
-      words.forEach(function (w) { var t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
-      if (line) lines.push(line);
-      var lh = fs * 1.25, y0 = ch / 2 - (lines.length - 1) * lh / 2;
-      ctx.fillStyle = '#3DB8C4'; ctx.fillRect(cw / 2 - cw * 0.08, y0 - lh * 0.95, cw * 0.16, Math.max(3, ch / 120));
-      ctx.fillStyle = '#fff'; lines.forEach(function (l, k) { ctx.fillText(l, cw / 2, y0 + k * lh); });
-      ctx.textAlign = 'left';
-    }
+    function drawIntro() { monIntro(ctx, cw, ch, title); }
     function draw() {
       if (!cw) return;
       if (introUntil && performance.now() < introUntil) { drawIntro(); return; }
@@ -2112,7 +2720,8 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
     function finish(save) {
       clearInterval(drawT); if (wk) { wk.terminate(); wk = null; } if (lock) { try { lock.release(); } catch (e) {} lock = null; }
       try { mv.pause(); } catch (e) {}
-      mon = null; pill.hidden = true; curClip = null;
+      pill.hidden = true; curClip = null;
+      if (monJobs.length) { mon = { n: 0 }; setTimeout(startNextJob, 700); } else mon = null;
       if (mr && mr.state !== 'inactive') {
         mr.onstop = function () {
           if (wr) {
@@ -2120,7 +2729,7 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
               .then(function () { toast(save ? 'Montaggio salvato: ' + wr.name : 'Montaggio interrotto.'); })
               .catch(function () { toast('Non sono riuscito a salvare il montaggio.'); });
           } else if (save && chunks.length) {
-            var ext = /mp4/.test(mime) ? 'mp4' : 'webm', name = 'montaggio_' + list.length + '_azioni.' + ext;
+            var ext = /mp4/.test(mime) ? 'mp4' : 'webm', name = job.name || ('montaggio_' + list.length + '_azioni.' + ext);
             saveBlob(name, new Blob(chunks, { type: mime || 'video/webm' })).then(function () { toast('Montaggio pronto: ' + name); }).catch(function () { toast('Non sono riuscito a salvare il montaggio.'); });
           } else toast('Montaggio interrotto.');
         };
@@ -2148,7 +2757,7 @@ if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decode
       if (monAbort) { finish(false); return; }
       if (i >= list.length) { setTimeout(function () { finish(true); }, 400); return; }
       var c = list[i++], v = videoFor(c), cl = range(c);
-      $('mp-text').textContent = 'Montaggio: azione ' + i + ' di ' + list.length;
+      $('mp-text').textContent = 'Montaggio: azione ' + i + ' di ' + list.length + (monJobs.length ? ' · altri ' + monJobs.length + ' in coda' : '');
       $('mp-fill').style.width = Math.round((i - 1) / list.length * 100) + '%';
       advancing = true; curClip = null; curC = c;
       function go() {
