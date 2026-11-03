@@ -94,7 +94,7 @@ h1, h2, h3 { margin: 0; font-family: var(--f-display); font-weight: 700; letter-
 
 .screen-wrap {
   position: relative; background: var(--screen); width: 100%;
-  aspect-ratio: 16 / 9; max-height: 54vh; margin-inline: auto; border-radius: 4px; overflow: hidden;
+  aspect-ratio: 16 / 9; max-height: 54vh; margin-inline: auto;
 }
 .screen-wrap video { width: 100%; height: 100%; object-fit: contain; display: block; background: var(--screen); }
 .empty-screen {
@@ -714,7 +714,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v74</small></h1>
+      <h1>Reader scout video <small class="ver">v75</small></h1>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -2531,19 +2531,27 @@ var FastMon = (function () {
     if (S.dur === 'rally3') return 'fine scambio +3 s';
     return '+' + S.dur + ' s';
   }
+  var barKey = '', barPos = -1;
   function updateBar(t) {
     if (!clip || cur < 0) {
+      barKey = ''; barPos = -1;
       $('trk-pre').style.width = '0'; $('trk-fill').style.width = '0'; $('trk-hit').style.left = '0';
       return;
     }
     var c = queue[cur], tot = Math.max(1, clip.end - clip.start);
-    var hit = Math.max(0, Math.min(100, 100 * (c.t - clip.start) / tot));
     var pos = Math.max(0, Math.min(100, 100 * (t - clip.start) / tot));
-    $('trk-pre').style.width = hit + '%'; $('trk-hit').style.left = 'calc(' + hit + '% - 1px)';
-    $('trk-fill').style.width = pos + '%';
-    $('cm-start').textContent = '−' + Math.round(c.t - clip.start) + ' s';
-    $('cm-hit').textContent = 'contatto ' + fmtTime(c.t);
-    $('cm-end').textContent = '+' + Math.round(clip.end - c.t) + ' s';
+    /* durante la riproduzione cambia solo la barra di avanzamento (e solo se si è mossa): il resto si riscrive soltanto quando cambia la clip, per non far ricalcolare la pagina mentre il video gira */
+    var key = cur + '|' + clip.start + '|' + clip.end;
+    if (key !== barKey) {
+      barKey = key;
+      var hit = Math.max(0, Math.min(100, 100 * (c.t - clip.start) / tot));
+      $('trk-pre').style.width = hit + '%'; $('trk-hit').style.left = 'calc(' + hit + '% - 1px)';
+      $('cm-start').textContent = '−' + Math.round(c.t - clip.start) + ' s';
+      $('cm-hit').textContent = 'contatto ' + fmtTime(c.t);
+      $('cm-end').textContent = '+' + Math.round(clip.end - c.t) + ' s';
+      barPos = -1;
+    }
+    if (Math.abs(pos - barPos) >= 0.15) { barPos = pos; $('trk-fill').style.width = pos + '%'; }
   }
 
   /* ---------- impostazioni clip ---------- */
