@@ -566,6 +566,132 @@ body.theater.nolist .panes { grid-template-rows: minmax(0, 1fr); }
 .monmode[hidden] { display: none; }
 .monmode small { color: var(--mut, #8CA2AA); font-size: 12px; }
 
+.advbox { border: 1px solid var(--line, #2a3a40); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; background: rgba(61,184,196,.08); font-size: 13px; }
+.advbox[hidden] { display: none; }
+.advhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.advl { margin: 4px 0 0 18px; padding: 0; }
+.advf code { font-family: inherit; font-weight: 600; }
+
+.msbox { grid-column: 1 / -1; border: 1px solid var(--accent); border-radius: 8px; padding: 8px 12px; background: color-mix(in srgb, var(--accent) 10%, var(--surface)); font-size: 14px; }
+.msbox[hidden] { display: none; }
+.msbox ol { margin: 6px 0 0 20px; padding: 0; }
+.msbox li { display: flex; justify-content: space-between; gap: 10px; }
+.msbox li small { color: var(--muted); }
+.filters.ms-on > *:not(.maskbar):not(.msbox) { opacity: .35; pointer-events: none; }
+.list li.stephead { display: flex; align-items: baseline; gap: 10px; padding: 10px 12px; background: var(--accent); color: var(--bg); font-size: 15px; border-top: 3px solid var(--bg); content-visibility: visible; }
+.list li.stephead .sn { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; opacity: .75; }
+.list li.stephead b { font-size: 17px; flex: 1; }
+.list li.stephead small { font-weight: 600; }
+.list li.stephead + li .row { border-top: 0; }
+.mk-row { flex-wrap: wrap; }
+.mk-steps { flex: 1 1 100%; display: flex; flex-direction: column; gap: 2px; margin: 2px 0 6px; padding-left: 14px; }
+.mk-step { display: flex; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 6px; background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.mk-step .sn { font-weight: 700; color: var(--accent); min-width: 16px; }
+.mk-step .nm { font-weight: 600; }
+.mk-step small { flex: 1; min-width: 0; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mk-step .sa { display: flex; gap: 4px; margin-left: auto; }
+.mk-step.edit .field { flex: 1; min-width: 0; }
+
+.edback { position: fixed; inset: 0; z-index: 65; background: rgba(0,0,0,.55); }
+.edback[hidden], .edbar[hidden] { display: none; }
+.filters.editing { position: fixed; inset: 2vh max(2vw, calc((100vw - 1100px) / 2)); z-index: 70; overflow-y: auto; background: var(--bg); padding: 0 16px 16px; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 24px 70px rgba(0,0,0,.55); max-height: none; }
+.filters.editing > .maskbar, .filters.editing > .msbox { display: none; }
+.edbar { grid-column: 1 / -1; position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; align-items: end; gap: 8px 12px; padding: 12px 0; margin-bottom: 8px; background: var(--bg); border-bottom: 2px solid var(--accent); }
+.edbar .edt { flex: 1 1 260px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.edbar .edc { color: var(--muted); font-size: 14px; padding-bottom: 8px; }
+
+.mk-top { display: flex; flex-wrap: wrap; gap: 8px; }
+.edbar .edf { flex: 0 1 200px; }
+.advrule { border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin: 8px 0; background: var(--surface); }
+.advtop { display: flex; align-items: center; gap: 8px 12px; margin-bottom: 6px; flex-wrap: wrap; }
+.advtop select { flex: 1; min-width: 0; }
+.advletter { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--bg); display: inline-flex; align-items: center; justify-content: center; }
+.advgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px 8px; }
+.advfld { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted); }
+.advfld .field { width: 100%; box-sizing: border-box; }
+.advformula { margin: 8px 0; }
+.field.bad { outline: 2px solid #c0392b; }
+#adv-box .advhead { margin-bottom: 2px; }
+
+.filters.editing .plgroup { display: none; }
+.edplayer { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.edplayer[hidden] { display: none; }
+.edplayer label { display: flex; align-items: center; gap: 6px; font-size: 15px; }
+.edplayer .field { width: auto; }
+.edplayer #ed-pname { flex: 1 1 140px; }
+
+.cmode { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 6px 0; }
+.cmode label { display: inline-flex; gap: 4px; align-items: center; }
+#alts { margin-bottom: 8px; }
+
+/* ---------- v68: condizioni più semplici ---------- */
+.qsum { border-left: 4px solid var(--accent); border-radius: 0 8px 8px 0; background: color-mix(in srgb, var(--accent) 8%, var(--surface)); padding: 8px 12px; font-size: 14px; line-height: 1.4; }
+.qsum .qs-main b { font-weight: 700; }
+.qsum .qs-list { margin: 4px 0 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
+.qsum .qs-list ul { margin: 2px 0 0; padding-left: 16px; }
+.qsum .qs-list b { color: var(--fg); }
+.ctx summary { text-transform: none; letter-spacing: 0; font-size: 14px; }
+.ctxbody { gap: 8px; }
+.cq-help summary { cursor: pointer; font: 600 12px var(--f-body); color: var(--muted); text-transform: none; letter-spacing: 0; padding: 0; }
+.cq-help p { margin: 4px 0 0; }
+.cq-empty[hidden], .cq-body[hidden], .cq-menulist[hidden] { display: none !important; }
+.cq-title { font: 700 13px var(--f-body); color: var(--fg); margin: 6px 0 2px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.cq-title small { font-weight: 400; color: var(--muted); font-size: 12px; }
+.cq-card { padding: 6px 8px; gap: 6px; border-radius: 6px; }
+.cq-card.open { border-color: var(--accent); }
+.cq-head { display: flex; align-items: center; gap: 6px; }
+.cq-s { flex: 1 1 auto; min-width: 0; font-size: 13.5px; line-height: 1.35; overflow-wrap: anywhere; }
+.cq-edit { flex: none; }
+.cq-card .xb { flex: none; padding: 0 6px; font-size: 18px; line-height: 1; }
+.cq-body { display: flex; flex-direction: column; gap: 8px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.cq-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.cq-row > .label { flex: 0 0 92px; font-size: 11px; }
+.cq-row > .chips { flex: 1 1 200px; gap: 4px; }
+.cq-row .chip { padding: 4px 8px; font-size: 13px; min-width: 28px; }
+.cq-more { border-top: 1px dashed var(--line); padding-top: 4px; }
+.cq-more > summary { cursor: pointer; font: 600 12px var(--f-body); color: var(--muted); text-transform: none; letter-spacing: 0; padding: 2px 0; }
+.cq-moreb { display: flex; flex-direction: column; gap: 8px; padding-top: 6px; }
+.cond-z { gap: 8px 16px; }
+.court-grid { grid-template-columns: repeat(3, 34px); grid-auto-rows: 28px; gap: 2px; padding: 2px; }
+.cz { font-size: 13px; }
+.cond-court .label, .sgroup .court-net { font-size: 10px; }
+.cond-court { gap: 3px; }
+.cond-top .field { flex: 1 1 160px; padding-top: 5px; padding-bottom: 5px; }
+.cq-card .xb { border: 0; background: none; color: var(--muted); cursor: pointer; }
+.cond-poss { font-size: 12.5px; }
+.cmode { margin: 2px 0 4px; font-size: 13px; }
+.advbox { background: none; border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.advbox .advhead { margin: 6px 0 0; }
+.cq-fsum { margin: 0; font-size: 13px; color: var(--muted); }
+.cq-fsum b { color: var(--fg); }
+.advrule { margin: 0; padding: 6px 8px; }
+.advrule .advletter { flex: none; width: 22px; height: 22px; font-size: 12px; }
+.advtop { margin: 0; }
+.advtop select { flex: 1 1 200px; }
+.advtop select:first-child { flex-basis: 100%; }
+.advcmb { width: 5em; text-transform: uppercase; }
+.cq-body .cq-row .chips { max-height: 9.5em; overflow-y: auto; }
+.advformula { margin: 0; }
+.advformula .advfld { margin-top: 6px; }
+.cq-addbtn { align-self: flex-start; font-weight: 700; color: var(--accent); border-color: var(--accent); font-size: 13px; padding: 5px 12px; }
+#d-det .ctxbody { gap: 6px; }
+#d-det .sgroup { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+#d-det .sgroup > .label { flex: 0 0 92px; font-size: 11px; }
+#d-det .sgroup > .chips { flex: 1 1 200px; gap: 4px; }
+#d-det .chip { padding: 4px 8px; font-size: 13px; min-width: 28px; }
+#d-det .sgroup[hidden] { display: none; }
+@media (max-width: 520px) {
+  .cq-row > .label, #d-det .sgroup > .label { flex-basis: 100%; }
+  .cq-s { font-size: 13px; }
+}
+#alts:empty, #conds:empty { display: none; }
+
+.mk-row .mk-info { cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; flex: 1; min-width: 0; }
+.mk-chev { width: 14px; color: var(--muted); }
+.mk-row.mk-off .mk-act, .mk-row.mk-off .mk-steps { display: none; }
+.mk-row.mk-off .mk-info small { display: none; }
+.mk-row.mk-off .mk-info:hover b { color: var(--accent); }
+
 </style>
 </head><body>
 <div id="gate" style="position:fixed;inset:0;z-index:99999;background:#0D1619;color:#E4EDF0;display:none;align-items:center;justify-content:center;font-family:system-ui,sans-serif">
@@ -588,7 +714,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v57</small></h1>
+      <h1>Reader scout video <small class="ver">v74</small></h1>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -712,6 +838,12 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 
     <section class="browser" aria-label="Filtri e azioni">
       <div class="filters">
+        <div class="edbar" id="ed-bar" hidden>
+          <div class="edt"><span class="label" id="ed-title"></span><input class="field" id="ed-name" type="text" maxlength="60" aria-label="Nome"></div>
+          <label class="edt edf" id="ed-folderbox" hidden><span class="label">Cartella</span><input class="field" id="ed-folder" list="mk-folders" maxlength="40" placeholder="Nessuna cartella"></label>
+          <span class="edc" id="ed-count"></span>
+          <button class="btn" type="button" id="ed-cancel">Annulla</button><button class="btn primary" type="button" id="ed-ok">Salva le modifiche</button>
+        </div>
         <div class="sgroup maskbar">
           <label class="label" for="f-mask">Maschere di ricerca <small class="hint">filtri salvati con un nome</small></label>
           <select class="field" id="f-mask"></select>
@@ -721,10 +853,20 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
           </div>
           <div class="maskstat" id="mask-stat" hidden></div>
         </div>
-        <div class="sgroup">
+        <div class="msbox" id="ms-box" hidden></div>
+        <div class="edplayer" id="ed-player" hidden>
+          <span class="label">Giocatrice di questa maschera</span>
+          <label><input type="radio" name="ed-pm" value="all" checked> Tutte</label>
+          <label><input type="radio" name="ed-pm" value="ask"> Chiedi quando uso la maschera</label>
+          <label><input type="radio" name="ed-pm" value="fixed"> Fissa:</label>
+          <input class="field" id="ed-pnum" type="text" inputmode="numeric" maxlength="3" placeholder="n°" size="3" aria-label="Numero di maglia">
+          <input class="field" id="ed-pname" type="text" maxlength="40" placeholder="cognome o nome" aria-label="Cognome o nome">
+        </div>
+        <div class="sgroup plgroup">
           <label class="label" for="f-player">Giocatrice</label>
           <select class="field" id="f-player"></select>
         </div>
+        <div class="qsum wide" id="q-sum" aria-live="polite"></div>
         <div class="sgroup wide">
           <span class="label" id="l-skill">Fondamentale</span>
           <div class="chips" id="f-skill" role="group" aria-labelledby="l-skill"></div>
@@ -732,6 +874,10 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <div class="sgroup wide">
           <span class="label" id="l-eval">Esito</span>
           <div class="chips" id="f-eval" role="group" aria-labelledby="l-eval"></div>
+        </div>
+        <div class="sgroup" id="d-det" hidden>
+          <span class="label" id="l-tf">Colpo di attacco <span id="det-sum" hidden></span></span>
+          <div class="chips" id="f-tf" role="group" aria-labelledby="l-tf"></div>
         </div>
         <div class="sgroup">
           <span class="label" id="l-set">Set</span>
@@ -756,9 +902,12 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <details class="wide ctx" id="d-cond">
           <summary>Condizioni sull’azione <span class="hint" id="cond-sum"></span></summary>
           <div class="ctxbody">
-            <p class="hint">Esempio: “attacchi dopo una ricezione positiva della stessa squadra” → scegli Attacco in alto, poi aggiungi: <b>Prima, nell’azione</b> · <b>Stessa squadra</b> · Ricezione · esito +.</p>
-            <div id="conds"></div>
-            <button class="btn small" id="cond-add" type="button">+ Aggiungi condizione</button>
+            <p class="hint">Aggiungi dei criteri su ciò che succede <b>prima</b> o <b>dopo</b> l’azione cercata. Ogni criterio ha una lettera (A, B, C…).</p>
+            <details class="cq-help"><summary>Vedi un esempio</summary><p class="hint">“Attacchi dopo una ricezione positiva della stessa squadra”: scegli Attacco in alto, poi premi <b>+ Aggiungi criterio</b> e scegli <b>c’è prima, in un punto qualsiasi dell’azione</b> · <b>Stessa squadra dell’azione</b> · Ricezione · esito +.</p></details>
+            <p class="hint cq-empty" id="cq-empty">Nessun criterio: la ricerca guarda solo l’azione scelta sopra.</p>
+            <datalist id="adv-combos"></datalist>
+            <div class="advbox" id="adv-box" hidden></div>
+            <button class="btn small cq-addbtn" id="adv-add" type="button">+ Aggiungi criterio</button>
           </div>
         </details>
         <div class="sgroup wide">
@@ -790,6 +939,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 </div>
 <button class="btn small" id="t-show" type="button">☰ Pannello</button>
 <div class="monpill" id="mon-pill" hidden role="status"><span id="mp-text"></span><div class="monbar"><div id="mp-fill"></div></div><button class="btn small" id="mp-stop" type="button">Interrompi</button></div>
+<div class="edback" id="ed-back" hidden></div>
 <div class="dlg mon" id="dlg-mon" hidden>
   <div class="dlg-card" role="dialog" aria-modal="true" aria-labelledby="mon-title">
     <div class="dlg-head"><h2 id="mon-title">Montaggio video</h2></div>
@@ -800,6 +950,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <label class="monchk"><input type="radio" name="mon-mode" value="real"> Normale <small>(in tempo reale, più lenta)</small></label>
       </div>
       <label class="monchk"><input type="checkbox" id="mon-score" checked> Mostra il punteggio</label>
+      <label class="monchk" id="mon-stepsbox" hidden><input type="checkbox" id="mon-steps" checked> Pagina con il nome del passo tra una sezione e l’altra</label>
       <label class="monchk"><input type="checkbox" id="mon-intro"> Pagina con il titolo all’inizio</label>
       <label class="monttl" id="mon-ttlbox" hidden><span class="label">Titolo</span>
         <span class="monrow"><input type="text" class="field" id="mon-ttl" maxlength="60" placeholder="es. Attacchi · Rossi">
@@ -809,15 +960,25 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
     <div class="dlg-foot"><button class="btn" id="mon-cancel" type="button">Annulla</button><button class="btn primary" id="mon-go" type="button">Avvia</button></div>
   </div>
 </div>
+<div class="dlg" id="dlg-ask" hidden>
+  <div class="dlg-card" role="dialog" aria-modal="true" aria-labelledby="ask-t">
+    <div class="dlg-head"><h2 id="ask-t">Per quale giocatrice?</h2></div>
+    <p class="hint">Questa maschera chiede la giocatrice ogni volta.</p>
+    <select class="field" id="ask-sel"></select>
+    <div class="dlg-foot"><button class="btn" id="ask-no" type="button">Tutte</button><button class="btn primary" id="ask-ok" type="button">Cerca</button></div>
+  </div>
+</div>
 <div class="dlg" id="dlg-msave" hidden>
   <div class="dlg-card mask-card" role="dialog" aria-modal="true" aria-labelledby="ms-title">
     <div class="dlg-head"><h2 id="ms-title">Salva i filtri come maschera</h2></div>
     <div class="ms-sum"><span class="label">Cosa viene salvato</span><p id="ms-cur"></p></div>
     <label class="ms-f"><span class="label">Nome della maschera</span><input class="field" id="ms-name" type="text" maxlength="60" placeholder="es. Distribuzione dopo ricezione #+"></label>
+    <label class="ms-f"><span class="label">Dove salvarla</span><select class="field" id="ms-where"></select></label>
     <label class="ms-f"><span class="label">Cartella</span><select class="field" id="ms-folder"></select></label>
     <label class="ms-f" id="ms-newbox" hidden><span class="label">Nome della nuova cartella</span><input class="field" id="ms-newfolder" type="text" maxlength="40" placeholder="es. Distribuzione per basi"></label>
     <div class="ms-f"><span class="label">Salva anche (facoltativo)</span>
       <label class="ms-chk"><input type="checkbox" id="ms-player"> la giocatrice scelta</label>
+      <label class="ms-chk"><input type="checkbox" id="ms-ask"> chiedi la giocatrice ogni volta che la uso</label>
       <label class="ms-chk"><input type="checkbox" id="ms-times"> i tempi della clip (secondi prima e dopo)</label>
     </div>
     <p class="hint">Squadra e partite non vengono salvate: la maschera vale per qualsiasi squadra.</p>
@@ -827,14 +988,14 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="dlg" id="dlg-mask" hidden>
   <div class="dlg-card mask-card" role="dialog" aria-modal="true" aria-labelledby="mk-title">
     <div class="dlg-head"><h2 id="mk-title">Le mie maschere</h2><button class="btn small" id="mk-close" type="button">Chiudi</button></div>
-    <p class="hint">Premi <b>Usa</b> per impostare subito i filtri. Con <b>Modifica</b> cambi nome o cartella.</p>
-    <div class="mk-top"><button class="btn primary" id="mk-new" type="button">＋ Nuova maschera dai filtri attuali</button></div>
+    <p class="hint">Premi <b>Usa</b> per impostare subito i filtri. Con <b>Modifica filtri</b> cambi quello che cerca la maschera.</p>
+    <div class="mk-top"><button class="btn primary" id="mk-new0" type="button">＋ Nuova maschera vuota</button><button class="btn" id="mk-new" type="button">＋ Nuova maschera dai filtri attuali</button></div>
     <div class="mk-list" id="mk-list"></div>
     <datalist id="mk-folders"></datalist>
     <div class="dlg-foot">
       <button class="btn small" id="mk-export" type="button" title="Salva tutte le maschere in un file">Esporta in un file</button>
-      <button class="btn small" id="mk-import" type="button" title="Carica maschere da un file">Importa da un file</button>
-      <input type="file" id="in-masks" accept=".json,application/json" hidden>
+      <button class="btn small" id="mk-import" type="button" title="Carica maschere da un file del reader o da Data Volley (.mon4)">Importa da un file</button>
+      <input type="file" id="in-masks" accept=".json,.mon4,application/json" multiple hidden>
     </div>
   </div>
 </div>
@@ -872,7 +1033,7 @@ function parseDvw(text) {
   var lines = text.split(/\r?\n/);
   var section = '';
   var m = { teams: [], players: {}, cams: {}, contacts: [], sets: [], title: '' };
-  var rows = { match: [], teams: [], ph: [], pv: [], video: [], scout: [], set: [] };
+  var rows = { match: [], teams: [], ph: [], pv: [], video: [], scout: [], set: [], ac: [], sc: [] };
 
   lines.forEach(function (l) {
     if (l.indexOf('[3') === 0) { section = l.trim(); return; }
@@ -884,7 +1045,14 @@ function parseDvw(text) {
     else if (section === '[3VIDEO]') rows.video.push(l);
     else if (section === '[3SCOUT]') rows.scout.push(l);
     else if (section === '[3SET]') rows.set.push(l);
+    else if (section === '[3ATTACKCOMBINATION]') rows.ac.push(l);
+    else if (section === '[3SETTERCALL]') rows.sc.push(l);
   });
+
+  // tabelle delle combinazioni d'attacco (codice;zona;mano;tipo;descrizione) e delle chiamate dell'alzatore (codice;;descrizione)
+  m.combos = { A: {}, E: {} };
+  rows.ac.forEach(function (l) { var f = l.split(';'); if (f[0]) m.combos.A[f[0]] = { zone: /^[1-9]$/.test(f[1] || '') ? f[1] : '', hand: f[2] || '', type: f[3] || '', desc: f[4] || '' }; });
+  rows.sc.forEach(function (l) { var f = l.split(';'); if (f[0]) m.combos.E[f[0]] = { desc: f[2] || '' }; });
 
   // punteggio finale di ogni set (quarto controllo del file, es. "25-20")
   m.setScores = {};
@@ -1268,7 +1436,8 @@ var FastMon = (function () {
   var LS_KEY = 'reader-scout-video-settings';
 
   var S = { pre: 3, dur: '5', spd: 1, stop: 'next', all: false };
-  var F = { team: '', who: 'team', player: '', skills: {}, evals: {}, sets: {}, phases: {}, rots: {}, zs: {}, ze: {}, conds: [], marks: {}, text: '' };
+  var F = { team: '', who: 'team', player: '', skills: {}, evals: {}, sets: {}, phases: {}, rots: {}, zs: {}, ze: {}, cmb: {}, tg: {}, ty: {}, tf: {}, alt: [], cmode: 'all', conds: [], marks: {}, text: '', adv: null };
+  var MS = null, qstep = null, msCounts = [], EDIT = null;
   var LIB = [], ALL = [], seq = 0, sampleEntry = null, pendingEntry = null, queue = [], cur = -1, clip = null, timer = null, ended = false;
   var savedDir = null;
   var vid = $('vid');
@@ -1298,11 +1467,12 @@ var FastMon = (function () {
   }
   function pkey(c) { return tc(c) + '|' + plain(c); }
   function involves(e) { return !F.team || e.M.teams[0].code === F.team || e.M.teams[1].code === F.team; }
-  function scope(c) {
-    if (!F.team) return true;
+  function scope(c, G) {
+    G = G || F;
+    if (!G.team) return true;
     if (!involves(c.e)) return false;
-    var mine = tc(c) === F.team;
-    return F.who === 'both' ? true : F.who === 'opp' ? !mine : mine;
+    var mine = tc(c) === G.team;
+    return G.who === 'both' ? true : G.who === 'opp' ? !mine : mine;
   }
   function multi() { return LIB.filter(function (e) { return e.active; }).length > 1; }
   function scoreText(sc) { return sc.replace('-', '–'); }
@@ -1484,6 +1654,9 @@ var FastMon = (function () {
     var act = LIB.filter(function (e) { return e.active; });
     toggleGroup($('f-skill'), SKILL_ORDER.filter(function (k) { return present[k]; }).map(function (k) { return { v: k, l: SKILLS[k] }; }), F.skills, '', resetBelow, true);
     toggleGroup($('f-eval'), EVALS.map(function (k) { return { v: k, l: '<i>' + k + '</i>' + EV_NAME[k].split(' / ')[0], c: EV_VAR[k], t: EV_NAME[k] }; }), F.evals, 'ev');
+    toggleGroup($('f-tf'), tfItems(F.skills, 'A'), F.tf, '');
+    
+    $('d-det').hidden = !$('f-tf').children.length;
     toggleGroup($('f-phase'), [{ v: 'C', l: 'Cambio palla', t: 'Ricezione, prima alzata e primo attacco dopo la battuta avversaria' }, { v: 'T', l: 'Transizione', t: 'Tutto il resto: battuta, muro, difesa e le azioni dopo il primo attacco (break point)' }, { v: 'F', l: 'Freeball', t: 'Ricezione di freeball e relativa alzata e attacco' }], F.phases, '');
     toggleGroup($('f-set'), Object.keys(setsP).map(Number).sort(function (a, b) { return a - b; }).map(function (n) {
       var sc = act.length === 1 && act[0].M.setScores[n];
@@ -1491,19 +1664,40 @@ var FastMon = (function () {
     }), F.sets, '');
     toggleGroup($('f-rot'), [1, 2, 3, 4, 5, 6].map(function (n) { return { v: String(n), l: 'P' + n, t: 'Rotazione: posizione della palleggiatrice' }; }), F.rots, '');
     court($('f-zs'), F.zs);
-    renderConds();
+    renderAdv();
     court($('f-ze'), F.ze);
     buildMarkFilter();
   }
   /* ---------- condizioni sull'azione (prima / dopo / presente) ---------- */
-  var REL = [
-    { v: 'prev1', l: 'Subito prima' }, { v: 'prevAny', l: 'Prima, nell’azione' },
-    { v: 'next1', l: 'Subito dopo' }, { v: 'nextAny', l: 'Dopo, nell’azione' },
-    { v: 'any', l: 'Presente nell’azione' }
-  ];
+  function detItems(fn, skillSet, pre) {
+    var sk = Object.keys(skillSet || {}).filter(function (k) { return skillSet[k]; }), seen = {};
+    ALL.forEach(function (c) { if (sk.length && sk.indexOf(c.skill) < 0) return; var v = fn(c); if (v && v !== '~') seen[v] = 1; });
+    return Object.keys(seen).sort().map(function (v) { return { v: v, l: v, t: pre + v }; });
+  }
+  /* il 13° carattere del codice cambia significato col fondamentale: attacco = H/P/T (colpo), alzata = 1/2/3 (giocatori a muro contro cui si alza) */
+  function tfItems(skillSet, sk) {
+    var on = Object.keys(skillSet || {}).filter(function (k) { return skillSet[k]; });
+    if (on.indexOf(sk) < 0) return [];
+    var ok = sk === 'A' ? /^[HPT]$/ : /^[0-3]$/, seen = {};
+    ALL.forEach(function (c) { if (c.skill !== sk) return; var v = c.code.charAt(12); if (ok.test(v)) seen[v] = 1; });
+    return Object.keys(seen).sort().map(function (v) { return { v: v, l: v, t: sk === 'A' ? 'Colpo ' + v : v + (v === '1' ? ' muro' : ' muri') + ' davanti all’alzata' }; });
+  }
+  function comboItems(skillSet) {
+    var tab = allCombos(), seen = {}, out = [], sk = Object.keys(skillSet || {}).filter(function (k) { return skillSet[k]; });
+    ALL.forEach(function (c) {
+      if (!c.combo || (c.skill !== 'A' && c.skill !== 'E')) return;
+      if (sk.length && sk.indexOf(c.skill) < 0) return;
+      seen[c.combo] = c.skill;
+    });
+    Object.keys(seen).sort().forEach(function (k) {
+      var d = (tab[seen[k]] || {})[k] || (tab.A[k] || tab.E[k]) || {};
+      out.push({ v: k, l: k, t: (d.desc || '') + (d.zone ? ' · parte dalla zona ' + d.zone : '') });
+    });
+    return out;
+  }
   function whoList() {
-    if (F.team) return [{ v: 'team', l: 'Squadra analizzata (' + F.team + ')' }, { v: 'oppteam', l: 'Squadra avversaria' }];
-    return [{ v: 'same', l: 'Squadra analizzata' }, { v: 'opp', l: 'Squadra avversaria' }];
+    if (F.team) return [{ v: 'team', l: 'Squadra analizzata (' + F.team + ')' }, { v: 'oppteam', l: 'Squadra avversaria' }, { v: 'any', l: 'Qualsiasi squadra' }];
+    return [{ v: 'same', l: 'Squadra analizzata' }, { v: 'opp', l: 'Squadra avversaria' }, { v: 'any', l: 'Qualsiasi squadra' }];
   }
   function condTeamOk(x, c, who) {
     if (who === 'same') return x.side === c.side;
@@ -1517,7 +1711,446 @@ var FastMon = (function () {
     if (hasKeys(k.ev) && !k.ev[x.eval]) return false;
     if (hasKeys(k.zs) && !k.zs[x.startZ]) return false;
     if (hasKeys(k.ze) && !k.ze[x.endZ]) return false;
+    if (hasKeys(k.cmb) && !k.cmb[x.combo]) return false;
+    if (hasKeys(k.tg) && !k.tg[x.code.charAt(8)]) return false;
+    if (hasKeys(k.ty) && !k.ty[x.type]) return false;
+    if (hasKeys(k.tf) && !k.tf[x.code.charAt(12)]) return false;
     return true;
+  }
+  /* ---------- regole avanzate importate da Data Volley (.mon4) ---------- */
+  /* Relazioni dei criteri. 1-10: come in Data Volley (.mon4). 11-17: aggiunte, per poter esprimere tutto con le lettere. */
+  var ADV_RULES = ['', 'è subito prima', 'è subito dopo', 'è presente nell’azione', 'non è presente nell’azione', 'è uguale', 'non è uguale', 'non è subito prima', 'non è subito dopo', 'è nel possesso palla precedente', 'è nel possesso palla successivo',
+    'c’è prima, in un punto qualsiasi', 'c’è dopo, in un punto qualsiasi', 'c’è prima, senza che la palla sia passata dall’altra parte', 'c’è dopo, senza che la palla passi dall’altra parte',
+    'c’è nell’azione, escluso questo colpo', 'c’è subito prima (della squadra scelta)', 'c’è subito dopo (della squadra scelta)'];
+  /* menu del criterio: gruppi e voci in italiano, ordinate per significato */
+  var ADV_MENU = [
+    ['Questo colpo', [[5, 'è questa stessa azione'], [6, 'NON è questa stessa azione']]],
+    ['Prima di questo colpo', [[16, 'c’è subito prima (tra i colpi della squadra scelta)'], [1, 'c’è subito prima (il colpo immediatamente precedente)'], [11, 'c’è prima, in un punto qualsiasi dell’azione'],
+      [13, 'c’è prima, senza che la palla sia passata dall’altra parte'], [9, 'c’è nel possesso palla precedente'], [7, 'NON c’è subito prima (colpo immediatamente precedente)']]],
+    ['Dopo questo colpo', [[17, 'c’è subito dopo (tra i colpi della squadra scelta)'], [2, 'c’è subito dopo (il colpo immediatamente successivo)'], [12, 'c’è dopo, in un punto qualsiasi dell’azione'],
+      [14, 'c’è dopo, senza che la palla passi dall’altra parte'], [10, 'c’è nel possesso palla successivo'], [8, 'NON c’è subito dopo (colpo immediatamente successivo)']]],
+    ['Nell’azione', [[15, 'c’è nell’azione, escluso questo colpo'], [3, 'c’è nell’azione (compreso questo colpo)'], [4, 'NON c’è mai nell’azione']]]
+  ];
+  var ADV_REL_SHORT = { 1: 'subito prima', 2: 'subito dopo', 3: 'nell’azione', 4: 'mai nell’azione', 5: 'questa stessa azione', 6: 'NON questa stessa azione', 7: 'NON subito prima', 8: 'NON subito dopo', 9: 'nel possesso precedente', 10: 'nel possesso successivo',
+    11: 'prima, in un punto qualsiasi', 12: 'dopo, in un punto qualsiasi', 13: 'prima, senza passaggio di palla', 14: 'dopo, senza passaggio di palla', 15: 'nell’azione (escluso questo colpo)', 16: 'subito prima (squadra scelta)', 17: 'subito dopo (squadra scelta)' };
+  /* dimensioni di un colpo: posizione nel codice a 14 caratteri e valore del contatto (stessi campi dei filtri principali) */
+  var ADV_DIMS = [['sk', 3, 1], ['ty', 4, 1], ['ev', 5, 1], ['cmb', 6, 2], ['tg', 8, 1], ['zs', 9, 1], ['ze', 10, 1], ['tf', 12, 1]];
+  function advDimVal(x, d) {
+    switch (d) {
+      case 'sk': return x.skill; case 'ev': return x.eval; case 'ty': return x.type; case 'cmb': return x.combo;
+      case 'tg': return (x.code || '').charAt(8); case 'zs': return x.startZ; case 'ze': return x.endZ; case 'tf': return (x.code || '').charAt(12);
+    }
+    return '';
+  }
+  function advMatch(x, rule, c) {
+    if (!x) return false;
+    if (!condTeamOk(x, c, rule.s)) return false;
+    var p = rule.pat, o = rule.o, code = x.code || '', d, v;
+    for (var i = 1; i < p.length; i++) {
+      var ch = p.charAt(i);
+      if (ch === '~') continue;
+      if (o && ((i === 3 && o.sk && o.sk.length) || (i === 4 && o.ty && o.ty.length) || (i === 5 && o.ev && o.ev.length) || ((i === 6 || i === 7) && o.cmb && o.cmb.length) ||
+        (i === 8 && o.tg && o.tg.length) || (i === 9 && o.zs && o.zs.length) || (i === 10 && o.ze && o.ze.length) || (i === 12 && o.tf && o.tf.length))) continue;
+      if ((code.charAt(i) || '~') !== ch) return false;
+    }
+    if (o) for (var q = 0; q < ADV_DIMS.length; q++) {
+      d = ADV_DIMS[q][0]; v = o[d];
+      if (v && v.length && v.indexOf(advDimVal(x, d)) < 0) return false;
+    }
+    return true;
+  }
+  function advRun(R, p, dir) {      /* contatti del possesso precedente (dir -1) o successivo (dir 1) */
+    var side = R[p].side, j = p, out = [];
+    while (j >= 0 && j < R.length && R[j].side === side) j += dir;
+    if (j < 0 || j >= R.length) return out;
+    var s2 = R[j].side;
+    while (j >= 0 && j < R.length && R[j].side === s2) { out.push(R[j]); j += dir; }
+    return out;
+  }
+  /* "c'è prima/dopo": cerca il contatto che soddisfa il criterio; con poss = true la palla non deve essere passata dall'altra parte */
+  function advScan(c, rule, back, poss) {
+    var R = c.rl, p = c.pos, j, t, x;
+    for (j = p + (back ? -1 : 1); j >= 0 && j < R.length; j += back ? -1 : 1) {
+      x = R[j];
+      if (!advMatch(x, rule, c)) continue;
+      if (poss && x.side === c.side) {
+        var lo = Math.min(j, p), hi = Math.max(j, p), ok = true;
+        for (t = lo + 1; t < hi; t++) if (R[t].side !== c.side) { ok = false; break; }
+        if (!ok) continue;
+      }
+      return true;
+    }
+    return false;
+  }
+  /* "subito prima/dopo" della squadra scelta: si salta chi è dell'altra squadra, ma un freeball avversario in mezzo interrompe */
+  function advNear(c, rule, back) {
+    var R = c.rl, p = c.pos, j, t, x;
+    for (j = p + (back ? -1 : 1); j >= 0 && j < R.length; j += back ? -1 : 1) {
+      x = R[j];
+      if (!condTeamOk(x, c, rule.s)) continue;
+      if (x.side === c.side) {
+        var lo = Math.min(j, p), hi = Math.max(j, p);
+        for (t = lo + 1; t < hi; t++) if (R[t].skill === 'F' && R[t].side !== c.side) return false;
+      }
+      return advMatch(x, rule, c);
+    }
+    return false;
+  }
+  function advRuleOk(c, rule) {
+    var r = advRuleOk0(c, rule);
+    return rule.n ? !r : r;
+  }
+  function advRuleOk0(c, rule) {
+    var R = c.rl, p = c.pos, k;
+    switch (rule.r) {
+      case 5: return advMatch(c, rule, c);
+      case 6: return !advMatch(c, rule, c);
+      case 1: return p > 0 && advMatch(R[p - 1], rule, c);
+      case 2: return p + 1 < R.length && advMatch(R[p + 1], rule, c);
+      case 7: return !(p > 0 && advMatch(R[p - 1], rule, c));
+      case 8: return !(p + 1 < R.length && advMatch(R[p + 1], rule, c));
+      case 3: for (k = 0; k < R.length; k++) if (advMatch(R[k], rule, c)) return true; return false;
+      case 4: for (k = 0; k < R.length; k++) if (advMatch(R[k], rule, c)) return false; return true;
+      case 9: case 10: return advRun(R, p, rule.r === 9 ? -1 : 1).some(function (x) { return advMatch(x, rule, c); });
+      case 11: return advScan(c, rule, true, false);
+      case 12: return advScan(c, rule, false, false);
+      case 13: return advScan(c, rule, true, true);
+      case 14: return advScan(c, rule, false, true);
+      case 15: for (k = 0; k < R.length; k++) if (k !== p && advMatch(R[k], rule, c)) return true; return false;
+      case 16: return advNear(c, rule, true);
+      case 17: return advNear(c, rule, false);
+    }
+    return false;
+  }
+  /* formula tipo "(A or B) and C": piccolo interprete, senza eval */
+  function advCompile(formula) {
+    var toks = formula.replace(/~/g, ' ').replace(/([()])/g, ' $1 ').trim().split(/\s+/).filter(Boolean), pos = 0;
+    function peek() { return toks[pos] ? toks[pos].toLowerCase() : null; }
+    function orE() { var a = andE(); while (peek() === 'or') { pos++; a = (function (l, r2) { return function (v) { return l(v) || r2(v); }; })(a, andE()); } return a; }
+    function andE() { var a = notE(); while (peek() === 'and') { pos++; a = (function (l, r2) { return function (v) { return l(v) && r2(v); }; })(a, notE()); } return a; }
+    function notE() { if (peek() === 'not') { pos++; var x = notE(); return function (v) { return !x(v); }; } return atom(); }
+    function atom() {
+      var t = toks[pos++];
+      if (t === '(') { var e = orE(); pos++; return e; }
+      var ix = t ? t.toUpperCase().charCodeAt(0) - 65 : 0;
+      return function (v) { return !!v[ix]; };
+    }
+    return orE();
+  }
+  var advCache = {};
+  function advOk(c, G) {
+    var a = (G || F).adv; if (!a || !a.rules.length) return true;
+    var fn = advCache[a.formula]; if (!fn) fn = advCache[a.formula] = advCompile(a.formula);
+    var v = a.rules.map(function (rl) { return advRuleOk(c, rl); });
+    return fn(v);
+  }
+  function allCombos() {
+    var out = { A: {}, E: {} };
+    LIB.forEach(function (e) { if (!e.M.combos) return; ['A', 'E'].forEach(function (s) { Object.keys(e.M.combos[s]).forEach(function (k) { if (!out[s][k]) out[s][k] = e.M.combos[s][k]; }); }); });
+    return out;
+  }
+  function patGet(pat, i, n) { return ((pat || '') + '~~~~~~~~~~~~~~~~~~~~').substr(i, n).replace(/~/g, ''); }
+  function patSet(pat, i, n, val) {
+    var p = ((pat || '*') + '~~~~~~~~~~~~~~~~~~~~').split(''), v = (val || '').toUpperCase(), k;
+    for (k = 0; k < n; k++) p[i + k] = v.charAt(k) || '~';
+    return p.join('').replace(/~+$/, '');
+  }
+  function advFormulaOk(f, n) {
+    try {
+      var fn = advCompile(f), v = [], k; for (k = 0; k < n; k++) v.push(true);
+      if (!/[A-Za-z]/.test(f)) return false;
+      var dep = 0, ch; for (k = 0; k < f.length; k++) { ch = f.charAt(k); if (ch === '(') dep++; else if (ch === ')') { dep--; if (dep < 0) return false; } }
+      if (dep !== 0 || /(\b(and|or|not)\b|\()\s*$/i.test(f) || /^\s*(\b(and|or)\b|\))/i.test(f)) return false;
+      var letters = f.replace(/\band\b|\bor\b|\bnot\b/gi, ' ').match(/[A-Za-z]+/g) || [];
+      for (k = 0; k < letters.length; k++) if (letters[k].length !== 1 || letters[k].toUpperCase().charCodeAt(0) - 65 >= n) return false;
+      fn(v); return true;
+    } catch (e) { return false; }
+  }
+  /* ---------- testi in italiano per riassumere le condizioni ---------- */
+  var cqOpen = [];   /* oggetti (condizioni, alternative, criteri) con la scheda aperta: solo a schermo, non si salva */
+  function cqIsOpen(o) { return cqOpen.indexOf(o) >= 0; }
+  function cqSetOpen(o, v) { var i = cqOpen.indexOf(o); if (v && i < 0) cqOpen.push(o); if (!v && i >= 0) cqOpen.splice(i, 1); }
+  function keysOf(o) { return Object.keys(o || {}).filter(function (k) { return o[k]; }); }
+  function joinOr(a) { return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' o ' + a[a.length - 1]; }
+  function xText(x, anyWord) {
+    var sk = keysOf(x.sk).map(function (s) { return SKILLS[s].toLowerCase(); });
+    var m = [], v;
+    if ((v = keysOf(x.ev)).length) m.push('esito ' + v.join(' '));
+    if ((v = keysOf(x.ty)).length) m.push('tipo ' + v.join(' '));
+    if ((v = keysOf(x.cmb)).length) m.push('combinazione ' + v.join(' '));
+    if ((v = keysOf(x.tg)).length) m.push('bersaglio ' + v.join(' '));
+    if ((v = keysOf(x.tf)).length) m.push('colpo ' + v.join(' '));
+    if ((v = keysOf(x.zs)).length) m.push('da zona ' + v.join(' '));
+    if ((v = keysOf(x.ze)).length) m.push('verso zona ' + v.join(' '));
+    return (sk.length ? joinOr(sk) : anyWord) + (m.length ? ' (' + m.join(', ') + ')' : '');
+  }
+  function whoLabel(w) {
+    if (w === 'team') return 'squadra analizzata' + (F.team ? ' (' + F.team + ')' : '');
+    if (w === 'oppteam') return 'l’altra squadra' + (F.team ? ' (non ' + F.team + ')' : '');
+    return w === 'same' ? 'stessa squadra' : w === 'opp' ? 'avversari' : 'qualsiasi squadra';
+  }
+  function advDimList(rl, d) {
+    var o = rl.o && rl.o[d]; if (o && o.length) return o;
+    var q = ADV_DIMS.filter(function (z) { return z[0] === d; })[0], v = patGet(rl.pat, q[1], q[2]);
+    return v ? [v] : [];
+  }
+  function advRuleSentence(rl) {
+    var parts = [], v = advDimList(rl, 'sk');
+    parts.push(v.length ? joinOr(v.map(function (z) { return SKILLS[z] || z; })) : 'qualsiasi azione');
+    parts.push(whoLabel(rl.s));
+    [['ty', 'tipo '], ['ev', 'esito '], ['cmb', 'combinazione '], ['tg', 'bersaglio '], ['zs', 'da zona '], ['ze', 'a zona '], ['tf', 'colpo ']].forEach(function (d) {
+      var l = advDimList(rl, d[0]); if (l.length) parts.push(d[1] + joinOr(l));
+    });
+    return (rl.n ? 'NON deve valere: ' : '') + parts.join(' · ') + ' — ' + (ADV_REL_SHORT[rl.r] || '?');
+  }
+  function advFormulaIt(f) {
+    var t = (f || '').match(/\(|\)|[A-Za-z]+/g) || [];
+    return t.map(function (x) { var l = x.toLowerCase(); return l === 'and' ? 'e' : l === 'or' ? 'oppure' : l === 'not' ? 'NON' : x.toUpperCase(); }).join(' ').replace(/\( /g, '(').replace(/ \)/g, ')');
+  }
+  function renderQSum() {
+    var el = $('q-sum'); if (!el) return;
+    var main = { sk: F.skills, ev: F.evals, ty: F.ty, cmb: F.cmb, tg: F.tg, tf: F.tf, zs: F.zs, ze: F.ze }, ex = [], v;
+    var head = 'Cerca: <b>' + esc(xText(main, 'tutte le azioni')) + '</b>';
+    if ((v = keysOf(F.sets)).length) ex.push('nel set ' + v.join(', '));
+    if ((v = keysOf(F.phases)).length) ex.push('in ' + v.map(function (p) { return p === 'C' ? 'cambio palla' : p === 'T' ? 'transizione' : 'freeball'; }).join(' o '));
+    if ((v = keysOf(F.rots)).length) ex.push('con rotazione ' + v.map(function (r) { return 'P' + r; }).join(', '));
+    if (hasKeys(F.marks)) ex.push('con i marker scelti');
+    if (F.text) ex.push('il cui codice contiene “' + F.text + '”');
+    if (ex.length) head += ', ' + esc(ex.join(', '));
+    var li = [];
+    if (F.adv && F.adv.rules.length) {
+      var md = advMode(F.adv), intro = F.adv.rules.length < 2 ? 'Criterio' : md === 'all' ? 'Devono valere tutti questi criteri' : md === 'any' ? 'Deve valere almeno uno di questi criteri' : 'Criteri, validi se: ' + advFormulaIt(F.adv.formula);
+      li.push(esc(intro) + ':<ul>' + F.adv.rules.map(function (rl, i) { return '<li>' + esc(String.fromCharCode(65 + i) + ') ' + advRuleSentence(rl)) + '</li>'; }).join('') + '</ul>');
+    }
+    el.innerHTML = '<div class="qs-main">' + head + '</div>' + (li.length ? '<ul class="qs-list">' + li.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ul>' : '');
+    var n = F.adv ? F.adv.rules.length : 0;
+    $('cond-sum').textContent = n ? n + (n === 1 ? ' attiva' : ' attive') : '';
+    var ds = [], d = [['tf', 'colpo']];
+    d.forEach(function (z) { var kk = keysOf(F[z[0]]); if (kk.length) ds.push(z[1] + ' ' + kk.join(' ')); });
+    $('det-sum').textContent = ds.join(' · ');
+    var em = $('cq-empty'); if (em) em.hidden = !!n;
+  }
+  /* ---------- pezzi di interfaccia condivisi ---------- */
+  function cqCard(obj, textFn, rmFn, rmLabel) {
+    var card = document.createElement('div'); card.className = 'cond cq-card';
+    var head = document.createElement('div'); head.className = 'cq-head';
+    var s = document.createElement('span'); s.className = 'cq-s'; s.textContent = textFn();
+    var ed = document.createElement('button'); ed.type = 'button'; ed.className = 'btn small cq-edit';
+    var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'xb'; rm.textContent = '×'; rm.setAttribute('aria-label', rmLabel);
+    rm.addEventListener('click', rmFn);
+    var body = document.createElement('div'); body.className = 'cq-body';
+    function show(o) { body.hidden = !o; ed.textContent = o ? 'Chiudi' : 'Modifica'; ed.setAttribute('aria-expanded', o ? 'true' : 'false'); card.classList.toggle('open', o); }
+    show(cqIsOpen(obj));
+    ed.addEventListener('click', function () { var o = body.hidden; cqSetOpen(obj, o); show(o); });
+    head.appendChild(s); head.appendChild(ed); head.appendChild(rm);
+    card.appendChild(head); card.appendChild(body);
+    return { card: card, body: body, refresh: function () { s.textContent = textFn(); renderQSum(); } };
+  }
+  function cqMore(parent, fill, forceOpen) {
+    var inner = document.createElement('div'); inner.className = 'cq-moreb'; fill(inner);
+    if (!inner.children.length) return;
+    var d = document.createElement('details'); d.className = 'cq-more';
+    var sm = document.createElement('summary'); sm.textContent = 'Altri dettagli del colpo (bersaglio, tipo, colpo)'; d.appendChild(sm); d.appendChild(inner);
+    if (forceOpen) d.open = true;
+    parent.appendChild(d);
+  }
+  function cqSel(opts, val, fn) {
+    var s = document.createElement('select'); s.className = 'field';
+    s.innerHTML = opts.map(function (o) { return '<option value="' + esc(o.v) + '">' + esc(o.l) + '</option>'; }).join('');
+    s.value = val; s.addEventListener('change', function () { fn(s.value); }); return s;
+  }
+  /* ---------- editor unico dei criteri (A, B, C…) ---------- */
+  var advCustom = [];   /* formule scelte a mano ("formula personalizzata"): solo a schermo, non si salva */
+  function advLetters(n) { var L = [], k; for (k = 0; k < n; k++) L.push(String.fromCharCode(65 + k)); return L; }
+  function advMode(a) {
+    if (advCustom.indexOf(a) >= 0) return 'custom';
+    var f = a.formula.replace(/\s+/g, '').toLowerCase(), L = advLetters(a.rules.length).join(' ').toLowerCase().split(' ');
+    if (f === L.join('and')) return 'all';
+    if (f === L.join('or')) return 'any';
+    return 'custom';
+  }
+  function advSetMode(a, mode) { a.formula = advLetters(a.rules.length).join(mode === 'any' ? ' or ' : ' and '); }
+  function advStore(rl, d) {
+    var st = {}; advDimList(rl, d).forEach(function (v) { st[v] = true; }); return st;
+  }
+  function advCommit(rl, d, st) {
+    var q = ADV_DIMS.filter(function (z) { return z[0] === d; })[0], keys = Object.keys(st).filter(function (k) { return st[k]; });
+    rl.pat = patSet(rl.pat, q[1], q[2], '');
+    if (!rl.o) rl.o = {};
+    if (keys.length) rl.o[d] = keys; else delete rl.o[d];
+    if (!Object.keys(rl.o).length) delete rl.o;
+  }
+  function advTeamList() {
+    var l = [{ v: 'same', l: 'Stessa squadra dell’azione' }, { v: 'opp', l: 'Squadra avversaria' }, { v: 'any', l: 'Qualsiasi squadra' }];
+    if (F.team) l.push({ v: 'team', l: 'Sempre la squadra analizzata (' + F.team + ')' }, { v: 'oppteam', l: 'Sempre l’altra squadra (non ' + F.team + ')' });
+    return l;
+  }
+  function renderAdv() {
+    var b = $('adv-box'); if (!b) return;
+    if (!F.adv || !F.adv.rules.length) { F.adv = null; b.hidden = true; b.innerHTML = ''; renderQSum(); return; }
+    var A = F.adv;
+    b.hidden = false; b.innerHTML = '';
+    var present = {}; ALL.forEach(function (c) { present[c.skill] = true; });
+    var skills = SKILL_ORDER.filter(function (s) { return present[s]; });
+    var head = document.createElement('div'); head.className = 'advhead';
+    head.innerHTML = '<b class="cq-title">Criteri <small>A, B, C… uniti dalla scelta qui sotto</small></b>';
+    var off = document.createElement('button'); off.type = 'button'; off.className = 'btn small'; off.textContent = 'Togli tutti';
+    off.addEventListener('click', function () { A.rules.forEach(function (r) { cqSetOpen(r, false); }); F.adv = null; renderAdv(); applyFilters(); });
+    head.appendChild(off); b.appendChild(head);
+    var mode = advMode(A);
+    if (A.rules.length > 1 || mode === 'custom') {
+      var mw = document.createElement('div'); mw.className = 'cmode';
+      mw.innerHTML = '<span class="label">Devono valere</span>' +
+        '<label><input type="radio" name="advmode" value="all"> tutti i criteri</label>' +
+        '<label><input type="radio" name="advmode" value="any"> almeno un criterio</label>' +
+        '<label><input type="radio" name="advmode" value="custom"> formula personalizzata</label>';
+      Array.prototype.forEach.call(mw.querySelectorAll('input'), function (i) {
+        i.checked = i.value === mode;
+        i.addEventListener('change', function () {
+          var ix = advCustom.indexOf(A); if (ix >= 0) advCustom.splice(ix, 1);
+          if (i.value === 'custom') advCustom.push(A); else advSetMode(A, i.value);
+          renderAdv(); applyFilters();
+        });
+      });
+      b.appendChild(mw);
+    }
+    var fsum = document.createElement('p'); fsum.className = 'cq-fsum'; b.appendChild(fsum);
+    function fsumUpd() { fsum.innerHTML = 'Vale se: <b>' + esc(advFormulaIt(A.formula)) + '</b>'; renderQSum(); }
+    function sel(opts, val, fn) { return cqSel(opts, val, fn); }
+    function lab(txt, el) { var l = document.createElement('label'); l.className = 'advfld'; var sp = document.createElement('span'); sp.textContent = txt; l.appendChild(sp); l.appendChild(el); return l; }
+    A.rules.forEach(function (rl, i) {
+      if (!rl.s) rl.s = 'any';
+      if (!F.team && (rl.s === 'team' || rl.s === 'oppteam')) rl.s = rl.s === 'team' ? 'same' : 'opp';
+      var C = cqCard(rl, function () { return advRuleSentence(rl); }, function () {
+        var wasMode = advMode(A);
+        cqSetOpen(rl, false); A.rules.splice(i, 1);
+        if (!A.rules.length) F.adv = null;
+        else {
+          var ix = advCustom.indexOf(A); if (ix >= 0) advCustom.splice(ix, 1);
+          advSetMode(A, wasMode === 'any' ? 'any' : 'all');
+          if (wasMode === 'custom') toast('Ho tolto il criterio: la formula è tornata a «tutti i criteri». Controllala.');
+        }
+        renderAdv(); applyFilters();
+      }, 'Elimina questo criterio');
+      C.card.className = 'advrule cq-card';
+      var ltr = document.createElement('b'); ltr.className = 'advletter'; ltr.textContent = String.fromCharCode(65 + i);
+      C.card.firstChild.insertBefore(ltr, C.card.firstChild.firstChild);
+      var upd = function () { C.refresh(); };
+      /* riga 1: relazione, NON, squadra */
+      var tt = document.createElement('div'); tt.className = 'advtop';
+      var rs = document.createElement('select'); rs.className = 'field'; rs.setAttribute('aria-label', 'Relazione con questa azione');
+      rs.innerHTML = ADV_MENU.map(function (g) { return '<optgroup label="' + esc(g[0]) + '">' + g[1].map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</optgroup>'; }).join('');
+      rs.value = String(rl.r); if (rs.value !== String(rl.r)) { rs.insertAdjacentHTML('afterbegin', '<option value="' + rl.r + '">' + esc(ADV_RULES[rl.r] || 'relazione ' + rl.r) + '</option>'); rs.value = String(rl.r); }
+      rs.addEventListener('change', function () { rl.r = +rs.value; upd(); applyFilters(); });
+      tt.appendChild(rs);
+      var nl = document.createElement('label'); nl.className = 'cond-poss';
+      var nc = document.createElement('input'); nc.type = 'checkbox'; nc.checked = !!rl.n;
+      nc.addEventListener('change', function () { if (nc.checked) rl.n = true; else delete rl.n; upd(); applyFilters(); });
+      nl.appendChild(nc); nl.appendChild(document.createTextNode(' NON deve valere')); tt.appendChild(nl);
+      var tl = advTeamList(); if (!tl.some(function (w) { return w.v === rl.s; })) tl.push({ v: rl.s, l: whoLabel(rl.s) });
+      tt.appendChild(sel(tl, rl.s, function (v) { rl.s = v; upd(); applyFilters(); }));
+      C.body.appendChild(tt);
+      /* righe con le scelte multiple */
+      function row(parent, label, items, d, cls, after) {
+        var st0 = advStore(rl, d);
+        Object.keys(st0).forEach(function (k) { if (!items.some(function (it) { return it.v === k; }) && (d !== 'cmb' || k.length === 2)) items.push({ v: k, l: SKILLS[k] && d === 'sk' ? SKILLS[k] : k }); });
+        if (!items.length) return;
+        var w = document.createElement('div'); w.className = 'cq-row';
+        var lb = document.createElement('span'); lb.className = 'label'; lb.textContent = label; w.appendChild(lb);
+        var ch = document.createElement('div'); ch.className = 'chips'; w.appendChild(ch);
+        items.forEach(function (it) {
+          var bt = mkChip(it.l, cls); bt.setAttribute('aria-pressed', st0[it.v] ? 'true' : 'false');
+          if (it.c) bt.style.setProperty('--c', 'var(' + it.c + ')');
+          if (it.t) bt.title = it.t;
+          bt.addEventListener('click', function () {
+            var st = advStore(rl, d);   /* sempre lo stato di adesso: il campo combinazione può averlo cambiato */
+            st[it.v] = !st[it.v]; bt.setAttribute('aria-pressed', st[it.v] ? 'true' : 'false');
+            advCommit(rl, d, st);
+            if (after && after(st)) { renderAdv(); } else upd();
+            applyFilters();
+          });
+          ch.appendChild(bt);
+        });
+        parent.appendChild(w);
+      }
+      function advCourt(parent) {
+        var zr = document.createElement('div'); zr.className = 'cond-z';
+        function zc(title, d) {
+          var st0 = advStore(rl, d), w = document.createElement('div'); w.className = 'cond-court';
+          w.innerHTML = '<span class="label">' + title + '</span><div class="court-net">rete</div>';
+          var g = document.createElement('div'); g.className = 'court-grid'; w.appendChild(g);
+          [4, 3, 2, 7, 8, 9, 5, 6, 1].forEach(function (z) {
+            var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'cz'; bt.textContent = z; bt.setAttribute('aria-label', title + ' ' + z);
+            bt.setAttribute('aria-pressed', st0[z] ? 'true' : 'false');
+            bt.addEventListener('click', function () { var st = advStore(rl, d); st[z] = !st[z]; bt.setAttribute('aria-pressed', st[z] ? 'true' : 'false'); advCommit(rl, d, st); upd(); applyFilters(); });
+            g.appendChild(bt);
+          });
+          return w;
+        }
+        zr.appendChild(zc('Da zona', 'zs')); zr.appendChild(zc('A zona', 'ze'));
+        parent.appendChild(zr);
+      }
+      row(C.body, 'Fondamentale', skills.map(function (s) { return { v: s, l: SKILLS[s] }; }), 'sk', '', function () { return true; });
+      row(C.body, 'Esito', EVALS.map(function (e2) { return { v: e2, l: '<i>' + e2 + '</i>' + EV_NAME[e2].split(' / ')[0], c: EV_VAR[e2], t: EV_NAME[e2] }; }), 'ev', 'ev');
+      /* combinazione: campo con autocompletamento + scelte multiple; la zona di partenza si imposta da sola */
+      var cw = document.createElement('div'); cw.className = 'cq-row';
+      var cl = document.createElement('span'); cl.className = 'label'; cl.textContent = 'Combinazione'; cw.appendChild(cl);
+      var cmbIn = document.createElement('input'); cmbIn.className = 'field advcmb'; cmbIn.type = 'text'; cmbIn.maxLength = 2; cmbIn.size = 4; cmbIn.placeholder = 'es. K1';
+      cmbIn.setAttribute('list', 'adv-combos'); cmbIn.setAttribute('aria-label', 'Combinazione (scrivi il codice)');
+      var cur0 = advDimList(rl, 'cmb'); cmbIn.value = cur0.length === 1 ? cur0[0] : '';
+      cw.appendChild(cmbIn); C.body.appendChild(cw);
+      cmbIn.addEventListener('focus', function () {
+        var cb = allCombos(), sk = advDimList(rl, 'sk'), h = '';
+        function opt(s, k) { var d = cb[s][k]; return '<option value="' + esc(k) + '">' + esc((d.desc || '') + (d.zone ? ' · zona ' + d.zone : '')) + '</option>'; }
+        if (!sk.length || sk.indexOf('A') >= 0) Object.keys(cb.A).forEach(function (k) { h += opt('A', k); });
+        if (!sk.length || sk.indexOf('E') >= 0) Object.keys(cb.E).forEach(function (k) { h += opt('E', k); });
+        $('adv-combos').innerHTML = h;
+      });
+      function back() { renderAdv(); applyFilters(); var c2 = document.querySelectorAll('#adv-box .advrule')[i]; var ci2 = c2 && c2.querySelector('input.advcmb'); if (ci2) { ci2.focus(); ci2.setSelectionRange(ci2.value.length, ci2.value.length); } }
+      cmbIn.addEventListener('input', function () {
+        var code = cmbIn.value.toUpperCase();
+        if (code.length === 0) { advCommit(rl, 'cmb', {}); back(); return; }
+        if (code.length < 2) return;
+        var cb = allCombos(), sk = advDimList(rl, 'sk'), info = null, isE = false;
+        advCommit(rl, 'cmb', (function (o) { o[code] = true; return o; })({}));
+        if ((!sk.length || sk.indexOf('A') >= 0) && cb.A[code]) { info = cb.A[code]; if (!sk.length) advCommit(rl, 'sk', { A: true }); }
+        else if ((!sk.length || sk.indexOf('E') >= 0) && cb.E[code]) { isE = true; if (!sk.length) advCommit(rl, 'sk', { E: true }); }
+        if (info) { if (info.zone) advCommit(rl, 'zs', (function (o) { o[info.zone] = true; return o; })({})); if (info.type) advCommit(rl, 'ty', (function (o) { o[info.type] = true; return o; })({})); back(); }
+        else back();
+      });
+      row(C.body, 'Scegli tra le combinazioni', comboItems(advStore(rl, 'sk')), 'cmb', '', function (st) {
+        var zs = advStore(rl, 'zs'); if (syncZoneFromCombo(st, zs)) { advCommit(rl, 'zs', zs); return true; } return false;
+      });
+      advCourt(C.body);
+      cqMore(C.body, function (m) {
+        var skS = advStore(rl, 'sk');
+        row(m, 'Bersaglio', detItems(function (c) { return c.code.charAt(8); }, skS, 'Bersaglio '), 'tg', '');
+        row(m, 'Tipo', detItems(function (c) { return c.type; }, skS, 'Tipo '), 'ty', '');
+        row(m, 'Colpo di attacco', tfItems(skS, 'A'), 'tf', '');
+      }, advDimList(rl, 'tg').length + advDimList(rl, 'ty').length + advDimList(rl, 'tf').length > 0);
+      b.appendChild(C.card);
+    });
+    var fd = document.createElement('details'); fd.className = 'cq-more advformula'; fd.open = mode === 'custom';
+    var fsm = document.createElement('summary'); fsm.textContent = 'Formula personalizzata (lettere con and / or / not)'; fd.appendChild(fsm);
+    var fi = document.createElement('input'); fi.className = 'field'; fi.type = 'text'; fi.value = A.formula; fi.setAttribute('aria-label', 'Formula dei criteri');
+    fi.addEventListener('input', function () {
+      var ok = advFormulaOk(fi.value, A.rules.length); fi.classList.toggle('bad', !ok);
+      if (ok) {
+        A.formula = fi.value.trim(); fsumUpd(); applyFilters();
+        var md2 = advMode(A); Array.prototype.forEach.call(b.querySelectorAll('input[name=advmode]'), function (r2) { r2.checked = r2.value === md2; });
+      }
+    });
+    fd.appendChild(lab('Vale se (lettere dei criteri con and / or / not e parentesi)', fi)); b.appendChild(fd);
+    fsumUpd();
+    $('d-cond').open = true;
+  }
+  function advAddRule() {
+    var A = F.adv || { formula: '', rules: [] }, k = A.rules.length;
+    if (k >= 26) { toast('Non si possono aggiungere più di 26 criteri.'); return; }
+    var mode = k ? advMode(A) : 'all', rule = { s: 'same', pat: '*', r: k ? 11 : 5 };
+    F.adv = A; A.rules.push(rule); cqSetOpen(rule, true);
+    if (mode === 'custom') A.formula = A.formula + ' and ' + String.fromCharCode(65 + k); else advSetMode(A, mode);
+    renderAdv(); applyFilters();
   }
   function condOk(c, k) {
     var R = c.rl, p = c.pos, j, x, t;
@@ -1528,7 +2161,7 @@ var FastMon = (function () {
     var back = k.rel === 'prev1' || k.rel === 'prevAny', one = k.rel === 'prev1' || k.rel === 'next1';
     for (j = p + (back ? -1 : 1); j >= 0 && j < R.length; j += back ? -1 : 1) {
       x = R[j];
-      if (!condTeamOk(x, c, k.who)) continue;
+      if (!condTeamOk(x, c, k.who)) { if (k.strict && one) return false; continue; }
       var lo = Math.min(j, p), hi = Math.max(j, p);
       if (one) {
         if (x.side === c.side) {
@@ -1546,76 +2179,16 @@ var FastMon = (function () {
     }
     return false;
   }
-  function renderConds() {
-    var box = $('conds'); if (!box) return;
-    box.innerHTML = '';
-    var present = {}; ALL.forEach(function (c) { present[c.skill] = true; });
-    var skills = SKILL_ORDER.filter(function (s) { return present[s]; });
-    function sel(opts, val, fn) {
-      var s = document.createElement('select'); s.className = 'field';
-      s.innerHTML = opts.map(function (o) { return '<option value="' + esc(o.v) + '">' + esc(o.l) + '</option>'; }).join('');
-      s.value = val; s.addEventListener('change', function () { fn(s.value); }); return s;
-    }
-    var zopts = [{ v: '', l: 'qualsiasi' }].concat([1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (n) { return { v: String(n), l: String(n) }; }));
-    F.conds.forEach(function (k, idx) {
-      var card = document.createElement('div'); card.className = 'cond';
-      var top = document.createElement('div'); top.className = 'cond-top';
-      top.appendChild(sel(REL, k.rel, function (v) { k.rel = v; renderConds(); applyFilters(); }));
-      var wl = whoList(); if (!wl.some(function (w) { return w.v === k.who; })) k.who = wl[0].v;
-      top.appendChild(sel(wl, k.who, function (v) { k.who = v; renderConds(); applyFilters(); }));
-      var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'xb'; rm.textContent = '×'; rm.setAttribute('aria-label', 'Togli la condizione');
-      rm.addEventListener('click', function () { F.conds.splice(idx, 1); renderConds(); applyFilters(); });
-      top.appendChild(rm); card.appendChild(top);
-      function chipRow(label, items, store, cls) {
-        var w = document.createElement('div'); w.className = 'sgroup';
-        w.innerHTML = '<span class="label">' + label + '</span>';
-        var ch = document.createElement('div'); ch.className = 'chips'; w.appendChild(ch);
-        items.forEach(function (it) {
-          var b = mkChip(it.l, cls); b.setAttribute('aria-pressed', store[it.v] ? 'true' : 'false');
-          if (it.c) b.style.setProperty('--c', 'var(' + it.c + ')');
-          if (it.t) b.title = it.t;
-          b.addEventListener('click', function () { store[it.v] = !store[it.v]; b.setAttribute('aria-pressed', store[it.v] ? 'true' : 'false'); applyFilters(); });
-          ch.appendChild(b);
-        });
-        card.appendChild(w);
-      }
-      chipRow('Fondamentale', skills.map(function (s) { return { v: s, l: SKILLS[s] }; }), k.sk, '');
-      chipRow('Esito', EVALS.map(function (e2) { return { v: e2, l: '<i>' + e2 + '</i>' + EV_NAME[e2].split(' / ')[0], c: EV_VAR[e2], t: EV_NAME[e2] }; }), k.ev, 'ev');
-      var zr = document.createElement('div'); zr.className = 'cond-z';
-      function zc(title, key) {
-        if (typeof k[key] !== 'object') k[key] = {};
-        var w = document.createElement('div'); w.className = 'cond-court';
-        w.innerHTML = '<span class="label">' + title + '</span><div class="court-net">rete</div>';
-        var g = document.createElement('div'); g.className = 'court-grid'; w.appendChild(g);
-        [4, 3, 2, 7, 8, 9, 5, 6, 1].forEach(function (z) {
-          var b = document.createElement('button'); b.type = 'button'; b.className = 'cz'; b.textContent = z;
-          b.setAttribute('aria-pressed', k[key][z] ? 'true' : 'false');
-          b.addEventListener('click', function () {
-            k[key][z] = !k[key][z]; b.setAttribute('aria-pressed', k[key][z] ? 'true' : 'false');
-            applyFilters();
-          });
-          g.appendChild(b);
-        });
-        return w;
-      }
-      var za = zc('Zona di partenza', 'zs'), zb = zc('Zona di arrivo', 'ze');
-      zr.appendChild(za); zr.appendChild(zb); card.appendChild(zr);
-      if ((k.rel === 'prevAny' || k.rel === 'nextAny')) {
-        var lb = document.createElement('label'); lb.className = 'cond-poss';
-        var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!k.poss;
-        cb.addEventListener('change', function () { k.poss = cb.checked; applyFilters(); });
-        lb.appendChild(cb); lb.appendChild(document.createTextNode(' Solo se la palla non è passata dall’altra parte'));
-        card.appendChild(lb);
-      }
-      box.appendChild(card);
-    });
-    if (F.conds.length) $('d-cond').open = true;
-    $('cond-sum').textContent = F.conds.length ? F.conds.length + (F.conds.length === 1 ? ' attiva' : ' attive') : '';
+  /* scelta di una combinazione: la zona di partenza si imposta da sola (è fissata nella tabella dello scout) */
+  function syncZoneFromCombo(cmbStore, zsStore) {
+    var tab = allCombos().A, zs = {};
+    Object.keys(cmbStore).forEach(function (k) { if (cmbStore[k] && tab[k] && tab[k].zone) zs[tab[k].zone] = true; });
+    if (!Object.keys(zs).length) return false;
+    Object.keys(zsStore).forEach(function (k) { delete zsStore[k]; });
+    Object.keys(zs).forEach(function (k) { zsStore[k] = true; });
+    return true;
   }
-  $('cond-add').addEventListener('click', function () {
-    F.conds.push({ rel: 'prevAny', who: whoList()[0].v, sk: {}, ev: {}, zs: {}, ze: {}, poss: true });
-    renderConds(); applyFilters();
-  });
+  $('adv-add').addEventListener('click', function () { advAddRule(); });
 
   function court(el, store) {
     el.innerHTML = '';
@@ -1631,8 +2204,8 @@ var FastMon = (function () {
     });
   }
   function resetBelow() {
-    F.evals = {}; F.sets = {}; F.phases = {}; F.rots = {}; F.zs = {}; F.ze = {};
-    F.conds = []; F.marks = {}; F.text = '';
+    F.evals = {}; F.sets = {}; F.phases = {}; F.rots = {}; F.zs = {}; F.ze = {}; F.cmb = {}; F.tg = {}; F.ty = {}; F.tf = {}; F.alt = []; F.cmode = 'all';
+    F.conds = []; F.marks = {}; F.text = ''; F.adv = null;
     $('f-code').value = '';
     buildFilters();
   }
@@ -1675,21 +2248,31 @@ var FastMon = (function () {
     }).join('');
     sel.value = F.player;
   }
-  function matches(c, tokens) {
-    if (!scope(c)) return false;
-    if (F.player && pkey(c) !== F.player) return false;
-    if (hasKeys(F.skills) && !F.skills[c.skill]) return false;
-    if (hasKeys(F.evals) && !F.evals[c.eval]) return false;
-    if (hasKeys(F.sets) && !F.sets[c.set]) return false;
-    if (hasKeys(F.phases) && !F.phases[c.phase]) return false;
-    if (hasKeys(F.rots) && !F.rots[c.rot]) return false;
-    if (hasKeys(F.zs) && !F.zs[c.startZ]) return false;
-    if (hasKeys(F.ze) && !F.ze[c.endZ]) return false;
-    for (var ci = 0; ci < F.conds.length; ci++) if (!condOk(c, F.conds[ci])) return false;
-    if (hasKeys(F.marks)) {
+  function matches(c, tokens, G) {
+    G = G || F;
+    if (!scope(c, G)) return false;
+    if (G.player && pkey(c) !== G.player) return false;
+    if (hasKeys(G.skills) && !G.skills[c.skill]) return false;
+    if (hasKeys(G.evals) && !G.evals[c.eval]) return false;
+    if (hasKeys(G.sets) && !G.sets[c.set]) return false;
+    if (hasKeys(G.phases) && !G.phases[c.phase]) return false;
+    if (G.adv && !advOk(c, G)) return false;
+    if (hasKeys(G.rots) && !G.rots[c.rot]) return false;
+    if (hasKeys(G.zs) && !G.zs[c.startZ]) return false;
+    if (hasKeys(G.ze) && !G.ze[c.endZ]) return false;
+    if (hasKeys(G.cmb) && !G.cmb[c.combo]) return false;
+    if (hasKeys(G.tg) && !G.tg[c.code.charAt(8)]) return false;
+    if (hasKeys(G.ty) && !G.ty[c.type]) return false;
+    if (hasKeys(G.tf) && !G.tf[c.code.charAt(12)]) return false;
+    if (G.alt && G.alt.length && !G.alt.some(function (a) { return condMatchX(c, a); })) return false;
+    if (G.conds.length) {
+      var okc = G.cmode === 'any' ? G.conds.some(function (k) { return condOk(c, k) !== !!k.neg; }) : G.conds.every(function (k) { return condOk(c, k) === !k.neg; });
+      if (!okc) return false;
+    }
+    if (hasKeys(G.marks)) {
       var mm = MARKS[c.uid] || [], okm = false;
-      if (F.marks.none && !mm.length) okm = true;
-      for (var q = 0; q < mm.length; q++) if (F.marks[mm[q]]) okm = true;
+      if (G.marks.none && !mm.length) okm = true;
+      for (var q = 0; q < mm.length; q++) if (G.marks[mm[q]]) okm = true;
       if (!okm) return false;
     }
     if (tokens.length) {
@@ -1699,14 +2282,25 @@ var FastMon = (function () {
     return true;
   }
   function applyFilters() {
+    renderQSum();
     var tokens = F.text.split(',').map(function (t) { return t.trim().toUpperCase(); }).filter(Boolean);
     var keep = cur >= 0 ? queue[cur] : null;
-    queue = ALL.filter(function (c) { return matches(c, tokens); });
+    if (MS && MASKS.indexOf(MS.mask) < 0) MS = null;
+    if (MS) {
+      queue = []; qstep = []; msCounts = [];
+      MS.mask.steps.forEach(function (st, si) {
+        var g = fromMaskF(st.f); if (st.f.ask && MS.player) g.player = MS.player;
+        var tk = (g.text || '').split(',').map(function (t) { return t.trim().toUpperCase(); }).filter(Boolean), n = 0;
+        ALL.forEach(function (c) { if (matches(c, tk, g)) { queue.push(c); qstep.push(si); n++; } });
+        msCounts.push(n);
+      });
+    } else { qstep = null; queue = ALL.filter(function (c) { return matches(c, tokens); }); }
     cur = keep ? queue.indexOf(keep) : -1;
     if (keep && cur < 0) { vid.pause(); clip = null; ended = false; S.all = false; syncAllBtn(); updateNow(); updateBar(0); }
     renderList();
     renderStats();
     if (typeof updateMaskStatus === 'function') updateMaskStatus();
+    if (EDIT) $('ed-count').textContent = queue.length + (queue.length === 1 ? ' azione trovata' : ' azioni trovate');
   }
 
   /* ---------- lista ---------- */
@@ -1728,7 +2322,10 @@ var FastMon = (function () {
   function renderMore(upTo) {
     if (rendered >= queue.length) return;
     var end = Math.min(queue.length, Math.max(upTo, rendered + CHUNK)), h = '';
-    for (var q = rendered; q < end; q++) h += rowHtml(queue[q], q);
+    for (var q = rendered; q < end; q++) {
+      if (qstep && (q === 0 || qstep[q] !== qstep[q - 1])) h += '<li class="stephead"><span class="sn">Passo ' + (qstep[q] + 1) + ' di ' + MS.mask.steps.length + '</span><b>' + esc(MS.mask.steps[qstep[q]].name) + '</b><small>' + msCounts[qstep[q]] + (msCounts[qstep[q]] === 1 ? ' azione' : ' azioni') + '</small></li>';
+      h += rowHtml(queue[q], q);
+    }
     $('list').insertAdjacentHTML('beforeend', h); rendered = end;
   }
   function checkMore() {
@@ -2286,32 +2883,38 @@ var FastMon = (function () {
   $('f-player').addEventListener('change', function (e) { F.player = e.target.value; applyFilters(); });
   $('f-code').addEventListener('input', function (e) { F.text = e.target.value; applyFilters(); });
   $('f-reset').addEventListener('click', function () {
-    F = { team: F.team, who: F.who, player: '', skills: {}, evals: {}, sets: {}, phases: {}, rots: {}, zs: {}, ze: {}, conds: [], marks: {}, text: '' };
+    MS = null; maskActive = null; renderMaskSelect();
+    F = { team: F.team, who: F.who, player: '', skills: {}, evals: {}, sets: {}, phases: {}, rots: {}, zs: {}, ze: {}, cmb: {}, tg: {}, ty: {}, tf: {}, alt: [], cmode: 'all', conds: [], marks: {}, text: '', adv: null };
     $('f-code').value = ''; buildFilters(); applyFilters();
   });
 
   /* ---------- maschere di ricerca (come in Data Volley: filtri salvati con un nome, in cartelle) ---------- */
-  var MKEY = 'reader-scout-video-masks', MASKS = [], mkEdit = '';
+  var MKEY = 'reader-scout-video-masks', MASKS = [], mkEdit = '', mkStep = '';
   try { var mm = JSON.parse(localStorage.getItem(MKEY) || 'null'); if (mm && mm.length) MASKS = mm; } catch (e) {}
+  /* (migrateMasks è chiamata più sotto, dopo la definizione di tutte le variabili) */
   function saveMasks() { try { localStorage.setItem(MKEY, JSON.stringify(MASKS)); } catch (e) {} }
   function cpOn(o) { var r2 = {}; for (var k in o) if (o[k]) r2[k] = true; return r2; }
   function snapMask(withPlayer, withTimes) {
-    var f = { who: F.who, skills: cpOn(F.skills), evals: cpOn(F.evals), sets: cpOn(F.sets), phases: cpOn(F.phases), rots: cpOn(F.rots), zs: cpOn(F.zs), ze: cpOn(F.ze),
-      conds: JSON.parse(JSON.stringify(F.conds)), marks: cpOn(F.marks), text: F.text };
+    var f = { who: F.who, skills: cpOn(F.skills), evals: cpOn(F.evals), sets: cpOn(F.sets), phases: cpOn(F.phases), rots: cpOn(F.rots), zs: cpOn(F.zs), ze: cpOn(F.ze), cmb: cpOn(F.cmb), tg: cpOn(F.tg), ty: cpOn(F.ty), tf: cpOn(F.tf), alt: JSON.parse(JSON.stringify(F.alt || [])), cmode: F.cmode === 'any' ? 'any' : 'all',
+      conds: JSON.parse(JSON.stringify(F.conds)), marks: cpOn(F.marks), text: F.text, adv: F.adv ? JSON.parse(JSON.stringify(F.adv)) : null };
+    migrateF(f);
     if (withPlayer && F.player) f.player = F.player;
     var m = { f: f }; if (withTimes) m.t = { pre: S.pre, dur: S.dur };
     return m;
   }
   function describeMask(m) {
+    if (m.steps && m.steps.length > 1) return m.steps.length + ' passi: ' + m.steps.map(function (s) { return s.name; }).join(' · ');
     var f = m.f, p = [];
     var sk = Object.keys(f.skills || {}).map(function (k) { return SKILLS[k]; }); if (sk.length) p.push(sk.join(' / '));
     var ev = Object.keys(f.evals || {}); if (ev.length) p.push('esito ' + ev.join(' '));
     var rt = Object.keys(f.rots || {}); if (rt.length) p.push('P' + rt.join(' P'));
     var st = Object.keys(f.sets || {}); if (st.length) p.push('set ' + st.join(','));
     var ph = Object.keys(f.phases || {}).map(function (k) { return k === 'C' ? 'cambio palla' : k === 'F' ? 'freeball' : 'transizione'; }); if (ph.length) p.push(ph.join(' / '));
+    var cm = Object.keys(f.cmb || {}); if (cm.length) p.push('comb. ' + cm.join(' '));
     var zs = Object.keys(f.zs || {}), ze = Object.keys(f.ze || {}); if (zs.length) p.push('da z.' + zs.join(',')); if (ze.length) p.push('a z.' + ze.join(','));
-    if (f.conds && f.conds.length) p.push(f.conds.length + (f.conds.length === 1 ? ' condizione' : ' condizioni'));
-    if (f.player) p.push('giocatrice fissata'); if (m.t) p.push('tempi −' + m.t.pre + ' s / +' + m.t.dur);
+    if (f.adv && f.adv.rules && f.adv.rules.length) p.push(f.adv.rules.length + (f.adv.rules.length === 1 ? ' criterio' : ' criteri') + ' (lettere)');
+    else if (f.conds && f.conds.length) p.push(f.conds.length + (f.conds.length === 1 ? ' condizione' : ' condizioni'));
+    if (f.ask) p.push('chiede la giocatrice'); else if (f.pl) p.push('giocatrice ' + [f.pl.num, f.pl.name].filter(Boolean).join(' ')); else if (f.player) p.push('giocatrice fissata'); if (m.t) p.push('tempi −' + m.t.pre + ' s / +' + m.t.dur);
     return p.join(' · ') || 'nessun filtro';
   }
   function maskFolders() { var s = {}; MASKS.forEach(function (m) { if (m.folder) s[m.folder] = 1; }); return Object.keys(s).sort(function (a, b) { return a.localeCompare(b); }); }
@@ -2323,10 +2926,23 @@ var FastMon = (function () {
     h += opts(MASKS.filter(function (m) { return !m.folder; }));
     sel.innerHTML = h; sel.value = maskActive ? maskActive.id : '';
   }
+  function renderMsBox() {
+    var b = $('ms-box'), fl = document.querySelector('.filters'); if (!b) return;
+    if (!MS) { b.hidden = true; b.innerHTML = ''; fl.classList.remove('ms-on'); return; }
+    fl.classList.add('ms-on'); b.hidden = false;
+    b.innerHTML = '<b>Maschera a ' + MS.mask.steps.length + ' passi</b><span class="hint"> — i passi si guardano uno dopo l’altro, nell’ordine qui sotto. I filtri sono disattivati finché la maschera è in uso.</span><ol>' +
+      MS.mask.steps.map(function (s, i) { return '<li><span>' + esc(s.name) + '</span><small>' + (msCounts[i] != null ? msCounts[i] : 0) + '</small></li>'; }).join('') + '</ol>';
+  }
   function baseOf(m) { return JSON.stringify(snapMask(!!m.f.player, false).f); }
   function updateMaskStatus() {
     var el = $('mask-stat'); if (!el) return;
-    if (!maskActive || MASKS.indexOf(maskActive) < 0) { maskActive = null; el.hidden = true; return; }
+    if (!maskActive || MASKS.indexOf(maskActive) < 0) { maskActive = null; el.hidden = true; renderMsBox(); return; }
+    if (MS && MS.mask === maskActive) {
+      el.hidden = false; el.className = 'maskstat';
+      el.innerHTML = '<span>✓ In uso: <b>' + esc(maskActive.name) + '</b> · ' + maskActive.steps.length + ' passi</span> <button class="btn small" type="button" data-s="off" title="Torna ai filtri normali">Scollega</button>';
+      renderMsBox(); return;
+    }
+    renderMsBox();
     var dirty = baseOf(maskActive) !== maskBase;
     el.hidden = false;
     el.innerHTML = '<span>' + (dirty ? '✎ Hai modificato i filtri di <b>' + esc(maskActive.name) + '</b>' : '✓ In uso: <b>' + esc(maskActive.name) + '</b>') + '</span>' +
@@ -2335,26 +2951,117 @@ var FastMon = (function () {
   }
   $('mask-stat').addEventListener('click', function (e) {
     var b2 = e.target.closest('[data-s]'); if (!b2) return;
-    if (b2.dataset.s === 'off') { maskActive = null; renderMaskSelect(); updateMaskStatus(); }
+    if (b2.dataset.s === 'off') { var wasMS = !!MS; maskActive = null; MS = null; renderMaskSelect(); if (wasMS) applyFilters(); else updateMaskStatus(); }
     else if (maskActive) { replaceMask(maskActive); toast('Maschera «' + maskActive.name + '» aggiornata.'); }
   });
   function replaceMask(m) {
-    var s2 = snapMask(!!m.f.player, !!m.t); m.f = s2.f; if (s2.t) m.t = s2.t;
+    var s2 = snapMask(!!m.f.player, !!m.t); if (m.f.ask) s2.f.ask = true; if (m.f.pl) s2.f.pl = m.f.pl; m.f = s2.f; if (s2.t) m.t = s2.t;
     saveMasks(); maskBase = baseOf(m); updateMaskStatus();
   }
+  function resolvePlayer(pl, g) {
+    var nm = (pl.name || '').toLowerCase().trim(), nu = String(pl.num || '').trim(), best = '';
+    LIB.forEach(function (e) {
+      if (!e.active || best) return;
+      Object.keys(e.M.players || {}).forEach(function (k) {
+        var p = e.M.players[k], c = { e: e, side: p.side, num: p.num };
+        if (best || !scope(c, g)) return;
+        var full = ((p.surname || '') + ' ' + (p.name || '')).toLowerCase();
+        if (nm ? full.indexOf(nm) >= 0 : (nu && String(p.num) === nu)) best = pkey(c);
+      });
+    });
+    return best;
+  }
+  function fromMaskF(f) {
+    var tm = F.team, subjOpp = f.who === 'opp', mapW = function (w) { if (tm) return w === 'same' ? (subjOpp ? 'oppteam' : 'team') : w === 'opp' ? (subjOpp ? 'team' : 'oppteam') : w; return w === 'team' ? 'same' : w === 'oppteam' ? 'opp' : w; };
+    var g = { team: tm, who: tm ? (f.who || F.who) : F.who, player: f.player || '', skills: cpOn(f.skills), evals: cpOn(f.evals), sets: cpOn(f.sets), phases: cpOn(f.phases && f.phases.B ? (function (o) { o = cpOn(o); o.T = true; delete o.B; return o; })(f.phases) : f.phases), rots: cpOn(f.rots),
+      zs: cpOn(f.zs), ze: cpOn(f.ze), cmb: cpOn(f.cmb), tg: cpOn(f.tg), ty: cpOn(f.ty), tf: cpOn(f.tf), alt: JSON.parse(JSON.stringify(f.alt || [])), cmode: f.cmode === 'any' ? 'any' : 'all', conds: JSON.parse(JSON.stringify(f.conds || [])), marks: cpOn(f.marks), text: f.text || '', adv: f.adv ? JSON.parse(JSON.stringify(f.adv)) : null };
+    g.conds.forEach(function (k) { k.who = mapW(k.who); });
+    migrateF(g);
+    if (g.adv) g.adv.rules.forEach(function (rl) { if (!tm) { if (rl.s === 'team') rl.s = 'same'; else if (rl.s === 'oppteam') rl.s = 'opp'; } });
+    if (f.pl && (f.pl.num || f.pl.name)) g.player = resolvePlayer(f.pl, g);
+    return g;
+  }
+  var askCb = null;
+  function askPlayer(cb) {
+    askCb = cb; $('ask-sel').innerHTML = $('f-player').innerHTML; $('ask-sel').value = '';
+    $('dlg-ask').hidden = false; $('ask-sel').focus();
+  }
+  $('ask-ok').addEventListener('click', function () { $('dlg-ask').hidden = true; if (askCb) askCb($('ask-sel').value); askCb = null; });
+  $('ask-no').addEventListener('click', function () { $('dlg-ask').hidden = true; if (askCb) askCb(''); askCb = null; });
   function applyMask(m) {
-    var f = m.f, tm = F.team, mapW = function (w) { if (tm) return w === 'same' ? 'team' : w === 'opp' ? 'oppteam' : w; return w === 'team' ? 'same' : w === 'oppteam' ? 'opp' : w; };
-    F = { team: tm, who: tm ? (f.who || F.who) : F.who, player: f.player || '', skills: cpOn(f.skills), evals: cpOn(f.evals), sets: cpOn(f.sets), phases: cpOn(f.phases && f.phases.B ? (function (o) { o = cpOn(o); o.T = true; delete o.B; return o; })(f.phases) : f.phases), rots: cpOn(f.rots),
-      zs: cpOn(f.zs), ze: cpOn(f.ze), conds: JSON.parse(JSON.stringify(f.conds || [])), marks: cpOn(f.marks), text: f.text || '' };
-    F.conds.forEach(function (k) { k.who = mapW(k.who); });
+    if (m.steps && m.steps.length > 1) {
+      MS = { mask: m, player: '' };
+      F = { team: F.team, who: F.who, player: '', skills: {}, evals: {}, sets: {}, phases: {}, rots: {}, zs: {}, ze: {}, cmb: {}, tg: {}, ty: {}, tf: {}, alt: [], cmode: 'all', conds: [], marks: {}, text: '', adv: null };
+      $('f-code').value = ''; buildFilters(); applyFilters(); renderHeader();
+      maskActive = m; maskBase = ''; renderMaskSelect(); updateMaskStatus();
+      if (m.steps.some(function (s) { return s.f.ask; })) askPlayer(function (k) { if (MS && MS.mask === m) { MS.player = k; applyFilters(); } });
+      return;
+    }
+    MS = null;
+    F = fromMaskF(m.f);
     if (m.t) { S.pre = m.t.pre; S.dur = m.t.dur; radioRedraws.forEach(function (fn) { fn(); }); onSettingsChanged(false); }
     $('f-code').value = F.text; buildFilters(); applyFilters(); renderHeader();
     maskActive = m; maskBase = baseOf(m); renderMaskSelect(); updateMaskStatus();
+    if (m.f.ask) askPlayer(function (k) { F.player = k; fillPlayers(); applyFilters(); });
   }
   $('f-mask').addEventListener('change', function () {
     var m = MASKS.filter(function (x) { return x.id === $('f-mask').value; })[0];
-    if (m) applyMask(m); else { maskActive = null; updateMaskStatus(); }
+    if (m) applyMask(m); else { maskActive = null; if (MS) { MS = null; applyFilters(); } updateMaskStatus(); }
   });
+
+  /* ---------- modifica dei filtri di una maschera (o di un suo passo) in una finestra ---------- */
+  function startEdit(m, si, isNew) {
+    var st = si >= 0 ? m.steps[si] : null, f = st ? st.f : m.f;
+    EDIT = { m: m, si: si, isNew: !!isNew, prev: { F: JSON.parse(JSON.stringify(F)), MS: MS, active: maskActive, text: $('f-code').value } };
+    $('dlg-mask').hidden = true;
+    MS = null; maskActive = null;
+    var wh = f.who; F = fromMaskF(f); if (wh) F.who = wh;
+    $('f-code').value = F.text;
+    document.querySelector('.filters').classList.add('editing'); document.body.classList.add('editing');
+    $('ed-bar').hidden = false; $('ed-back').hidden = false;
+    $('ed-title').textContent = st ? 'Passo ' + (si + 1) + ' di ' + m.steps.length + ' · maschera «' + m.name + '»' : 'Maschera';
+    $('ed-name').value = st ? st.name : m.name;
+    $('ed-folderbox').hidden = !!st; $('ed-folder').value = m.folder || '';
+    var mode = f.ask ? 'ask' : (f.pl || f.player) ? 'fixed' : 'all', pn = '', pnm = '';
+    if (f.pl) { pn = f.pl.num || ''; pnm = f.pl.name || ''; } else if (f.player) pnm = String(f.player).split('|').slice(1).join('|');
+    document.querySelector('input[name="ed-pm"][value="' + mode + '"]').checked = true; $('ed-pnum').value = pn; $('ed-pname').value = pnm; $('ed-player').hidden = false; F.player = '';
+    $('mk-folders').innerHTML = maskFolders().map(function (f) { return '<option value="' + esc(f) + '">'; }).join('');
+    buildFilters(); edPlayerSync(); $('ed-name').focus();
+  }
+  function edPlayerMode() { var x = document.querySelector('input[name="ed-pm"]:checked'); return x ? x.value : 'all'; }
+  function edPlayerSync() {
+    var md = edPlayerMode(); $('ed-pnum').disabled = $('ed-pname').disabled = md !== 'fixed';
+    F.player = md === 'fixed' && (($('ed-pnum').value || $('ed-pname').value)) ? resolvePlayer({ num: $('ed-pnum').value, name: $('ed-pname').value }, F) : '';
+    applyFilters();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="ed-pm"]'), function (x) { x.addEventListener('change', edPlayerSync); });
+  $('ed-pnum').addEventListener('input', edPlayerSync); $('ed-pname').addEventListener('input', edPlayerSync);
+  function endEdit(save) {
+    var e = EDIT; if (!e) return; EDIT = null;
+    var st = e.si >= 0 ? e.m.steps[e.si] : null;
+    if (save) {
+      F.player = ''; var nf = snapMask(false, false).f, nm = $('ed-name').value.trim(), pm = edPlayerMode();
+      if (pm === 'ask') nf.ask = true; else if (pm === 'fixed' && ($('ed-pnum').value.trim() || $('ed-pname').value.trim())) nf.pl = { num: $('ed-pnum').value.trim(), name: $('ed-pname').value.trim() };
+      if (st) { st.f = nf; if (nm) st.name = nm; if (e.si === 0) e.m.f = nf; }
+      else { e.m.f = nf; if (nm) e.m.name = nm; e.m.folder = $('ed-folder').value.trim(); }
+      saveMasks();
+    } else if (e.isNew) {
+      if (st) { e.m.steps.splice(e.si, 1); if (e.m.steps.length === 1) { e.m.f = e.m.steps[0].f; delete e.m.steps; } }
+      else MASKS.splice(MASKS.indexOf(e.m), 1);
+      saveMasks();
+    }
+    document.querySelector('.filters').classList.remove('editing'); document.body.classList.remove('editing');
+    $('ed-bar').hidden = true; $('ed-back').hidden = true; $('ed-folderbox').hidden = true; $('ed-player').hidden = true;
+    F = e.prev.F; MS = e.prev.MS; maskActive = e.prev.active; $('f-code').value = e.prev.text;
+    buildFilters(); applyFilters(); renderMaskSelect();
+    if (maskActive === e.m && !e.m.steps) maskBase = baseOf(e.m);
+    updateMaskStatus();
+    if (save) toast('Modifiche salvate.');
+    $('dlg-mask').hidden = false; renderMaskDlg();
+  }
+  $('ed-ok').addEventListener('click', function () { endEdit(true); });
+  $('ed-cancel').addEventListener('click', function () { endEdit(false); });
+  $('ed-back').addEventListener('click', function () { endEdit(false); });
 
   /* finestra "Salva": un solo scopo, salvare i filtri di adesso */
   function fillFolderSelect(sel, cur) {
@@ -2365,16 +3072,38 @@ var FastMon = (function () {
     $('ms-cur').textContent = describeMask(snapMask(false, false));
     $('ms-name').value = ''; $('ms-newfolder').value = ''; $('ms-newbox').hidden = true; $('ms-player').checked = false; $('ms-times').checked = false;
     fillFolderSelect($('ms-folder'), maskActive && maskActive.folder);
+    $('ms-where').innerHTML = '<option value="">Come nuova maschera</option>' + MASKS.map(function (m) { return '<option value="' + m.id + '">Come passo di «' + esc(m.name) + '»</option>'; }).join('');
+    $('ms-where').value = ''; whereChanged();
     $('ms-upd').hidden = !maskActive; if (maskActive) $('ms-upd').textContent = 'Aggiorna «' + maskActive.name + '»';
     $('dlg-msave').hidden = false; $('ms-name').focus();
   }
+  function whereChanged() {
+    var add = !!$('ms-where').value;
+    $('ms-folder').parentNode.hidden = add; $('ms-newbox').hidden = add || $('ms-folder').value !== '__new';
+    $('ms-name').previousElementSibling.textContent = add ? 'Nome del passo' : 'Nome della maschera';
+    $('ms-ok').textContent = add ? 'Aggiungi il passo' : 'Salva come nuova';
+    $('ms-upd').hidden = add || !maskActive || !!(maskActive && maskActive.steps);
+    $('ms-times').parentNode.hidden = add;
+  }
+  $('ms-where').addEventListener('change', whereChanged);
   $('ms-folder').addEventListener('change', function () { var nw = $('ms-folder').value === '__new'; $('ms-newbox').hidden = !nw; if (nw) $('ms-newfolder').focus(); });
   $('ms-cancel').addEventListener('click', function () { $('dlg-msave').hidden = true; });
   $('ms-upd').addEventListener('click', function () { if (!maskActive) return; var nm = maskActive.name; replaceMask(maskActive); $('dlg-msave').hidden = true; toast('Maschera «' + nm + '» aggiornata.'); });
   $('ms-ok').addEventListener('click', function () {
-    var name = $('ms-name').value.trim(); if (!name) { toast('Scrivi un nome per la maschera.'); $('ms-name').focus(); return; }
+    var name = $('ms-name').value.trim(); if (!name) { toast('Scrivi un nome.'); $('ms-name').focus(); return; }
+    if ($('ms-where').value) {
+      var tg = MASKS.filter(function (x) { return x.id === $('ms-where').value; })[0]; if (!tg) return;
+      if (!tg.steps) tg.steps = [{ name: tg.name, f: tg.f }];
+      var sf = snapMask($('ms-player').checked && !$('ms-ask').checked, false).f; if ($('ms-ask').checked) sf.ask = true;
+      tg.steps.push({ name: name, f: sf });
+      tg.f = tg.steps[0].f; saveMasks(); $('dlg-msave').hidden = true;
+      if (MS && MS.mask === tg) applyFilters(); else updateMaskStatus();
+      if (!$('dlg-mask').hidden) renderMaskDlg(); renderMaskSelect();
+      toast('Passo «' + name + '» aggiunto a «' + tg.name + '» (' + tg.steps.length + ' passi).'); return;
+    }
     var folder = $('ms-folder').value === '__new' ? $('ms-newfolder').value.trim() : $('ms-folder').value;
-    var m = snapMask($('ms-player').checked, $('ms-times').checked);
+    var m = snapMask($('ms-player').checked && !$('ms-ask').checked, $('ms-times').checked);
+    if ($('ms-ask').checked) m.f.ask = true;
     m.id = 'm' + Date.now() + Math.floor(Math.random() * 1000); m.name = name; m.folder = folder;
     MASKS.push(m); saveMasks(); maskActive = m; maskBase = baseOf(m); renderMaskSelect(); updateMaskStatus();
     $('dlg-msave').hidden = true; if (!$('dlg-mask').hidden) renderMaskDlg(); toast('Maschera «' + name + '» salvata.');
@@ -2382,6 +3111,8 @@ var FastMon = (function () {
   $('mask-save').addEventListener('click', openSaveDlg);
 
   /* finestra "Le mie maschere": elenco e gestione */
+  var mkRowOpen = {};   /* maschere aperte (dettagli visibili): di default solo il nome */
+  var mkOpen = {};   /* cartelle aperte nella finestra «Le mie maschere»: di default tutte chiuse */
   function renderMaskDlg() {
     $('mk-folders').innerHTML = maskFolders().map(function (f) { return '<option value="' + esc(f) + '">'; }).join('');
     var box = $('mk-list'), h = '';
@@ -2391,27 +3122,71 @@ var FastMon = (function () {
           '<label><span class="label">Cartella</span><input class="field" data-r="folder" list="mk-folders" value="' + esc(m.folder || '') + '" placeholder="Nessuna cartella" maxlength="40"></label></div>' +
           '<div class="mk-act"><button class="btn small primary" data-a="ok" type="button">Salva modifiche</button><button class="btn small" data-a="upd" type="button" title="Sostituisce i filtri di questa maschera con quelli impostati adesso">Usa i filtri attuali</button><button class="btn small" data-a="no" type="button">Annulla</button></div></div>';
       }
-      return '<div class="mk-row" data-id="' + m.id + '"><div class="mk-info"><b>' + esc(m.name) + '</b><small>' + esc(describeMask(m)) + '</small></div>' +
-        '<div class="mk-act"><button class="btn small primary" data-a="go" type="button">Usa</button><button class="btn small" data-a="edit" type="button">Modifica</button><button class="btn small" data-a="dup" type="button">Duplica</button><button class="btn small" data-a="del" type="button">Elimina</button></div></div>';
+      var stp = '';
+      if (m.steps && m.steps.length > 1) {
+        stp = '<div class="mk-steps">' + m.steps.map(function (s, si) {
+          if (mkStep === m.id + ':' + si) return '<div class="mk-step edit" data-si="' + si + '"><input class="field" data-r="sname" value="' + esc(s.name) + '" maxlength="60"><button class="btn small primary" data-a="s-ok" type="button">OK</button><button class="btn small" data-a="s-no" type="button">Annulla</button></div>';
+          return '<div class="mk-step" data-si="' + si + '"><span class="sn">' + (si + 1) + '</span><span class="nm">' + esc(s.name) + '</span><small>' + esc(describeMask({ f: s.f })) + '</small>' +
+            '<span class="sa"><button class="btn small" data-a="s-go" type="button" title="Imposta i filtri di questo passo">Usa</button><button class="btn small" data-a="s-ren" type="button" title="Modifica questo passo: nome e filtri">✎ Modifica</button>' +
+            '<button class="btn small" data-a="s-up" type="button"' + (si ? '' : ' disabled') + '>▲</button><button class="btn small" data-a="s-dn" type="button"' + (si < m.steps.length - 1 ? '' : ' disabled') + '>▼</button><button class="btn small" data-a="s-del" type="button">✕</button></span></div>';
+        }).join('') + '</div>';
+      }
+      var isOpen = mkRowOpen[m.id] || mkStep.indexOf(m.id + ':') === 0;
+      return '<div class="mk-row ' + (isOpen ? 'mk-on' : 'mk-off') + '" data-id="' + m.id + '"><div class="mk-info" role="button" tabindex="0" aria-expanded="' + (isOpen ? 'true' : 'false') + '"><span class="mk-chev">' + (isOpen ? '▾' : '▸') + '</span><b>' + esc(m.name) + '</b><small>' + esc(m.steps && m.steps.length > 1 ? m.steps.length + ' passi in sequenza' : describeMask(m)) + '</small></div>' +
+        '<div class="mk-act"><button class="btn small primary" data-a="go" type="button">Usa</button>' + (m.steps && m.steps.length > 1 ? '' : '<button class="btn small" data-a="filt" type="button" title="Apre i filtri di questa maschera per cambiarli">Modifica filtri</button>') + '<button class="btn small" data-a="addstep" type="button" title="Aggiunge un passo vuoto in fondo alla maschera">＋ Passo</button><button class="btn small" data-a="edit" type="button" title="Cambia nome e cartella">Nome e cartella</button><button class="btn small" data-a="dup" type="button">Duplica</button><button class="btn small" data-a="del" type="button">Elimina</button></div>' + stp + '</div>';
     }
     if (!MASKS.length) h = '<p class="hint">Non hai ancora salvato nessuna maschera. Imposta i filtri nella pagina Analisi, poi premi <b>Salva questi filtri</b>.</p>';
     maskFolders().forEach(function (f) {
-      h += '<details class="mk-folder" open><summary>📁 ' + esc(f) + '<small>' + MASKS.filter(function (m) { return m.folder === f; }).length + '</small></summary>' + MASKS.filter(function (m) { return m.folder === f; }).map(row).join('') + '</details>';
+      h += '<details class="mk-folder" data-f="' + esc(f) + '"' + (mkOpen[f] || MASKS.some(function (m) { return m.folder === f && m.id === mkEdit; }) ? ' open' : '') + '><summary>📁 ' + esc(f) + '<small>' + MASKS.filter(function (m) { return m.folder === f; }).length + '</small></summary>' + MASKS.filter(function (m) { return m.folder === f; }).map(row).join('') + '</details>';
     });
     var loose = MASKS.filter(function (m) { return !m.folder; });
-    if (loose.length) h += '<details class="mk-folder" open><summary>Senza cartella<small>' + loose.length + '</small></summary>' + loose.map(row).join('') + '</details>';
+    if (loose.length) h += '<details class="mk-folder" data-f=""' + (mkOpen[''] || MASKS.some(function (m) { return !m.folder && m.id === mkEdit; }) ? ' open' : '') + '><summary>Senza cartella<small>' + loose.length + '</small></summary>' + loose.map(row).join('') + '</details>';
     box.innerHTML = h;
   }
   function openMaskDlg() { mkEdit = ''; renderMaskDlg(); $('dlg-mask').hidden = false; }
-  $('mask-manage').addEventListener('click', openMaskDlg);
+  $('mk-list').addEventListener('toggle', function (e) { var d = e.target; if (d.classList && d.classList.contains('mk-folder')) mkOpen[d.getAttribute('data-f')] = d.open; }, true);
+  $('mask-manage').addEventListener('click', function () { mkOpen = {}; mkRowOpen = {}; openMaskDlg(); });
   $('mk-close').addEventListener('click', function () { $('dlg-mask').hidden = true; });
   $('mk-new').addEventListener('click', function () { $('dlg-mask').hidden = true; openSaveDlg(); });
+  function blankF() { return { who: 'team', skills: {}, evals: {}, sets: {}, phases: {}, rots: {}, zs: {}, ze: {}, cmb: {}, tg: {}, ty: {}, tf: {}, alt: [], cmode: 'all', conds: [], marks: {}, text: '', adv: null }; }
+  $('mk-new0').addEventListener('click', function () {
+    var m = { id: 'm' + Date.now() + Math.floor(Math.random() * 1000), name: 'Nuova maschera', folder: '', f: blankF() };
+    MASKS.push(m); saveMasks(); renderMaskSelect(); startEdit(m, -1, true);
+  });
+  function mkToggleRow(info) { var rw = info.closest('.mk-row'), id = rw.getAttribute('data-id'); mkRowOpen[id] = !mkRowOpen[id]; renderMaskDlg(); }
+  $('mk-list').addEventListener('keydown', function (e) { var i = e.target.closest && e.target.closest('.mk-info'); if (i && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); mkToggleRow(i); } });
   $('mk-list').addEventListener('click', function (e) {
+    var inf = e.target.closest && e.target.closest('.mk-info'); if (inf && !e.target.closest('button')) { mkToggleRow(inf); return; }
     var bt = e.target.closest('[data-a]'); if (!bt) return;
     var rw = bt.closest('.mk-row'), id = rw.getAttribute('data-id'), m = MASKS.filter(function (x) { return x.id === id; })[0], a = bt.getAttribute('data-a'); if (!m) return;
+    if (a.indexOf('s-') === 0) {
+      var sw = bt.closest('.mk-step'), si = sw ? +sw.getAttribute('data-si') : -1, st = m.steps && m.steps[si];
+      if (!st) return;
+      if (a === 's-go') { $('dlg-mask').hidden = true; applyMask({ id: 'tmp', name: st.name, folder: '', f: st.f }); toast('Filtri del passo «' + st.name + '» impostati.'); }
+      else if (a === 's-ren') startEdit(m, si);
+      else if (a === 's-no') { mkStep = ''; renderMaskDlg(); }
+      else if (a === 's-ok') { var nn = sw.querySelector('[data-r=sname]').value.trim(); if (nn) st.name = nn; mkStep = ''; saveMasks(); renderMaskDlg(); updateMaskStatus(); if (MS) applyFilters(); }
+      else if (a === 's-up' || a === 's-dn') {
+        var to = a === 's-up' ? si - 1 : si + 1; if (to < 0 || to >= m.steps.length) return;
+        m.steps.splice(to, 0, m.steps.splice(si, 1)[0]); m.f = m.steps[0].f; saveMasks(); renderMaskDlg(); if (MS && MS.mask === m) applyFilters();
+      } else if (a === 's-del') {
+        if (bt.dataset.sure) {
+          m.steps.splice(si, 1);
+          if (m.steps.length === 1) { m.f = m.steps[0].f; delete m.steps; if (MS && MS.mask === m) MS = null; } else m.f = m.steps[0].f;
+          saveMasks(); renderMaskDlg(); renderMaskSelect(); applyFilters();
+        } else { bt.dataset.sure = '1'; bt.textContent = 'Sicuro?'; setTimeout(function () { if (bt.isConnected) { bt.textContent = '✕'; delete bt.dataset.sure; } }, 2500); }
+      }
+      return;
+    }
     if (a === 'go') { $('dlg-mask').hidden = true; applyMask(m); toast('Maschera «' + m.name + '» applicata.'); }
     else if (a === 'upd') { replaceMask(m); mkEdit = ''; renderMaskDlg(); toast('Maschera aggiornata con i filtri attuali.'); }
     else if (a === 'edit') { mkEdit = id; renderMaskDlg(); }
+    else if (a === 'filt') startEdit(m, -1);
+    else if (a === 'addstep') {
+      if (!m.steps) m.steps = [{ name: m.name, f: m.f }];
+      m.steps.push({ name: 'Passo ' + (m.steps.length + 1), f: blankF() }); saveMasks();
+      startEdit(m, m.steps.length - 1, true);
+    }
     else if (a === 'no') { mkEdit = ''; renderMaskDlg(); }
     else if (a === 'ok') {
       var nm = rw.querySelector('[data-r=name]').value.trim(); if (nm) m.name = nm; m.folder = rw.querySelector('[data-r=folder]').value.trim();
@@ -2419,7 +3194,7 @@ var FastMon = (function () {
     }
     else if (a === 'dup') { var c2 = JSON.parse(JSON.stringify(m)); c2.id = 'm' + Date.now() + Math.floor(Math.random() * 1000); c2.name = m.name + ' (copia)'; MASKS.splice(MASKS.indexOf(m) + 1, 0, c2); saveMasks(); renderMaskDlg(); renderMaskSelect(); }
     else if (a === 'del') {
-      if (bt.dataset.sure) { MASKS.splice(MASKS.indexOf(m), 1); saveMasks(); renderMaskDlg(); renderMaskSelect(); updateMaskStatus(); }
+      if (bt.dataset.sure) { var wasMs = MS && MS.mask === m; MASKS.splice(MASKS.indexOf(m), 1); saveMasks(); renderMaskDlg(); renderMaskSelect(); if (wasMs) { MS = null; maskActive = null; applyFilters(); } else updateMaskStatus(); }
       else { bt.dataset.sure = '1'; bt.textContent = 'Sicuro?'; setTimeout(function () { if (bt.isConnected) { bt.textContent = 'Elimina'; delete bt.dataset.sure; } }, 2500); }
     }
   });
@@ -2427,15 +3202,134 @@ var FastMon = (function () {
     if (!MASKS.length) { toast('Non ci sono maschere da esportare.'); return; }
     saveBlob('maschere_reader.json', new Blob([JSON.stringify({ tipo: 'reader-scout-video-maschere', maschere: MASKS })], { type: 'application/json' })).then(function () { toast('Maschere salvate in un file.'); }).catch(function () {});
   });
+  /* ---------- importa le maschere di montaggio di Data Volley (.mon4) ---------- */
+  function readText(file) {
+    return file.arrayBuffer().then(function (buf) {
+      try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch (e) { return new TextDecoder('windows-1252').decode(buf); }
+    });
+  }
+
+  /* ---------- conversione automatica: condizioni semplici e azioni alternative diventano criteri a lettere ---------- */
+  function dimsOf(k) {
+    var o = {}, any = false;
+    ADV_DIMS.forEach(function (d) { var v = keysOf(k[d[0]]); if (v.length) { o[d[0]] = v; any = true; } });
+    return any ? o : null;
+  }
+  function condToRule(k) {
+    var r;
+    if (k.rel === 'any') r = 15;
+    else if (k.rel === 'prev1') r = k.strict ? 1 : 16;
+    else if (k.rel === 'prevAny') r = k.poss ? 13 : 11;
+    else if (k.rel === 'next1') r = k.strict ? 2 : 17;
+    else r = k.poss ? 14 : 12;
+    var rule = { s: k.who || 'any', pat: '*', r: r }, o = dimsOf(k);
+    if (o) rule.o = o;
+    if (k.neg) rule.n = true;
+    return rule;
+  }
+  function altToRule(a) {
+    var rule = { s: 'any', pat: '*', r: 5 }, o = dimsOf(a);
+    if (o) rule.o = o;
+    return rule;
+  }
+  /* trasforma f.conds / f.alt / f.cmode in f.adv (in AND con un eventuale f.adv già presente); vero se ha cambiato qualcosa */
+  function migrateF(f) {
+    var hc = f.conds && f.conds.length, ha = f.alt && f.alt.length;
+    if (!hc && !ha) { f.cmode = 'all'; f.conds = f.conds || []; f.alt = f.alt || []; return false; }
+    var a = f.adv && f.adv.rules && f.adv.rules.length ? f.adv : null, rules = a ? a.rules.slice() : [], parts = [], cl = [], al = [], L = function (n) { return String.fromCharCode(65 + n); };
+    if (rules.length + (f.conds || []).length + (f.alt || []).length > 26) return false;
+    if (a) { var one = /^\s*\(?\s*[A-Za-z]\s*\)?\s*$/.test(a.formula); parts.push({ t: a.formula, w: one ? a.formula : '(' + a.formula + ')' }); }
+    (f.conds || []).forEach(function (k) { rules.push(condToRule(k)); cl.push(L(rules.length - 1)); });
+    (f.alt || []).forEach(function (x) { rules.push(altToRule(x)); al.push(L(rules.length - 1)); });
+    if (cl.length) { var anyM = f.cmode === 'any' && cl.length > 1; parts.push({ t: cl.join(anyM ? ' or ' : ' and '), w: anyM ? '(' + cl.join(' or ') + ')' : cl.join(' and ') }); }
+    if (al.length) parts.push({ t: al.join(' or '), w: al.length > 1 ? '(' + al.join(' or ') + ')' : al[0] });
+    f.adv = { formula: parts.length === 1 ? parts[0].t : parts.map(function (z) { return z.w; }).join(' and '), rules: rules };
+    f.conds = []; f.alt = []; f.cmode = 'all';
+    return true;
+  }
+  function migrateMasks() {
+    var ch = false;
+    MASKS.forEach(function (m) {
+      if (m.steps && m.steps[0] && m.f !== m.steps[0].f && m.steps.length > 1) m.f = m.steps[0].f;   /* tiene mask.f allineato al primo passo */
+      var fs = (m.steps || []).map(function (s) { return s.f; });
+      if (m.f && fs.indexOf(m.f) < 0) fs.push(m.f);
+      fs.forEach(function (f) { if (f && migrateF(f)) ch = true; });
+    });
+    if (ch) saveMasks();
+  }
+  function parseMon4(text, rep) {
+    var lines = text.replace(/\r/g, '').split('\n'), steps = [], i = 0, folder = '';
+    if (lines.length && /^\d+$/.test(lines[0].trim())) i = 1;
+    if (i < lines.length && lines[i].charAt(0) !== '[') { folder = lines[i].trim(); i++; }
+    var cur = null;
+    function done() {
+      if (!cur) return; var k = cur.k;
+      var team = (k.Team || '~').charAt(0), subj = team === '0' ? '*' : team === '1' ? 'a' : '';
+      var f = { who: team === '0' ? 'team' : team === '1' ? 'opp' : 'both', skills: {}, evals: {}, sets: {}, phases: {}, rots: {}, zs: {}, ze: {}, cmb: {}, tg: {}, ty: {}, tf: {}, alt: [], cmode: 'all', conds: [], marks: {}, text: '', adv: null };
+      var sk = (k.Skill || '').replace(/~+$/, '');
+      if (sk.length === 1) f.skills[sk] = true;
+      else for (var q = 0; q < sk.length; q += 2) { var t2 = sk.substr(q, 2); if (t2.charAt(1) === '~') f.skills[t2.charAt(0)] = true; else { f.skills.A = true; rep.fase = true; } }
+      if (+k.Set > 0) f.sets[String(+k.Set)] = true;
+      if (+k.Rotation > 0) f.rots[String(+k.Rotation)] = true;
+      if (/^\d+$/.test((k.Player || '').trim())) rep.giocatrice = true;
+      var ad = (k.Advanced || '').trim();
+      if (ad) {
+        var b0 = ad.indexOf('['), head = ad.slice(0, b0 < 0 ? ad.length : b0).trim(), rules = [], re = /\[([^\],]*),(\d+)\]/g, mm;
+        while ((mm = re.exec(ad))) {
+          var pat = mm[1], tl = pat.charAt(0);
+          rules.push({ s: (!subj || tl === '~') ? 'any' : (tl === subj ? 'same' : 'opp'), pat: pat, r: +mm[2] });
+        }
+        if (rules.length) {
+          var fm;
+          if (head.charAt(0) === '"') fm = head.replace(/"/g, '');
+          else { var op = /^and/i.test(head) ? ' and ' : ' or '; fm = rules.map(function (x, ix) { return String.fromCharCode(65 + ix); }).join(op); }
+          f.adv = { formula: fm.replace(/~/g, ' ').trim(), rules: rules };
+        }
+      }
+      steps.push({ name: cur.name, f: f });
+      cur = null;
+    }
+    for (; i < lines.length; i++) {
+      var ln = lines[i], h = /^\[(.*)\]\s*$/.exec(ln);
+      if (h) { done(); cur = { name: h[1].trim(), k: {} }; }
+      else if (cur) { var e = ln.indexOf('='); if (e > 0) cur.k[ln.slice(0, e).trim()] = ln.slice(e + 1); }
+    }
+    done();
+    return { folder: folder, steps: steps };
+  }
   $('mk-import').addEventListener('click', function () { $('in-masks').click(); });
   $('in-masks').addEventListener('change', function (e) {
-    var f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
-    f.text().then(function (t) {
-      var d = JSON.parse(t); if (!d || !d.maschere) throw new Error('x');
-      d.maschere.forEach(function (m) { m.id = 'm' + Date.now() + Math.floor(Math.random() * 100000); MASKS.push(m); });
-      saveMasks(); renderMaskDlg(); renderMaskSelect(); toast(d.maschere.length + ' maschere importate.');
+    var files = Array.prototype.slice.call(e.target.files || []); e.target.value = ''; if (!files.length) return;
+    var added = 0, dup = 0, rep = {};
+    Promise.all(files.map(function (f) {
+      return readText(f).then(function (t) {
+        if (/\.mon4$/i.test(f.name)) {
+          var pm = parseMon4(t, rep); if (!pm.steps.length) return;
+          var nm = f.name.replace(/\.mon4$/i, '').replace(/^[0-9a-f]{8}-\d{8,}_/, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+          var m = { name: pm.steps.length > 1 ? nm : pm.steps[0].name, folder: pm.folder, f: pm.steps[0].f };
+          if (pm.steps.length > 1) m.steps = pm.steps;
+          var sig = JSON.stringify(m.steps || m.f);
+          if (MASKS.some(function (x) { return x.name === m.name && (x.folder || '') === m.folder && JSON.stringify(x.steps || x.f) === sig; })) { dup++; return; }
+          var base = m.name, n2 = 2; while (MASKS.some(function (x) { return x.name === m.name && (x.folder || '') === m.folder; })) m.name = base + ' (' + n2++ + ')';
+          /* toglie le maschere singole importate in precedenza da questo stesso file */
+          if (m.steps) {
+            var names = {}; pm.steps.forEach(function (s) { names[s.name + '|' + JSON.stringify(s.f)] = 1; });
+            var before = MASKS.length;
+            MASKS = MASKS.filter(function (x) { return x.steps || (x.folder || '') !== m.folder || !names[x.name + '|' + JSON.stringify(x.f)]; });
+            rep.rimosse = (rep.rimosse || 0) + before - MASKS.length;
+          }
+          m.id = 'm' + Date.now() + Math.floor(Math.random() * 100000); MASKS.push(m); added++;
+        } else {
+          var d = JSON.parse(t); if (!d || !d.maschere) throw new Error('x');
+          d.maschere.forEach(function (m) { m.id = 'm' + Date.now() + Math.floor(Math.random() * 100000); MASKS.push(m); added++; });
+        }
+      });
+    })).then(function () {
+      migrateMasks(); saveMasks(); renderMaskDlg(); renderMaskSelect();
+      toast(added + (added === 1 ? ' maschera importata' : ' maschere importate') + (dup ? ' (' + dup + ' già presenti)' : '') + (rep.rimosse ? ', ' + rep.rimosse + ' vecchie maschere singole sostituite' : '') + '.' + (rep.giocatrice ? ' Il numero di maglia non viene importato: scegli la giocatrice dal menù.' : ''));
     }).catch(function () { toast('Questo file non contiene maschere.'); });
   });
+  migrateMasks();
   renderMaskSelect();
 
   /* ---------- schermo intero: video grande e lista dei codici in piccolo a lato ---------- */
@@ -2471,6 +3365,7 @@ var FastMon = (function () {
     setTimeout(function () { URL.revokeObjectURL(u); }, 5000); return Promise.resolve();
   }
   function monAutoTitle() {
+    if (MS) return MS.mask.name;
     var parts = [], sk = Object.keys(F.skills).filter(function (k) { return F.skills[k]; });
     if (sk.length) parts.push(sk.map(function (k) { return SKILLS[k]; }).join(' / '));
     if (F.player) { var o = $('f-player').selectedOptions && $('f-player').selectedOptions[0]; if (o) parts.push(o.textContent.replace(/\s*\(.*$/, '').trim()); }
@@ -2503,6 +3398,7 @@ var FastMon = (function () {
     $('mon-modebox').hidden = !(canFast && canReal);
     refreshMonDlg();
     $('mon-opt').hidden = false; $('mon-intro').checked = false; $('mon-ttlbox').hidden = true;
+    $('mon-stepsbox').hidden = !qstep; $('mon-steps').checked = true;
     $('mon-go').hidden = !ok; $('mon-go').disabled = false; $('mon-go').textContent = mon ? 'Metti in coda' : 'Avvia';
     $('dlg-mon').hidden = false;
   });
@@ -2556,7 +3452,14 @@ var FastMon = (function () {
     try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore })); } catch (e) {}
     var fast = monMode() === 'fast';
     try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore, mode: fast ? 'fast' : 'real' })); } catch (e) {}
-    var job = { list: queue.filter(function (c) { return !!videoFor(c); }), showScore: showScore, title: title, fast: fast };
+    var jl = [], cards = null, lastSt = -1;
+    if (qstep && $('mon-steps').checked) cards = {};
+    queue.forEach(function (c, q) {
+      if (!videoFor(c)) return;
+      if (cards && qstep[q] !== lastSt) { lastSt = qstep[q]; cards[jl.length] = MS.mask.steps[lastSt].name; }
+      jl.push(c);
+    });
+    var job = { list: jl, showScore: showScore, title: title, fast: fast, cards: cards };
     $('dlg-mon').hidden = true;
     var n = job.list.length, mimeX = fast ? 'video/mp4' : monMime(), ext = /mp4/.test(mimeX) ? 'mp4' : 'webm';
     var ttl = job.title.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, '_').slice(0, 40);
@@ -2616,10 +3519,11 @@ var FastMon = (function () {
       });
       enc.configure(chosen.cfg);
       var outBase = 0;
-      if (title) {
-        for (var t = 0; t < 3000; t += 100) { monIntro(ctx, cw, ch, title); push(t * 1000, 100000, t === 0); }
-        outBase = 3000000;
+      function card(txt) {
+        for (var t = 0; t < 3000; t += 100) { monIntro(ctx, cw, ch, txt); push(outBase + t * 1000, 100000, t === 0); }
+        outBase += 3000000;
       }
+      if (title) card(title);
       async function doClip(c, idx) {
         var v = videoFor(c), rd2 = readers[v.url], cl = range(c), pl = FastMon.plan(rd2, cl.start, cl.end);
         if (!pl) return;
@@ -2658,7 +3562,7 @@ var FastMon = (function () {
         } finally { try { dec.close(); } catch (e) {} }
         outBase = lastOut + fd;
       }
-      for (var ix = 0; ix < list.length && !monAbort; ix++) await doClip(list[ix], ix);
+      for (var ix = 0; ix < list.length && !monAbort; ix++) { if (job.cards && job.cards[ix]) card(job.cards[ix]); await doClip(list[ix], ix); }
       if (monAbort) {
         try { enc.close(); } catch (e) {}
         if (wr) { try { await wr.w.abort(); } catch (e) {} }
@@ -2702,8 +3606,8 @@ var FastMon = (function () {
       cw = canvas.width = Math.round(w * k / 2) * 2; ch = canvas.height = Math.round(h * k / 2) * 2;
     }
     function badge() { monBadge(ctx, cw, ch, curC, showScore); }
-    var introUntil = 0;
-    function drawIntro() { monIntro(ctx, cw, ch, title); }
+    var introUntil = 0, introStart = 0, introList = [];
+    function drawIntro() { var k = Math.min(introList.length - 1, Math.floor((performance.now() - introStart) / 3000)); monIntro(ctx, cw, ch, introList[Math.max(0, k)]); }
     function draw() {
       if (!cw) return;
       if (introUntil && performance.now() < introUntil) { drawIntro(); return; }
@@ -2765,7 +3669,11 @@ var FastMon = (function () {
         var onSeek = function () {
           mv.removeEventListener('seeked', onSeek);
           var delay = 0;
-          if (!cw) { size(); if (!startRec()) return; if (title) { delay = 3000; introUntil = performance.now() + delay; } }
+          if (!cw) { size(); if (!startRec()) return; }
+          var il = [];
+          if (i === 1 && title) il.push(title);
+          if (job.cards && job.cards[i - 1]) il.push(job.cards[i - 1]);
+          if (il.length) { introList = il; delay = 3000 * il.length; introStart = performance.now(); introUntil = introStart + delay; }
           setTimeout(function () {
             if (monAbort) { clipDone(); return; }
             curClip = cl; advancing = false;
