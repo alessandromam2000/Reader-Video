@@ -714,7 +714,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v75</small></h1>
+      <h1>Reader scout video <small class="ver">v77</small></h1>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -902,9 +902,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <details class="wide ctx" id="d-cond">
           <summary>Condizioni sull’azione <span class="hint" id="cond-sum"></span></summary>
           <div class="ctxbody">
-            <p class="hint">Aggiungi dei criteri su ciò che succede <b>prima</b> o <b>dopo</b> l’azione cercata. Ogni criterio ha una lettera (A, B, C…).</p>
-            <details class="cq-help"><summary>Vedi un esempio</summary><p class="hint">“Attacchi dopo una ricezione positiva della stessa squadra”: scegli Attacco in alto, poi premi <b>+ Aggiungi criterio</b> e scegli <b>c’è prima, in un punto qualsiasi dell’azione</b> · <b>Stessa squadra dell’azione</b> · Ricezione · esito +.</p></details>
-            <p class="hint cq-empty" id="cq-empty">Nessun criterio: la ricerca guarda solo l’azione scelta sopra.</p>
+            <p class="hint cq-empty" id="cq-empty">Nessun criterio.</p>
             <datalist id="adv-combos"></datalist>
             <div class="advbox" id="adv-box" hidden></div>
             <button class="btn small cq-addbtn" id="adv-add" type="button">+ Aggiungi criterio</button>
@@ -1682,11 +1680,18 @@ var FastMon = (function () {
     ALL.forEach(function (c) { if (c.skill !== sk) return; var v = c.code.charAt(12); if (ok.test(v)) seen[v] = 1; });
     return Object.keys(seen).sort().map(function (v) { return { v: v, l: v, t: sk === 'A' ? 'Colpo ' + v : v + (v === '1' ? ' muro' : ' muri') + ' davanti all’alzata' }; });
   }
+  var TG_NAMES = { B: 'Back', F: 'Front', C: 'Center', P: 'Pipe', S: 'Setter' };
+  function tgItems(skillSet) {   /* bersaglio dell'alzata: solo quando è scelta l'Alzata */
+    if (!skillSet || !skillSet.E) return [];
+    var seen = {};
+    ALL.forEach(function (c) { if (c.skill === 'E' && TG_NAMES[c.code.charAt(8)]) seen[c.code.charAt(8)] = 1; });
+    return ['B', 'F', 'C', 'P', 'S'].filter(function (k) { return seen[k]; }).map(function (k) { return { v: k, l: TG_NAMES[k] + ' (' + k + ')', t: 'Alzata a ' + TG_NAMES[k] }; });
+  }
   function comboItems(skillSet) {
     var tab = allCombos(), seen = {}, out = [], sk = Object.keys(skillSet || {}).filter(function (k) { return skillSet[k]; });
     ALL.forEach(function (c) {
       if (!c.combo || (c.skill !== 'A' && c.skill !== 'E')) return;
-      if (sk.length && sk.indexOf(c.skill) < 0) return;
+      if (sk.indexOf(c.skill) < 0) return;   /* solo se è scelto Attacco (combinazioni d'attacco) o Alzata (K1, K2…) */
       seen[c.combo] = c.skill;
     });
     Object.keys(seen).sort().forEach(function (k) {
@@ -1723,14 +1728,9 @@ var FastMon = (function () {
     'c’è prima, in un punto qualsiasi', 'c’è dopo, in un punto qualsiasi', 'c’è prima, senza che la palla sia passata dall’altra parte', 'c’è dopo, senza che la palla passi dall’altra parte',
     'c’è nell’azione, escluso questo colpo', 'c’è subito prima (della squadra scelta)', 'c’è subito dopo (della squadra scelta)'];
   /* menu del criterio: gruppi e voci in italiano, ordinate per significato */
-  var ADV_MENU = [
-    ['Questo colpo', [[5, 'è questa stessa azione'], [6, 'NON è questa stessa azione']]],
-    ['Prima di questo colpo', [[16, 'c’è subito prima (tra i colpi della squadra scelta)'], [1, 'c’è subito prima (il colpo immediatamente precedente)'], [11, 'c’è prima, in un punto qualsiasi dell’azione'],
-      [13, 'c’è prima, senza che la palla sia passata dall’altra parte'], [9, 'c’è nel possesso palla precedente'], [7, 'NON c’è subito prima (colpo immediatamente precedente)']]],
-    ['Dopo questo colpo', [[17, 'c’è subito dopo (tra i colpi della squadra scelta)'], [2, 'c’è subito dopo (il colpo immediatamente successivo)'], [12, 'c’è dopo, in un punto qualsiasi dell’azione'],
-      [14, 'c’è dopo, senza che la palla passi dall’altra parte'], [10, 'c’è nel possesso palla successivo'], [8, 'NON c’è subito dopo (colpo immediatamente successivo)']]],
-    ['Nell’azione', [[15, 'c’è nell’azione, escluso questo colpo'], [3, 'c’è nell’azione (compreso questo colpo)'], [4, 'NON c’è mai nell’azione']]]
-  ];
+  var ADV_MENU = [[5, 'Questo colpo'], [1, 'Subito prima'], [11, 'Prima, nell’azione'], [2, 'Subito dopo'], [12, 'Dopo, nell’azione'], [15, 'Altrove nell’azione']];
+  var ADV_NEG = { 4: 3, 6: 5, 7: 1, 8: 2 };   /* "NON …" = la stessa relazione con la casella "NON deve valere" */
+
   var ADV_REL_SHORT = { 1: 'subito prima', 2: 'subito dopo', 3: 'nell’azione', 4: 'mai nell’azione', 5: 'questa stessa azione', 6: 'NON questa stessa azione', 7: 'NON subito prima', 8: 'NON subito dopo', 9: 'nel possesso precedente', 10: 'nel possesso successivo',
     11: 'prima, in un punto qualsiasi', 12: 'dopo, in un punto qualsiasi', 13: 'prima, senza passaggio di palla', 14: 'dopo, senza passaggio di palla', 15: 'nell’azione (escluso questo colpo)', 16: 'subito prima (squadra scelta)', 17: 'subito dopo (squadra scelta)' };
   /* dimensioni di un colpo: posizione nel codice a 14 caratteri e valore del contatto (stessi campi dei filtri principali) */
@@ -1993,7 +1993,7 @@ var FastMon = (function () {
     var present = {}; ALL.forEach(function (c) { present[c.skill] = true; });
     var skills = SKILL_ORDER.filter(function (s) { return present[s]; });
     var head = document.createElement('div'); head.className = 'advhead';
-    head.innerHTML = '<b class="cq-title">Criteri <small>A, B, C… uniti dalla scelta qui sotto</small></b>';
+    head.innerHTML = '<b class="cq-title">Criteri</b>';
     var off = document.createElement('button'); off.type = 'button'; off.className = 'btn small'; off.textContent = 'Togli tutti';
     off.addEventListener('click', function () { A.rules.forEach(function (r) { cqSetOpen(r, false); }); F.adv = null; renderAdv(); applyFilters(); });
     head.appendChild(off); b.appendChild(head);
@@ -2001,9 +2001,9 @@ var FastMon = (function () {
     if (A.rules.length > 1 || mode === 'custom') {
       var mw = document.createElement('div'); mw.className = 'cmode';
       mw.innerHTML = '<span class="label">Devono valere</span>' +
-        '<label><input type="radio" name="advmode" value="all"> tutti i criteri</label>' +
-        '<label><input type="radio" name="advmode" value="any"> almeno un criterio</label>' +
-        '<label><input type="radio" name="advmode" value="custom"> formula personalizzata</label>';
+        '<label><input type="radio" name="advmode" value="all"> tutti</label>' +
+        '<label><input type="radio" name="advmode" value="any"> almeno uno</label>' +
+        '<label><input type="radio" name="advmode" value="custom"> formula</label>';
       Array.prototype.forEach.call(mw.querySelectorAll('input'), function (i) {
         i.checked = i.value === mode;
         i.addEventListener('change', function () {
@@ -2015,7 +2015,7 @@ var FastMon = (function () {
       b.appendChild(mw);
     }
     var fsum = document.createElement('p'); fsum.className = 'cq-fsum'; b.appendChild(fsum);
-    function fsumUpd() { fsum.innerHTML = 'Vale se: <b>' + esc(advFormulaIt(A.formula)) + '</b>'; renderQSum(); }
+    function fsumUpd() { fsum.innerHTML = advMode(A) === 'custom' ? 'Vale se: <b>' + esc(advFormulaIt(A.formula)) + '</b>' : ''; fsum.hidden = advMode(A) !== 'custom'; renderQSum(); }
     function sel(opts, val, fn) { return cqSel(opts, val, fn); }
     function lab(txt, el) { var l = document.createElement('label'); l.className = 'advfld'; var sp = document.createElement('span'); sp.textContent = txt; l.appendChild(sp); l.appendChild(el); return l; }
     A.rules.forEach(function (rl, i) {
@@ -2039,8 +2039,9 @@ var FastMon = (function () {
       /* riga 1: relazione, NON, squadra */
       var tt = document.createElement('div'); tt.className = 'advtop';
       var rs = document.createElement('select'); rs.className = 'field'; rs.setAttribute('aria-label', 'Relazione con questa azione');
-      rs.innerHTML = ADV_MENU.map(function (g) { return '<optgroup label="' + esc(g[0]) + '">' + g[1].map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</optgroup>'; }).join('');
-      rs.value = String(rl.r); if (rs.value !== String(rl.r)) { rs.insertAdjacentHTML('afterbegin', '<option value="' + rl.r + '">' + esc(ADV_RULES[rl.r] || 'relazione ' + rl.r) + '</option>'); rs.value = String(rl.r); }
+      if (ADV_NEG[rl.r]) { rl.r = ADV_NEG[rl.r]; if (rl.n) delete rl.n; else rl.n = true; }
+      rs.innerHTML = ADV_MENU.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('');
+      rs.value = String(rl.r); if (rs.value !== String(rl.r)) { rs.insertAdjacentHTML('beforeend', '<option value="' + rl.r + '">' + esc(ADV_REL_SHORT[rl.r] || 'altra relazione') + '</option>'); rs.value = String(rl.r); }
       rs.addEventListener('change', function () { rl.r = +rs.value; upd(); applyFilters(); });
       tt.appendChild(rs);
       var nl = document.createElement('label'); nl.className = 'cond-poss';
@@ -2051,6 +2052,7 @@ var FastMon = (function () {
       tt.appendChild(sel(tl, rl.s, function (v) { rl.s = v; upd(); applyFilters(); }));
       C.body.appendChild(tt);
       /* righe con le scelte multiple */
+      function rlSk() { var s = advStore(rl, 'sk'); return Object.keys(s).some(function (k) { return s[k]; }) ? s : (rl.r === 5 ? F.skills : {}); }
       function row(parent, label, items, d, cls, after) {
         var st0 = advStore(rl, d);
         Object.keys(st0).forEach(function (k) { if (!items.some(function (it) { return it.v === k; }) && (d !== 'cmb' || k.length === 2)) items.push({ v: k, l: SKILLS[k] && d === 'sk' ? SKILLS[k] : k }); });
@@ -2118,16 +2120,16 @@ var FastMon = (function () {
         if (info) { if (info.zone) advCommit(rl, 'zs', (function (o) { o[info.zone] = true; return o; })({})); if (info.type) advCommit(rl, 'ty', (function (o) { o[info.type] = true; return o; })({})); back(); }
         else back();
       });
-      row(C.body, 'Scegli tra le combinazioni', comboItems(advStore(rl, 'sk')), 'cmb', '', function (st) {
+      row(C.body, 'Scegli tra le combinazioni', comboItems(rlSk()), 'cmb', '', function (st) {
         var zs = advStore(rl, 'zs'); if (syncZoneFromCombo(st, zs)) { advCommit(rl, 'zs', zs); return true; } return false;
       });
+      row(C.body, 'Bersaglio dell’alzata', tgItems(rlSk()), 'tg', '');
       advCourt(C.body);
       cqMore(C.body, function (m) {
         var skS = advStore(rl, 'sk');
-        row(m, 'Bersaglio', detItems(function (c) { return c.code.charAt(8); }, skS, 'Bersaglio '), 'tg', '');
         row(m, 'Tipo', detItems(function (c) { return c.type; }, skS, 'Tipo '), 'ty', '');
         row(m, 'Colpo di attacco', tfItems(skS, 'A'), 'tf', '');
-      }, advDimList(rl, 'tg').length + advDimList(rl, 'ty').length + advDimList(rl, 'tf').length > 0);
+      }, advDimList(rl, 'ty').length + advDimList(rl, 'tf').length > 0);
       b.appendChild(C.card);
     });
     var fd = document.createElement('details'); fd.className = 'cq-more advformula'; fd.open = mode === 'custom';
