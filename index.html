@@ -714,7 +714,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v77</small></h1>
+      <h1>Reader scout video <small class="ver">v78</small></h1>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -1886,8 +1886,8 @@ var FastMon = (function () {
   }
   function whoLabel(w) {
     if (w === 'team') return 'squadra analizzata' + (F.team ? ' (' + F.team + ')' : '');
-    if (w === 'oppteam') return 'l’altra squadra' + (F.team ? ' (non ' + F.team + ')' : '');
-    return w === 'same' ? 'stessa squadra' : w === 'opp' ? 'avversari' : 'qualsiasi squadra';
+    if (w === 'oppteam') return 'avversari';
+    return w === 'same' ? (F.team ? 'stessa squadra del colpo' : 'squadra analizzata') : w === 'opp' ? (F.team ? 'squadra opposta al colpo' : 'avversari') : 'entrambe';
   }
   function advDimList(rl, d) {
     var o = rl.o && rl.o[d]; if (o && o.length) return o;
@@ -1981,9 +1981,8 @@ var FastMon = (function () {
     if (!Object.keys(rl.o).length) delete rl.o;
   }
   function advTeamList() {
-    var l = [{ v: 'same', l: 'Stessa squadra dell’azione' }, { v: 'opp', l: 'Squadra avversaria' }, { v: 'any', l: 'Qualsiasi squadra' }];
-    if (F.team) l.push({ v: 'team', l: 'Sempre la squadra analizzata (' + F.team + ')' }, { v: 'oppteam', l: 'Sempre l’altra squadra (non ' + F.team + ')' });
-    return l;
+    return F.team ? [{ v: 'team', l: 'Squadra analizzata (' + F.team + ')' }, { v: 'oppteam', l: 'Avversari' }, { v: 'any', l: 'Entrambe' }]
+      : [{ v: 'same', l: 'Squadra analizzata' }, { v: 'opp', l: 'Avversari' }, { v: 'any', l: 'Entrambe' }];
   }
   function renderAdv() {
     var b = $('adv-box'); if (!b) return;
@@ -2149,7 +2148,7 @@ var FastMon = (function () {
   function advAddRule() {
     var A = F.adv || { formula: '', rules: [] }, k = A.rules.length;
     if (k >= 26) { toast('Non si possono aggiungere più di 26 criteri.'); return; }
-    var mode = k ? advMode(A) : 'all', rule = { s: 'same', pat: '*', r: k ? 11 : 5 };
+    var mode = k ? advMode(A) : 'all', rule = { s: F.team ? 'team' : 'same', pat: '*', r: k ? 11 : 5 };
     F.adv = A; A.rules.push(rule); cqSetOpen(rule, true);
     if (mode === 'custom') A.formula = A.formula + ' and ' + String.fromCharCode(65 + k); else advSetMode(A, mode);
     renderAdv(); applyFilters();
