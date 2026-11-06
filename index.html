@@ -725,7 +725,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v82</small></h1>
+      <h1>Reader scout video <small class="ver">v83</small></h1>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -841,7 +841,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <div class="sgroup">
           <span class="label" id="l-stop">A fine clip</span>
           <div class="chips" role="radiogroup" aria-labelledby="l-stop" id="ch-stop"></div>
-          <p class="hint">Tasti: spazio = play/pausa, ↓ ↑ = azione successiva/precedente, ← → = −/+ 2 s nel video, 1–5 = marker, F = schermo intero.</p>
+          <p class="hint">Tasti: spazio (o il tasto play/pausa della tastiera) = play/pausa, ↓ ↑ = azione successiva/precedente, ← → = −/+ 2 s nel video, 1–5 = marker, F = schermo intero.</p>
         </div>
       </div>
       </details>
@@ -2321,7 +2321,7 @@ var FastMon = (function () {
     if (keep && cur < 0) { vid.pause(); clip = null; ended = false; S.all = false; syncAllBtn(); updateNow(); updateBar(0); }
     renderList();
     renderStats();
-    if (everSel && cur < 0 && queue.length && !EDIT && videoFor(queue[0])) select(0, true);
+    if (everSel && cur < 0 && queue.length && !EDIT && videoFor(queue[0])) select(0, false);   /* si posiziona sulla prima azione, senza far partire il video */
     if (typeof updateMaskStatus === 'function') updateMaskStatus();
     if (EDIT) $('ed-count').textContent = queue.length + (queue.length === 1 ? ' azione trovata' : ' azioni trovate');
   }
@@ -2517,7 +2517,24 @@ var FastMon = (function () {
     if (!queue.length) return;
     S.all = true; syncAllBtn(); select(cur < 0 ? 0 : cur, true);
   });
+  /* tasto multimediale «play/pausa» della tastiera (e tasti stop, avanti, indietro) */
+  function mediaPause() { if (!vid.paused) vid.pause(); }
+  try {
+    if ('mediaSession' in navigator) {
+      var ms = navigator.mediaSession;
+      ms.setActionHandler('play', function () { if (vid.paused) togglePlay(); });
+      ms.setActionHandler('pause', mediaPause);
+      ms.setActionHandler('stop', mediaPause);
+      ms.setActionHandler('nexttrack', function () { $('b-next').click(); });
+      ms.setActionHandler('previoustrack', function () { $('b-prev').click(); });
+    }
+  } catch (x) {}
   document.addEventListener('keydown', function (e) {
+    if (e.key === 'MediaPlayPause' || e.key === 'MediaPlay' || e.key === 'MediaPause' || e.key === 'MediaStop') {
+      e.preventDefault();
+      if (e.key === 'MediaStop' || e.key === 'MediaPause') mediaPause(); else togglePlay();
+      return;
+    }
     var tg = e.target && e.target.tagName;
     if (tg === 'INPUT' || tg === 'SELECT' || tg === 'TEXTAREA') return;
     if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
