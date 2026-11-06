@@ -718,7 +718,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v79</small></h1>
+      <h1>Reader scout video <small class="ver">v80</small></h1>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -3497,6 +3497,7 @@ var FastMon = (function () {
     monAbort = false; mon = { n: list.length };
     pill.hidden = false; $('mp-fill').style.width = '0'; $('mp-text').textContent = 'Montaggio veloce: controllo i video…';
     var canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'), readers = {}, wrote = false, enc = null, encErr = null, writer = null, sink = null, cw = 0, ch = 0;
+    function sink0() { return !wr; }   /* senza file su disco il video resta in memoria: bitrate più prudente */
     function fin() { pill.hidden = true; if (monJobs.length) { mon = { n: 0 }; setTimeout(startNextJob, 700); } else mon = null; }
     function push(ts, dur, key) { var vf = new VideoFrame(canvas, { timestamp: ts, duration: dur }); try { enc.encode(vf, { keyFrame: !!key }); } finally { vf.close(); } }
     try {
@@ -3509,11 +3510,15 @@ var FastMon = (function () {
         if (!sp.supported) throw { fb: 1 };
         readers[u] = rd;
       }
-      var r0 = readers[videoFor(list[0]).url], k0 = Math.min(1, 1280 / r0.width);
+      var r0 = readers[videoFor(list[0]).url], k0 = Math.min(1, 1920 / r0.width, 1080 / r0.height);   /* risoluzione originale, fino a Full HD (prima era limitata a 1280) */
       cw = canvas.width = Math.round(r0.width * k0 / 2) * 2; ch = canvas.height = Math.round(r0.height * k0 / 2) * 2;
-      var cands = [['avc', 'avc1.640028'], ['avc', 'avc1.4d0028'], ['avc', 'avc1.42e028'], ['vp9', 'vp09.00.10.08']], chosen = null;
+      var srcFps = r0.n > 1 ? Math.max(10, Math.min(60, Math.round(1e6 / Math.max(1000, (r0.dts[1] - r0.dts[0]) / r0.timescale * 1e6)))) : 30,
+        /* qualità: circa 0,2 bit per pixel e fotogramma (Full HD a 30 fps ≈ 12 Mb/s), senza tetto basso come prima (6 Mb/s) */
+        bps = Math.round(Math.max(8e6, Math.min(sink0() ? 12e6 : 24e6, cw * ch * srcFps * 0.2)));
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      var cands = [['avc', 'avc1.64002a'], ['avc', 'avc1.640028'], ['avc', 'avc1.4d0028'], ['avc', 'avc1.42e028'], ['vp9', 'vp09.00.10.08']], chosen = null;
       for (var ci = 0; ci < cands.length && !chosen; ci++) {
-        var cfg = { codec: cands[ci][1], width: cw, height: ch, bitrate: 6000000, framerate: 30 };
+        var cfg = { codec: cands[ci][1], width: cw, height: ch, bitrate: bps, framerate: srcFps, bitrateMode: 'variable', latencyMode: 'quality' };
         if (cands[ci][0] === 'avc') cfg.avc = { format: 'avc' };
         var se = await VideoEncoder.isConfigSupported(cfg);
         if (se.supported) chosen = { kind: cands[ci][0], cfg: cfg };
