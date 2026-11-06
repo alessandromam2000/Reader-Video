@@ -696,6 +696,13 @@ body.theater.nolist .panes { grid-template-rows: minmax(0, 1fr); }
 .mk-row.mk-off .mk-info small { display: none; }
 .mk-row.mk-off .mk-info:hover b { color: var(--accent); }
 
+/* cognome lungo: si accorcia con «…» ma i pallini dei marker restano sempre visibili */
+body.theater .row .who { display: flex; align-items: center; min-width: 0; overflow: hidden; text-overflow: clip; }
+body.theater .row .who .tm, body.theater .row .who .mks { flex: none; }
+body.theater .row .who .pn { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.theater .row .who .mks { margin-left: 5px; }
+body.theater .row .who .mks i { width: 11px; height: 11px; }
+
 </style>
 </head><body>
 <div id="gate" style="position:fixed;inset:0;z-index:99999;background:#0D1619;color:#E4EDF0;display:none;align-items:center;justify-content:center;font-family:system-ui,sans-serif">
@@ -718,7 +725,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v80</small></h1>
+      <h1>Reader scout video <small class="ver">v82</small></h1>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -1081,11 +1088,20 @@ function parseDvw(text) {
       var f = l.split(';');
       var num = parseInt(f[1], 10);
       if (isNaN(num)) return;
-      m.players[side + num] = {
+      var pk = side + num, np = {
         side: side, num: num,
         surname: f[9] || '', name: f[10] || '',
         role: f[12] === 'L' ? 'L' : (ROLES[f[13]] || '')
-      };
+      }, old = m.players[pk];
+      if (!old) { m.players[pk] = np; return; }
+      // stesso numero di maglia per due righe: se è la stessa persona resta una voce sola, altrimenti le unisco
+      if (old.surname === np.surname && old.name === np.name) return;
+      var nm = (old.names || [(old.surname + ' ' + old.name).trim()]);
+      nm.push((np.surname + ' ' + np.name).trim());
+      old.names = nm; old.surname = nm.map(function (s) { return s.split(' ')[0]; }).join(' / '); old.name = '';
+      if (!old.role) old.role = np.role;
+      var tcode = m.teams[side === 'H' ? 0 : 1].code, dd = (m.dupes = m.dupes || []).filter(function (d) { return d.key === pk; })[0];
+      if (dd) dd.names = nm; else m.dupes.push({ key: pk, num: num, team: tcode, names: nm });
     });
   }
   addPlayers(rows.ph, 'H');
@@ -1499,6 +1515,7 @@ var FastMon = (function () {
     var ex = LIB.filter(function (e) { return e.key === key; })[0];
     if (ex && ex.sample && !(opts && opts.sample)) { dropEntry(ex); sampleEntry = null; ex = null; }
     if (ex) return ex;
+    if (m.dupes && m.dupes.length && !(opts && opts.sample)) toast(m.teams[0].code + '–' + m.teams[1].code + ': ' + m.dupes.map(function (d) { return 'due giocatrici con il numero ' + d.num + ' (' + d.team + ': ' + d.names.join(' e ') + ')'; }).join('; ') + '. Le ho unite in un’unica voce, perché nello scout hanno lo stesso numero.');
     var e = { id: 'm' + (++seq), key: key, name: name, text: text, M: m, active: true, videos: {}, giornata: giornataOf(name, m), sample: !!(opts && opts.sample) };
     var rl = {};
     m.contacts.forEach(function (c) {
@@ -2304,6 +2321,7 @@ var FastMon = (function () {
     if (keep && cur < 0) { vid.pause(); clip = null; ended = false; S.all = false; syncAllBtn(); updateNow(); updateBar(0); }
     renderList();
     renderStats();
+    if (everSel && cur < 0 && queue.length && !EDIT && videoFor(queue[0])) select(0, true);
     if (typeof updateMaskStatus === 'function') updateMaskStatus();
     if (EDIT) $('ed-count').textContent = queue.length + (queue.length === 1 ? ' azione trovata' : ' azioni trovate');
   }
@@ -2317,7 +2335,7 @@ var FastMon = (function () {
       if (c.startZ && c.endZ && (c.skill === 'A' || c.skill === 'S')) extra.push(c.startZ + '→' + c.endZ);
       return '<li><button class="row" type="button" data-q="' + q + '" title="' + esc(tc(c) + ' vs ' + opp(c)) + ' · S' + c.set + ' · ' + scoreText(c.score) + ' · rotazione P' + c.rot + (c.phase ? ' · ' + (c.phase === 'C' ? 'cambio palla' : c.phase === 'T' ? 'transizione' : c.phase === 'F' ? 'freeball' : '') : '') + '"' + (q === cur ? ' aria-current="true"' : '') + '>' +
         '<span class="ev" style="--c:' + ev + '" title="' + esc(EV_NAME[c.eval] || '') + '">' + esc(c.eval) + '</span>' +
-        '<span class="who"><span class="tm ' + (c.side === 'H' ? 'h' : 'a') + '">' + esc(tc(c)) + '</span>' + esc(pl(c)) + '<span class="mks">' + dots(c) + '</span>' +
+        '<span class="who"><span class="tm ' + (c.side === 'H' ? 'h' : 'a') + '">' + esc(tc(c)) + '</span><span class="pn">' + esc(pl(c)) + '</span><span class="mks">' + dots(c) + '</span>' +
         '<span class="sk">' + SKILLS[c.skill] + (extra.length ? ' · ' + extra.join(' · ') : '') + '</span></span>' +
         '<span class="when">' + fmtTime(c.t) + '</span>' +
         '<span class="code">' + esc(c.code) + '</span>' +
@@ -2445,10 +2463,11 @@ var FastMon = (function () {
     var done = function () { vid.removeEventListener('loadedmetadata', done); cb(); };
     vid.addEventListener('loadedmetadata', done);
   }
+  var everSel = false;   /* l'utente ha già scelto un'azione: se cambia la ricerca parte la prima della nuova lista */
   function select(q, autoplay) {
     if (q < 0 || q >= queue.length) return;
     if (q >= rendered) renderMore(q + 60);
-    cur = q; var c = queue[q]; clip = range(c); ended = false;
+    everSel = true; cur = q; var c = queue[q]; clip = range(c); ended = false;
     markCurrent(); updateNow(); updateBar(clip.start);
     updateVideoUI();
     var v = videoFor(c);
