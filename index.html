@@ -1,5 +1,9 @@
 <!doctype html>
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#14213d">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Reader scout video</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -714,7 +718,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v78</small></h1>
+      <h1>Reader scout video <small class="ver">v79</small></h1>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -3777,5 +3781,10 @@ var FastMon = (function () {
   });
 })();
 
+</script>
+<script>
+if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+}
 </script>
 </body></html>
