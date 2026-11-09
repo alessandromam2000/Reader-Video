@@ -703,6 +703,107 @@ body.theater .row .who .pn { flex: 0 1 auto; min-width: 0; overflow: hidden; tex
 body.theater .row .who .mks { margin-left: 5px; }
 body.theater .row .who .mks i { width: 11px; height: 11px; }
 
+/* modifica codice */
+.ce-card { width: min(640px, 100%); max-height: 92vh; overflow-y: auto; }
+.ce-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+.ce-f { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ce-f > span { font-size: 12px; color: var(--muted); }
+.ce-f .field { width: 100%; min-height: 36px; }
+.ce-raw { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: .06em; }
+.ce-chk { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.ce-err { margin: 0; color: var(--bad, #c0392b); font-size: 13px; min-height: 0; }
+.ce-err:empty { display: none; }
+.dlg-foot { flex-wrap: wrap; }
+.row .mod { color: var(--accent, #c8641e); font-size: 12px; margin-left: 4px; }
+.vb.ex.mdf { color: var(--accent, #c8641e); }
+@media (max-width: 480px) { .ce-grid { grid-template-columns: 1fr; } }
+
+/* modifica codice v85 */
+.ce-card { width: min(820px, 100%); max-height: 96vh; outline: none; }
+.ce-code { font: 700 18px var(--f-mono, monospace); letter-spacing: .08em; color: var(--accent); }
+.ce-body { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+.ce-left { display: flex; gap: 10px; flex-wrap: wrap; flex: 0 0 auto; max-width: 100%; }
+.ce-left .court-grid { grid-template-columns: repeat(3, 46px); grid-auto-rows: 42px; }
+.ce-right { flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.ce-g { display: flex; align-items: flex-start; gap: 8px; }
+.ce-g > .label { flex: 0 0 92px; padding-top: 7px; font-size: 11px; }
+.ce-chips { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.ce-chips .chip { min-height: 32px; padding: 2px 9px; }
+.ce-pl .ce-chips { max-height: 108px; overflow-y: auto; }
+.ce-sub { flex-basis: 100%; }
+.ce-sub .ce-g > .label { flex-basis: 62px; }
+.chip.zc { font: 700 15px var(--f-mono, monospace); padding: 0; }
+.ce-rawf { flex-direction: row; align-items: center; gap: 8px; }
+.ce-rawf .ce-raw { max-width: 300px; }
+@media (max-width: 560px) { .ce-g { flex-direction: column; gap: 2px; } .ce-g > .label { padding-top: 0; flex-basis: auto; } }
+.ce-body { flex-wrap: nowrap; }
+.ce-left { width: 326px; flex: 0 0 326px; }
+.ce-right { flex: 1 1 0; }
+@media (max-width: 760px) { .ce-body { flex-wrap: wrap; } .ce-left { width: auto; flex: 0 0 auto; } .ce-right { flex: 1 1 100%; } }
+.ce-pl .ce-chips { max-height: 150px; }
+
+/* modifica codice v86: campo reale */
+.ce-card { width: min(760px, 100%); }
+.ce-left { width: 258px; flex: 0 0 258px; flex-direction: column; flex-wrap: nowrap; gap: 8px; }
+.ce-tg { display: flex; gap: 6px; }
+.ce-tg .chip { flex: 1; min-height: 34px; }
+.ce-field { border: 2px solid var(--fg); border-radius: 4px; background: color-mix(in srgb, var(--accent) 14%, var(--surface)); padding: 6px; }
+.ce-half { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 52px; gap: 0; position: relative; }
+.ce-half.top { border-bottom: 0; }
+.ce-half.top > :nth-child(n+7), .ce-half.bot > :nth-child(-n+3) { border-bottom: 0; }
+.ce-netl { height: 6px; margin: 2px -6px; background: repeating-linear-gradient(90deg, var(--fg) 0 6px, transparent 6px 9px); border-top: 2px solid var(--fg); }
+.cz { border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent); background: transparent; color: var(--muted); font: 600 15px var(--f-mono, monospace); cursor: pointer; }
+.ce-half.top .cz:nth-child(n+7) { border-bottom: 3px solid var(--fg); }
+.ce-half.bot .cz:nth-child(-n+3) { border-top: 3px solid var(--fg); }
+.cz:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.cz.st { background: var(--accent); color: var(--accent-ink); }
+.cz.en { background: #c8641e; color: #fff; }
+.cz.st.en { background: linear-gradient(135deg, var(--accent) 50%, #c8641e 50%); }
+.ce-cb { max-width: 100%; min-height: 34px; }
+.ce-half .cz { height: 100%; min-height: 0; padding: 0; margin: 0; display: grid; place-items: center; border-radius: 0; box-sizing: border-box; }
+.ce-pl .ce-chips { max-height: none; }
+.ce-half { grid-auto-rows: 50px; }
+
+/* modifica codice v87: come Data Volley */
+.ce-card { width: min(860px, 100%); max-height: 96vh; overflow-y: auto; gap: 8px; }
+.ce-title { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.ce-title h2 { margin: 0; font: 700 20px var(--f-display); }
+.ce-body { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.ce-L { flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 8px; position: relative; }
+.ce-panels { display: flex; gap: 6px; flex-wrap: wrap; }
+.cp { border: 1px solid var(--line); border-radius: 4px; padding: 0 0 6px; background: color-mix(in srgb, var(--fg) 5%, var(--surface)); }
+.cp h3 { margin: 0 0 6px; font: 700 13px var(--f-body, sans-serif); text-align: center; color: #fff; padding: 2px 10px; border-radius: 3px 3px 0 0; }
+.cp.main h3 { background: #8b0000; } .cp.adv h3 { background: #0a1fd0; } .cp.ext h3 { background: #6a7bf0; } .cp.cus h3 { background: #777; }
+.cp-r { display: flex; gap: 4px; padding: 0 6px; }
+.cb-b { display: flex; flex-direction: column; align-items: center; gap: 2px; font: 600 11px var(--f-body, sans-serif); color: var(--muted); }
+.cb-i { width: 32px; height: 34px; text-align: center; font: 700 17px var(--f-mono, monospace); border: 1px solid var(--fg); border-radius: 2px; background: var(--surface); color: var(--fg); padding: 0; text-transform: none; }
+.cb-i.w2 { width: 44px; } .cb-i.w3 { width: 86px; font-size: 14px; }
+.cb-i:focus { outline: 2px solid #1f5fe0; background: color-mix(in srgb, #1f5fe0 14%, var(--surface)); }
+.ce-pname { font-size: 13px; color: var(--muted); min-height: 18px; }
+.ce-dd { border: 1px solid var(--fg); background: var(--surface); width: 220px; display: flex; flex-direction: column; }
+.ce-dd[hidden] { display: none; }
+.ce-opt { text-align: left; border: 0; background: transparent; color: var(--fg); padding: 5px 10px; font: 500 14px var(--f-body, sans-serif); cursor: pointer; }
+.ce-opt b { display: inline-block; width: 18px; font-family: var(--f-mono, monospace); }
+.ce-opt:hover, .ce-opt.on { background: #8d8fa0; color: #fff; }
+.ce-R { flex: 0 0 auto; border: 2px solid #5aa0e0; border-radius: 2px; width: 290px; max-width: 100%; text-align: center; }
+.ce-rt { background: #0a1fd0; color: #fff; font: 700 14px var(--f-body, sans-serif); padding: 3px; }
+.ce-cw { padding: 6px; display: flex; justify-content: center; background: #f4f6f9; }
+.ce-court2 svg { display: block; cursor: crosshair; max-width: 100%; height: auto; }
+.ce-sk { color: #1f5fe0; font: 700 15px var(--f-body, sans-serif); padding: 4px 0 0; }
+.ce-help { color: #5aa0e0; font-size: 11px; padding-bottom: 6px; line-height: 1.4; }
+.ce-bot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ce-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.ce-ok { background: #1a9a2e; color: #fff; border-color: #1a9a2e; min-width: 110px; font-weight: 700; }
+.cb-i { width: 27px; } .cb-i.w2 { width: 38px; } .cb-i.w3 { width: 58px; font-size: 13px; }
+.cp-r { gap: 3px; padding: 0 4px; } .cp h3 { padding: 2px 4px; }
+.ce-panels { flex-wrap: nowrap; gap: 4px; }
+.ce-card { width: min(880px, 100%); }
+@media (max-width: 700px) { .ce-panels { flex-wrap: wrap; } }
+
+.cb-b.off { opacity: .35; } .cb-i:disabled { background: color-mix(in srgb, var(--fg) 8%, var(--surface)); }
+
+.credit { font: 500 11px var(--f-body, sans-serif); color: var(--muted); letter-spacing: .02em; margin-top: -2px; }
+
 </style>
 </head><body>
 <div id="gate" style="position:fixed;inset:0;z-index:99999;background:#0D1619;color:#E4EDF0;display:none;align-items:center;justify-content:center;font-family:system-ui,sans-serif">
@@ -725,7 +826,8 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v83</small></h1>
+      <h1>Reader scout video <small class="ver">v96</small></h1>
+      <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
@@ -819,6 +921,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <button class="btn" id="b-all" type="button" aria-pressed="false">Riproduci tutte</button>
         <span class="grow"></span>
         <span class="qpos" id="qpos"></span>
+        <button class="btn small" id="b-edit" type="button" aria-label="Modifica il codice dell\'azione" title="Invio o doppio clic sul codice">✎ Modifica codice</button>
         <button class="btn small" id="b-full" type="button" aria-label="Schermo intero con lista dei codici" title="Tasto Tab (o F)">⛶ Schermo intero</button>
       </div>
       </div>
@@ -841,7 +944,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <div class="sgroup">
           <span class="label" id="l-stop">A fine clip</span>
           <div class="chips" role="radiogroup" aria-labelledby="l-stop" id="ch-stop"></div>
-          <p class="hint">Tasti: spazio (o il tasto play/pausa della tastiera) = play/pausa, ↓ ↑ = azione successiva/precedente, ← → = −/+ 2 s nel video, 1–5 = marker, F = schermo intero.</p>
+          <p class="hint">Tasti: spazio (o il tasto play/pausa della tastiera) = play/pausa, ↓ ↑ = azione successiva/precedente, ← → = −/+ 2 s nel video, Invio (o doppio clic sul codice) = modifica il codice, 1–5 = marker, F = schermo intero.</p>
         </div>
       </div>
       </details>
@@ -969,6 +1072,19 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
     <div class="dlg-foot"><button class="btn" id="mon-cancel" type="button">Annulla</button><button class="btn primary" id="mon-go" type="button">Avvia</button></div>
   </div>
 </div>
+<div class="dlg" id="dlg-code" hidden>
+  <div class="dlg-card ce-card" id="ce-card" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="ce-t">
+    <div class="ce-title"><h2 id="ce-t">Modifica codice</h2><code class="ce-code" id="ce-code"></code></div>
+    <p class="hint" id="ce-sub"></p>
+    <div class="ce-body" id="ce-fields"></div>
+    <input id="ce-raw" type="hidden">
+    <p class="ce-err" id="ce-err" role="alert"></p>
+    <div class="ce-bot">
+      <label class="ce-chk"><input type="checkbox" id="ce-next"> Dopo la conferma passa alla modifica del codice successivo</label>
+      <div class="ce-btns"><button class="btn" id="ce-exp" type="button">Esporta scout</button><button class="btn" id="ce-orig" type="button" hidden>Originale</button><button class="btn ce-ok" id="ce-ok" type="button">Ok</button><button class="btn" id="ce-no" type="button">Annulla</button></div>
+    </div>
+  </div>
+</div>
 <div class="dlg" id="dlg-ask" hidden>
   <div class="dlg-card" role="dialog" aria-modal="true" aria-labelledby="ask-t">
     <div class="dlg-head"><h2 id="ask-t">Per quale giocatrice?</h2></div>
@@ -1038,13 +1154,46 @@ function decodeDvw(buffer) {
   }
 }
 
+function decodeDvwEx(buffer) {
+  var u = new Uint8Array(buffer), bom = u.length > 2 && u[0] === 0xEF && u[1] === 0xBB && u[2] === 0xBF;
+  try { return { text: new TextDecoder('utf-8', { fatal: true }).decode(buffer), enc: 'utf8', bom: bom }; }
+  catch (e) { return { text: new TextDecoder('windows-1252').decode(buffer), enc: 'w1252', bom: false }; }
+}
+var CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
+function encodeDvw(text, enc, bom) {
+  if (enc === 'w1252') {
+    var o = new Uint8Array(text.length);
+    for (var i = 0; i < text.length; i++) { var ch = text.charCodeAt(i); o[i] = ch < 256 ? ch : (CP1252[ch] || 63); }
+    return o;
+  }
+  var b = new TextEncoder().encode(text);
+  if (!bom) return b;
+  var r = new Uint8Array(b.length + 3); r.set([0xEF, 0xBB, 0xBF]); r.set(b, 3); return r;
+}
+// sostituisce il codice (primo campo) della riga ln dello scout
+function setScoutLine(text, ln, code, c4, c6) {
+  var parts = text.split(/(\r?\n)/), k = ln * 2, l = parts[k];
+  if (l == null) return text;
+  var f = l.split(';');
+  f[0] = code;
+  if (c4 != null || c6 != null) {
+    while (f.length < 8) f.push('');
+    if (c4 != null) f[4] = c4;
+    if (c6 != null) f[6] = c6;
+    if (!f[5]) f[5] = '-1-1';
+  }
+  parts[k] = f.join(';');
+  return parts.join('');
+}
+function setScoutCode(text, ln, code) { return setScoutLine(text, ln, code); }
 function parseDvw(text) {
   var lines = text.split(/\r?\n/);
   var section = '';
   var m = { teams: [], players: {}, cams: {}, contacts: [], sets: [], title: '' };
   var rows = { match: [], teams: [], ph: [], pv: [], video: [], scout: [], set: [], ac: [], sc: [] };
 
-  lines.forEach(function (l) {
+  var scoutLn = [];
+  lines.forEach(function (l, li) {
     if (l.indexOf('[3') === 0) { section = l.trim(); return; }
     if (!l.trim()) return;
     if (section === '[3MATCH]') rows.match.push(l);
@@ -1052,7 +1201,7 @@ function parseDvw(text) {
     else if (section === '[3PLAYERS-H]') rows.ph.push(l);
     else if (section === '[3PLAYERS-V]') rows.pv.push(l);
     else if (section === '[3VIDEO]') rows.video.push(l);
-    else if (section === '[3SCOUT]') rows.scout.push(l);
+    else if (section === '[3SCOUT]') { rows.scout.push(l); scoutLn.push(li); }
     else if (section === '[3SET]') rows.set.push(l);
     else if (section === '[3ATTACKCOMBINATION]') rows.ac.push(l);
     else if (section === '[3SETTERCALL]') rows.sc.push(l);
@@ -1060,7 +1209,7 @@ function parseDvw(text) {
 
   // tabelle delle combinazioni d'attacco (codice;zona;mano;tipo;descrizione) e delle chiamate dell'alzatore (codice;;descrizione)
   m.combos = { A: {}, E: {} };
-  rows.ac.forEach(function (l) { var f = l.split(';'); if (f[0]) m.combos.A[f[0]] = { zone: /^[1-9]$/.test(f[1] || '') ? f[1] : '', hand: f[2] || '', type: f[3] || '', desc: f[4] || '' }; });
+  rows.ac.forEach(function (l) { var f = l.split(';'); if (f[0]) m.combos.A[f[0]] = { zone: /^[1-9]$/.test(f[1] || '') ? f[1] : '', hand: f[2] || '', type: f[3] || '', desc: f[4] || '', y: /^\d{4}$/.test(f[7] || '') ? +f[7].substr(0, 2) : null, x: /^\d{4}$/.test(f[7] || '') ? +f[7].substr(2, 2) : null }; });
   rows.sc.forEach(function (l) { var f = l.split(';'); if (f[0]) m.combos.E[f[0]] = { desc: f[2] || '' }; });
 
   // punteggio finale di ogni set (quarto controllo del file, es. "25-20")
@@ -1119,7 +1268,7 @@ function parseDvw(text) {
   var rallyOpen = null;
   var all = m.contacts;
 
-  rows.scout.forEach(function (l) {
+  rows.scout.forEach(function (l, sk) {
     var f = l.split(';');
     var c = f[0];
     if (c.length < 2) return;
@@ -1146,7 +1295,7 @@ function parseDvw(text) {
     var num = parseInt(c.substr(1, 2), 10);
     var rotH = parseInt(f[9], 10), rotA = parseInt(f[10], 10);
     var ct = {
-      i: order++, side: side, num: num,
+      i: order++, ln: scoutLn[sk], sc: /^\d{4}$/.test(f[4] || '') ? { y: +f[4].substr(0, 2), x: +f[4].substr(2, 2) } : null, ec: /^\d{4}$/.test(f[6] || '') ? { y: +f[6].substr(0, 2), x: +f[6].substr(2, 2) } : null, side: side, num: num,
       skill: skill, type: c.charAt(4) === '~' ? '' : c.charAt(4),
       eval: c.charAt(5),
       combo: c.substr(6, 2).replace(/~/g, ''),
@@ -1225,7 +1374,7 @@ function fmtTime(s) {
   return (h ? h + ':' : '') + pad(mi) + ':' + pad(se);
 }
 
-if (typeof module !== 'undefined') module.exports = { parseDvw: parseDvw, decodeDvw: decodeDvw, SKILLS: SKILLS, fmtTime: fmtTime, playerLabel: playerLabel };
+if (typeof module !== 'undefined') module.exports = { setScoutLine: setScoutLine, decodeDvwEx: decodeDvwEx, encodeDvw: encodeDvw, setScoutCode: setScoutCode, parseDvw: parseDvw, decodeDvw: decodeDvw, SKILLS: SKILLS, fmtTime: fmtTime, playerLabel: playerLabel };
 
 /* ---------- montaggio veloce: lettore MP4 + scrittore MP4 (la decodifica/codifica la fa il browser con WebCodecs) ---------- */
 var FastMon = (function () {
@@ -1516,13 +1665,14 @@ var FastMon = (function () {
     if (ex && ex.sample && !(opts && opts.sample)) { dropEntry(ex); sampleEntry = null; ex = null; }
     if (ex) return ex;
     if (m.dupes && m.dupes.length && !(opts && opts.sample)) toast(m.teams[0].code + '–' + m.teams[1].code + ': ' + m.dupes.map(function (d) { return 'due giocatrici con il numero ' + d.num + ' (' + d.team + ': ' + d.names.join(' e ') + ')'; }).join('; ') + '. Le ho unite in un’unica voce, perché nello scout hanno lo stesso numero.');
-    var e = { id: 'm' + (++seq), key: key, name: name, text: text, M: m, active: true, videos: {}, giornata: giornataOf(name, m), sample: !!(opts && opts.sample) };
+    var e = { id: 'm' + (++seq), key: key, name: name, text: text, M: m, active: true, videos: {}, giornata: giornataOf(name, m), sample: !!(opts && opts.sample), orig: (opts && opts.orig) || null, enc: (opts && opts.enc) || 'utf8', bom: !!(opts && opts.bom) };
     var rl = {};
     m.contacts.forEach(function (c) {
       c.e = e; c.uid = key + ':' + c.i;
       var arr = rl[c.rally] || (rl[c.rally] = []);
       c.pos = arr.length; c.rl = arr; arr.push(c);
     });
+    markMods(e);
     try {
       var old = JSON.parse(localStorage.getItem('reader-scout-video-marks:' + key) || 'null');
       if (old) { Object.keys(old).forEach(function (i) { if (!MARKS[key + ':' + i]) MARKS[key + ':' + i] = old[i]; }); saveMarks(); }
@@ -1566,7 +1716,7 @@ var FastMon = (function () {
         '<span class="lg">' + (e.giornata != null ? 'G' + e.giornata : '–') + '</span>' +
         '<span class="lt">' + esc(e.M.teams[0].code) + ' – ' + esc(e.M.teams[1].code) + '</span>' +
         '<span class="lw">' + (w[0] + w[1] ? w[0] + '–' + w[1] : '') + '</span></label>' +
-        '<button type="button" class="vb' + (ok ? ' ok' : Object.keys(e.videos).length ? ' part' : '') + '" data-link="' + e.id + '" title="' + (ok ? 'Video collegato (clic per cambiarlo)' : 'Video non collegato. Cerco: giornata ' + (e.giornata != null ? e.giornata : '?') + ', squadre ' + esc(e.M.teams[0].name) + ' / ' + esc(e.M.teams[1].name) + '. Clic per sceglierlo a mano.') + '">' + (ok ? '▶ video' : 'collega video') + '</button>' + '</li>';
+        '<button type="button" class="vb ex' + (e.orig ? ' mdf' : '') + '" data-exp="' + e.id + '" title="' + (e.orig ? 'Esporta lo scout modificato (.dvw)' : 'Esporta lo scout (.dvw)') + '">⤓</button>' + '<button type="button" class="vb' + (ok ? ' ok' : Object.keys(e.videos).length ? ' part' : '') + '" data-link="' + e.id + '" title="' + (ok ? 'Video collegato (clic per cambiarlo)' : 'Video non collegato. Cerco: giornata ' + (e.giornata != null ? e.giornata : '?') + ', squadre ' + esc(e.M.teams[0].name) + ' / ' + esc(e.M.teams[1].name) + '. Clic per sceglierlo a mano.') + '">' + (ok ? '▶ video' : 'collega video') + '</button>' + '</li>';
     }).join('') || '<li class="none">Nessuna partita.</li>';
     var dg = $('lib-diag');
     if (dg) {
@@ -1589,6 +1739,7 @@ var FastMon = (function () {
   });
   $('lib-list').addEventListener('click', function (ev) {
     var b = ev.target.closest ? ev.target.closest('button') : null; if (!b) return;
+    if (b.dataset.exp) { exportScout(byId(b.dataset.exp)); return; }
     if (b.dataset.link) { pendingEntry = byId(b.dataset.link); $('in-video').click(); }
   });
   /* ---------- togli scout (da in alto) ---------- */
@@ -1636,12 +1787,12 @@ var FastMon = (function () {
   async function readScouts(files) {
     var n = 0;
     for (var i = 0; i < files.length; i++) {
-      try { var buf = await files[i].arrayBuffer(); if (addScout(decodeDvw(buf), files[i].name)) n++; } catch (x) { toast('Non riesco a leggere ' + files[i].name); }
+      try { var buf = await files[i].arrayBuffer(), dx = decodeDvwEx(buf); if (addScout(dx.text, files[i].name, { enc: dx.enc, bom: dx.bom })) n++; } catch (x) { toast('Non riesco a leggere ' + files[i].name); }
     }
     if (n) { saveLib(); rebuild(); autoScanSaved(); toast(n === 1 ? 'Scout caricato.' : n + ' scout caricati.'); }
   }
   function saveLib() {
-    var items = LIB.filter(function (e) { return !e.sample; }).map(function (e) { return { name: e.name, text: e.text }; });
+    var items = LIB.filter(function (e) { return !e.sample; }).map(function (e) { var o = { name: e.name, text: e.text, enc: e.enc, bom: e.bom }; if (e.orig) o.orig = e.orig; return o; });
     idb(function (st, done) { try { st.put(items, 'lib'); } catch (x) {} done(); });
   }
   function loadLibStore() {
@@ -2335,7 +2486,7 @@ var FastMon = (function () {
       if (c.startZ && c.endZ && (c.skill === 'A' || c.skill === 'S')) extra.push(c.startZ + '→' + c.endZ);
       return '<li><button class="row" type="button" data-q="' + q + '" title="' + esc(tc(c) + ' vs ' + opp(c)) + ' · S' + c.set + ' · ' + scoreText(c.score) + ' · rotazione P' + c.rot + (c.phase ? ' · ' + (c.phase === 'C' ? 'cambio palla' : c.phase === 'T' ? 'transizione' : c.phase === 'F' ? 'freeball' : '') : '') + '"' + (q === cur ? ' aria-current="true"' : '') + '>' +
         '<span class="ev" style="--c:' + ev + '" title="' + esc(EV_NAME[c.eval] || '') + '">' + esc(c.eval) + '</span>' +
-        '<span class="who"><span class="tm ' + (c.side === 'H' ? 'h' : 'a') + '">' + esc(tc(c)) + '</span><span class="pn">' + esc(pl(c)) + '</span><span class="mks">' + dots(c) + '</span>' +
+        '<span class="who"><span class="tm ' + (c.side === 'H' ? 'h' : 'a') + '">' + esc(tc(c)) + '</span><span class="pn">' + esc(pl(c)) + '</span>' + (c.mod ? '<span class="mod" title="Codice modificato">✎</span>' : '') + '<span class="mks">' + dots(c) + '</span>' +
         '<span class="sk">' + SKILLS[c.skill] + (extra.length ? ' · ' + extra.join(' · ') : '') + '</span></span>' +
         '<span class="when">' + fmtTime(c.t) + '</span>' +
         '<span class="code">' + esc(c.code) + '</span>' +
@@ -2537,6 +2688,7 @@ var FastMon = (function () {
     }
     var tg = e.target && e.target.tagName;
     if (tg === 'INPUT' || tg === 'SELECT' || tg === 'TEXTAREA') return;
+    if (codeEditOpen()) return;
     if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
     else if (e.key === 'ArrowDown') { e.preventDefault(); $('b-next').click(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); $('b-prev').click(); }
@@ -3778,7 +3930,7 @@ var FastMon = (function () {
   document.addEventListener('fullscreenchange', function () { if (theater && !document.fullscreenElement) exitTheater(); });
   document.addEventListener('keydown', function (e) {
     var tg = e.target && e.target.tagName;
-    if (tg === 'INPUT' || tg === 'SELECT' || tg === 'TEXTAREA') return;
+    if (tg === 'INPUT' || tg === 'SELECT' || tg === 'TEXTAREA' || codeEditOpen()) return;
     if (e.key === 'Escape' && theater) exitTheater();
     else if (((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey) || (e.key === 'Tab' && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey)) { e.preventDefault(); toggleTheater(); }
   });
@@ -3802,6 +3954,344 @@ var FastMon = (function () {
   $('pg-go').addEventListener('click', function () { setPage('analisi'); });
   setPage('partite');
 
+  /* ---------- modifica codice (come in Data Volley) + esportazione ---------- */
+  function markMods(e) {
+    var ol = e.orig ? e.orig.split(/\r?\n/) : null, nl = e.text.split(/\r?\n/);
+    e.M.contacts.forEach(function (c) { c.mod = ol ? (ol[c.ln] !== nl[c.ln]) : false; });
+  }
+  function origCode(c) { return c.e.orig ? (c.e.orig.split(/\r?\n/)[c.ln] || '').split(';')[0] : c.code; }
+  function exportScout(e) {
+    if (!e) return;
+    var bytes = encodeDvw(e.text, e.enc || 'utf8', e.bom);
+    var nm = e.name.replace(/\.dvw$/i, '') + (e.orig ? '_mod' : '') + '.dvw';
+    var url = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+    var a = document.createElement('a'); a.href = url; a.download = nm; document.body.appendChild(a); a.click();
+    setTimeout(function () { a.remove(); URL.revokeObjectURL(url); }, 4000);
+    toast('Scout esportato: ' + nm);
+  }
+  var CE = { c: null, q: -1, cd: '' };
+  function ceGet(pos, len) { var s = CE.cd.substr(pos, len || 1); return s.replace(/~/g, ''); }
+  function ceSet(pos, val, len) {
+    len = len || 1; val = (val || '').toUpperCase().substr(0, len); while (val.length < len) val += '~';
+    var s = CE.cd; while (s.length < pos + len) s += '~';
+    CE.cd = s.substr(0, pos) + val + s.substr(pos + len);
+  }
+  function cePlayers(side) {
+    var M = CE.c.e.M, out = [];
+    Object.keys(M.players).forEach(function (k) { var p = M.players[k]; if (p.side === side) out.push(p); });
+    out.sort(function (x, y) { return x.num - y.num; });
+    return out;
+  }
+  var CE_OWN = [[4, 3, 2], [7, 8, 9], [5, 6, 1]], CE_OPP = [[1, 6, 5], [9, 8, 7], [2, 3, 4]];
+  var CE_IN = [
+    { k: 'tm', pos: 0, len: 1 }, { k: 'num', pos: 1, len: 2 }, { k: 'sk', pos: 3, len: 1 }, { k: 'ty', pos: 4, len: 1 }, { k: 'ev', pos: 5, len: 1 },
+    { k: 'cb', pos: 6, len: 2 }, { k: 'tg', pos: 8, len: 1 }, { k: 'sz', pos: 9, len: 1 }, { k: 'ez', pos: 10, len: 1 }, { k: 'sub', pos: 11, len: 1 },
+    { k: 'tpf', pos: 12, len: 1 }, { k: 'gi', pos: 13, len: 1 }, { k: 'spc', pos: 14, len: 1 }, { k: 'cu', pos: 15, len: 0 }
+  ];
+  var CE_DD = {
+    sk: [['S', 'Battuta'], ['R', 'Ricezione'], ['E', 'Alzata'], ['A', 'Attacco'], ['B', 'Muro'], ['D', 'Difesa'], ['F', 'Freeball']],
+    ty: [['H', 'High'], ['M', 'Medium'], ['Q', 'Quick'], ['T', 'Tense'], ['U', 'Super'], ['F', 'Fast'], ['N', 'Float'], ['O', 'Other'], ['~', 'nessuno']],
+    ev: [['#', 'Punto / perfetta'], ['+', 'Positiva'], ['!', 'Neutra'], ['-', 'Negativa'], ['/', 'Murata / coperta'], ['=', 'Errore']],
+    gi: [['0', 'no Block'], ['1', '1 player Block'], ['2', '2 players Block'], ['3', '3 players Block'], ['4', 'hole Block'], ['C', 'Block Control'], ['N', 'Let'], ['~', 'nessuno']],
+    tg: [['B', 'Back'], ['F', 'Front'], ['C', 'Center'], ['P', 'Pipe'], ['S', 'Setter'], ['~', 'nessuno']],
+    tm: [['*', 'squadra di casa'], ['a', 'squadra ospite']]
+  };
+  var CE_TPF = {
+    A: [['H', 'Hard Spike'], ['P', 'Soft Spike'], ['T', 'Tip'], ['~', 'nessuno']],
+    R: [['L', 'Left'], ['R', 'Right'], ['M', 'Middleline'], ['O', 'Overhead'], ['W', 'Low'], ['~', 'nessuno']],
+    E: [['1', 'One hand'], ['2', 'Two hands'], ['3', 'Bagher'], ['~', 'nessuno']]
+  };
+  var CE_ON = { tpf: 'ARE', gi: 'AB', cb: 'AE', tg: 'E', ez: 'SRABDF', sub: 'SRABDF' };
+  function ceEn(k) { return !CE_ON[k] || CE_ON[k].indexOf(CE.cd.charAt(3)) >= 0; }
+  function ceDDList(k) { return k === 'tpf' ? (CE_TPF[CE.cd.charAt(3)] || null) : CE_DD[k] || null; }
+  function cefar() { var s = CE.cd.charAt(3); return s === 'A' || s === 'S' || s === 'F'; }
+  function cehalf(k) { var s = CE.cd.charAt(3); if (k === 'sz') return s === 'R' ? 't' : 'b'; return cefar() ? 't' : 'b'; }
+  function ceBuild() {
+    function inp(k, cap, w, ph) { var f = CE_IN.filter(function (x) { return x.k === k; })[0]; return '<label class="cb-b"><span>' + cap + '</span><input class="cb-i ' + (w || '') + '" data-k="' + k + '" ' + (f.len ? 'maxlength="' + f.len + '"' : '') + ' autocomplete="off" spellcheck="false"' + (ph ? ' placeholder="' + ph + '"' : '') + '></label>'; }
+    $('ce-fields').innerHTML =
+      '<div class="ce-L"><div class="ce-panels">' +
+      '<div class="cp main"><h3>Main</h3><div class="cp-r">' + inp('tm', '*') + inp('num', 'N.', 'w2') + inp('sk', 'Fn') + inp('ty', 'Tp') + inp('ev', '±') + '</div></div>' +
+      '<div class="cp adv"><h3>Advanced</h3><div class="cp-r">' + inp('cb', 'Cmb', 'w2') + inp('tg', 'Bers') + inp('sz', 'zp') + inp('ez', 'za') + inp('sub', 'za+') + '</div></div>' +
+      '<div class="cp ext"><h3>Extended</h3><div class="cp-r">' + inp('tpf', 'TpF') + inp('gi', 'Gioc') + inp('spc', 'Spc') + '</div></div>' +
+      '<div class="cp cus"><h3>Custom</h3><div class="cp-r">' + inp('cu', 'Person.', 'w3') + '</div></div>' +
+      '</div><div class="ce-pname" id="ce-pname"></div><div class="ce-dd" id="ce-dd" hidden></div></div>' +
+      '<div class="ce-R"><div class="ce-rt">Sestetto e traiettorie</div><div class="ce-cw"><div class="ce-court2" id="ce-court"></div></div>' +
+      '<div class="ce-sk" id="ce-skn"></div><div class="ce-help" id="ce-help"></div></div>';
+    CE.built = true;
+  }
+  var CW = 260, CH = 410, CX = 40, CWD = 180, CHALF = 160, CNET = 30, CY = 30, NETB = CY + CHALF + CNET, BASEB = CY + 2 * CHALF + CNET;
+  function cepos(half, zone, sub) {
+    var rows = half === 'b' ? CE_OWN : CE_OPP, r = -1, c = -1;
+    rows.forEach(function (row, i) { row.forEach(function (z, j) { if (String(z) === String(zone)) { r = i; c = j; } }); });
+    if (r < 0) return null;
+    var cw = CWD / 3, ch = CHALF / 3, x = CX + c * cw + cw / 2, y = (half === 't' ? CY : NETB) + r * ch + ch / 2;
+    var o = { A: [-1, -1], B: [-1, 1], C: [1, 1], D: [1, -1] }[sub];
+    if (o) { x += o[0] * cw * 0.27; y += o[1] * ch * 0.27; }
+    return { x: x, y: y };
+  }
+  /* coordinate di Data Volley (YYXX su 100x100): il campo occupa x 12-88 e y 7,3-96,3, rete a y 51,8 (misurato sulle schermate di Data Volley) */
+  var DV_X0 = 12, DV_XS = 9 / 76, DV_YN = 51.8, DV_YS = 0.2021;
+  function dvToPx(o) {
+    var xm = (o.x - DV_X0) * DV_XS, own = o.y <= DV_YN, ym = Math.abs(o.y - DV_YN) * DV_YS;
+    return { x: CX + xm / 9 * CWD, y: own ? NETB + ym / 9 * CHALF : CY + CHALF - ym / 9 * CHALF };
+  }
+  function pxToDv(px, py) {
+    var xm = (px - CX) / CWD * 9, ym = (py >= CY + CHALF + CNET / 2 ? (py - NETB) : (CY + CHALF - py)) / CHALF * 9, own = py >= CY + CHALF + CNET / 2;
+    var yy = Math.round(own ? DV_YN - ym / DV_YS : DV_YN + ym / DV_YS), xx = Math.round(DV_X0 + xm / DV_XS);
+    function p2(n) { n = Math.max(0, Math.min(99, n)); return (n < 10 ? '0' : '') + n; }
+    return p2(yy) + p2(xx);
+  }
+  function comboPt(cm) {
+    if (!cm || cm.x == null || cm.y == null) return null;
+    return dvToPx({ x: cm.x, y: cm.y });
+  }
+  function cevalid(k) { var p = CE.pt && CE.pt[k]; if (!p) return null; return p.z === ceGet(k === 'sz' ? 9 : 10) && (k === 'sz' || p.s === ceGet(11)) ? p : null; }
+  function cestart() {
+    var sk = CE.cd.charAt(3), sz = ceGet(9); if (!sz) return null;
+    var p = cevalid('sz'); if (p) return p;
+    if (sk === 'S') { var q = cepos('b', sz); return q && { x: q.x, y: BASEB }; }
+    if (sk === 'R') { var q2 = cepos('t', sz); return q2 && { x: q2.x, y: CY }; }
+    if (sk === 'A') {
+      var cm = CE.c.e.M.combos && CE.c.e.M.combos.A && CE.c.e.M.combos.A[ceGet(6, 2)];
+      var cpt = cm && cm.zone === sz ? comboPt(cm) : null; if (cpt) return cpt;
+    }
+    return cepos(cehalf('sz'), sz, '');
+  }
+  function ceend() {
+    var ez = ceGet(10); if (!ez || !ceEn('ez')) return null;
+    return cevalid('ez') || cepos(cehalf('ez'), ez, ceGet(11));
+  }
+  function ceCourt() {
+    var s = '<svg viewBox="0 0 ' + CW + ' ' + CH + '" width="' + CW + '" height="' + CH + '">';
+    s += '<rect x="' + CX + '" y="' + CY + '" width="' + CWD + '" height="' + (2 * CHALF + CNET) + '" fill="#fff" stroke="#9aa5b1"/>';
+    s += '<rect x="' + (CX - 30) + '" y="' + (CY + CHALF + 6) + '" width="' + (CWD + 60) + '" height="' + (CNET - 12) + '" fill="#e9edf2"/>';
+    s += '<line x1="' + (CX - 20) + '" x2="' + (CX + CWD + 20) + '" y1="' + (CY + CHALF + CNET / 2) + '" y2="' + (CY + CHALF + CNET / 2) + '" stroke="#111" stroke-width="3"/>';
+    [CY, NETB].forEach(function (y0, hi) {
+      for (var i = 1; i < 3; i++) { s += '<line x1="' + (CX + i * CWD / 3) + '" x2="' + (CX + i * CWD / 3) + '" y1="' + y0 + '" y2="' + (y0 + CHALF) + '" stroke="#c4ccd6" stroke-dasharray="3 3"/>'; s += '<line x1="' + CX + '" x2="' + (CX + CWD) + '" y1="' + (y0 + i * CHALF / 3) + '" y2="' + (y0 + i * CHALF / 3) + '" stroke="#c4ccd6" stroke-dasharray="3 3"/>'; }
+      var rows = hi === 0 ? CE_OPP : CE_OWN;
+      rows.forEach(function (r, ri) { r.forEach(function (z, ci) { s += '<text x="' + (CX + ci * CWD / 3 + CWD / 6) + '" y="' + (y0 + ri * CHALF / 3 + CHALF / 6 + 5) + '" text-anchor="middle" font-size="14" fill="#c4ccd6" font-family="monospace">' + z + '</text>'; }); });
+    });
+    var p1 = cestart(), p2 = ceend();
+    if (p1 && p2) s += '<line x1="' + p1.x + '" y1="' + p1.y + '" x2="' + p2.x + '" y2="' + p2.y + '" stroke="#b9a35a" stroke-width="2" stroke-dasharray="5 4"/>';
+    if (p1) s += '<circle cx="' + p1.x + '" cy="' + p1.y + '" r="14" fill="#f6e9a8" stroke="#8a7a2a" stroke-width="2"/><text x="' + p1.x + '" y="' + (p1.y + 5) + '" text-anchor="middle" font-size="13" font-weight="700" fill="#333">' + esc(CE.cd.substr(1, 2).replace(/^0/, '')) + '</text>';
+    if (p2) s += '<circle cx="' + p2.x + '" cy="' + p2.y + '" r="3.5" fill="#1f5fe0" stroke="#fff" stroke-width="1.5"/>';
+    return s + '</svg>';
+  }
+  function ceDD(k) {
+    var dd = $('ce-dd'), list = ceDDList(k);
+    if (!list || !ceEn(k)) { dd.hidden = true; return; }
+    var cur = k === 'tm' ? CE.cd.charAt(0) : ceGet(CE_IN.filter(function (x) { return x.k === k; })[0].pos);
+    dd.innerHTML = list.map(function (o) { return '<button type="button" class="ce-opt' + ((o[0] === cur || (o[0] === '~' && !cur)) ? ' on' : '') + '" data-dk="' + k + '" data-v="' + esc(o[0]) + '"><b>' + (o[0] === '~' ? '·' : esc(o[0])) + '</b> ' + esc(o[1]) + '</button>'; }).join('');
+    dd.hidden = false;
+  }
+  function ceSync() {
+    var M = CE.c.e.M, side = CE.cd.charAt(0) === '*' ? 'H' : 'A';
+    CE_IN.forEach(function (f) {
+      var el = $('ce-fields').querySelector('[data-k="' + f.k + '"]'); if (!el) return;
+      var v = f.k === 'cu' ? CE.cd.substr(15) : f.k === 'tm' ? CE.cd.charAt(0) : ceGet(f.pos, f.len);
+      if (el !== document.activeElement || el.value.toUpperCase() !== v.toUpperCase()) el.value = v;
+      el.disabled = !ceEn(f.k); el.parentNode.classList.toggle('off', !ceEn(f.k));
+    });
+    $('ce-court').innerHTML = ceCourt();
+    var sk = CE.cd.charAt(3), nm = (SKILLS[sk] || '').toUpperCase();
+    $('ce-skn').textContent = nm;
+    $('ce-help').innerHTML = ceEn('ez') ? 'click arrivo<br>click partenza e arrivo' : 'click partenza';
+    var pn = M.players[side + parseInt(CE.cd.substr(1, 2), 10)];
+    $('ce-pname').textContent = pn ? ((pn.surname || '') + ' ' + (pn.name || '')).trim() + (pn.role ? ' (' + pn.role + ')' : '') : 'giocatrice non in elenco';
+    $('ce-code').textContent = CE.cd;
+    var c = CE.c, oc = origCode(c);
+    $('ce-orig').hidden = oc === c.code; $('ce-orig').textContent = 'Originale: ' + oc;
+    var fk = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.k : null; if (fk) ceDD(fk);
+  }
+  function ceRender() { if (!CE.built) ceBuild(); ceSync(); }
+  function ceApply(k, v) {
+    var f = CE_IN.filter(function (x) { return x.k === k; })[0]; if (!f) return;
+    if (k === 'cu') { var s = CE.cd; while (s.length < 15) s += '~'; CE.cd = s.substr(0, 15) + v.replace(/[;\r\n]/g, ''); return; }
+    if (k === 'tm') { ceSet(0, v === '*' ? '*' : 'a'); return; }
+    if (k === 'cb') { ceSet(6, v, 2); var cmb = CE.c.e.M.combos && CE.c.e.M.combos[CE.cd.charAt(3)], z = cmb && cmb[v.toUpperCase()] && cmb[v.toUpperCase()].zone; if (z && CE.cd.charAt(3) === 'A') { ceSet(9, z); CE.pt.sz = null; } return; }
+    if (k === 'num') { ceSet(1, ('0' + v).slice(-2), 2); return; }
+    ceSet(f.pos, v === '' ? '~' : v, f.len);
+    if (k === 'sk') { /* la lettera del fondamentale non cambia altri campi */ }
+  }
+  function ceNext(k) { var i = CE_IN.map(function (x) { return x.k; }).indexOf(k), n = CE_IN[i + 1]; while (n && !ceEn(n.k)) { i++; n = CE_IN[i + 1]; } if (!n) return; var el = $('ce-fields').querySelector('[data-k="' + n.k + '"]'); if (el) { el.focus(); el.select(); } }
+  $('ce-fields').addEventListener('input', function (ev) {
+    var t = ev.target; if (!t || !t.dataset || !t.dataset.k) return;
+    var k = t.dataset.k, v = t.value;
+    if (k === 'num') v = v.replace(/\D/g, '').substr(0, 2); else if (k !== 'cu') v = v.toUpperCase();
+    if (k === 'tm') v = (v === '*' ? '*' : (v === 'A' || v === 'H' ? 'a' : CE.cd.charAt(0)));
+    if (k === 'num') { if (v.length === 1) { t.value = v; ceApply(k, v); ceSync(); return; } ceApply(k, v); }
+    else ceApply(k, v);
+    t.value = k === 'tm' ? v : v;
+    ceSync();
+    var f = CE_IN.filter(function (x) { return x.k === k; })[0];
+    if (f.len && (v.length >= f.len || (k !== 'num' && f.len === 1 && v.length === 1))) ceNext(k);
+  });
+
+  function ceList(k) {
+    var M = CE.c.e.M, sk = CE.cd.charAt(3);
+    if (k === 'num') return cePlayers(CE.cd.charAt(0) === '*' ? 'H' : 'A').map(function (p) { return ('0' + p.num).slice(-2); });
+    if (k === 'cb') { var cm = M.combos && M.combos[sk] ? Object.keys(M.combos[sk]).sort() : []; return [''].concat(cm); }
+    if (k === 'sz' || k === 'ez') return ['', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    if (k === 'sub') return ['', 'A', 'B', 'C', 'D'];
+    if (ceDDList(k)) return ceDDList(k).map(function (o) { return o[0] === '~' ? '' : o[0]; });
+    return null;
+  }
+  $('ce-fields').addEventListener('keydown', function (ev) {
+    var t = ev.target; if (!t || !t.dataset || !t.dataset.k) return;
+    var k = t.dataset.k, ks = CE_IN.map(function (x) { return x.k; }), i = ks.indexOf(k);
+    if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') {
+      var dir = ev.key === 'ArrowRight' ? 1 : -1, ii = i + dir; while (ks[ii] && !ceEn(ks[ii])) ii += dir; var n = ks[ii]; if (!n) { ev.preventDefault(); return; }
+      ev.preventDefault(); var el = $('ce-fields').querySelector('[data-k="' + n + '"]'); if (el) { el.focus(); el.select(); }
+    } else if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
+      ev.preventDefault();
+      var list = ceList(k); if (!list) return;
+      var f = CE_IN[i], cur = k === 'tm' ? CE.cd.charAt(0) : k === 'cb' ? ceGet(6, 2) : k === 'num' ? CE.cd.substr(1, 2) : ceGet(f.pos, f.len);
+      var j = list.indexOf(cur); if (j < 0) j = ev.key === 'ArrowDown' ? -1 : list.length;
+      j += ev.key === 'ArrowDown' ? 1 : -1; j = Math.max(0, Math.min(list.length - 1, j));
+      ceApply(k, list[j]); ceSync(); t.select();
+    }
+  });
+  $('ce-fields').addEventListener('focusin', function (ev) { var t = ev.target; if (t && t.dataset && t.dataset.k) { if (t.select) t.select(); ceDD(t.dataset.k); } });
+  $('ce-fields').addEventListener('click', function (ev) {
+    var o = ev.target.closest ? ev.target.closest('.ce-opt') : null;
+    if (o) {
+      var k = o.dataset.dk; ceApply(k, o.dataset.v === '~' ? '' : o.dataset.v); ceSync(); ceNext(k); return;
+    }
+    var cv = ev.target.closest ? ev.target.closest('.ce-court2') : null;
+    if (cv) {
+      var svg = cv.querySelector('svg'), r = svg.getBoundingClientRect(), x = (ev.clientX - r.left) * CW / r.width, y = (ev.clientY - r.top) * CH / r.height;
+      if (x < CX - 30 || x > CX + CWD + 30) return;
+      var half = y < CY + CHALF + CNET / 2 ? 't' : 'b';
+      if (y > CY + CHALF && y < NETB) return;
+      var yy = half === 't' ? Math.max(0, Math.min(CHALF - .01, y - CY)) : Math.max(0, Math.min(CHALF - .01, y - NETB));
+      var xx = Math.max(0, Math.min(CWD - .01, x - CX));
+      var col = Math.floor(xx / (CWD / 3)), row = Math.floor(yy / (CHALF / 3));
+      var zone = (half === 'b' ? CE_OWN : CE_OPP)[row][col];
+      var qx = (xx % (CWD / 3)) < CWD / 6 ? 0 : 1, qy = (yy % (CHALF / 3)) < CHALF / 6 ? 0 : 1, sub = [['A', 'D'], ['B', 'C']][qy][qx];
+      var cand = ['sz', 'ez'].filter(function (kk) { return cehalf(kk) === half && ceEn(kk); });
+      if (!cand.length) return;
+      var tk = cand.length === 1 ? cand[0] : (CE.t || 'sz'), px = CX + xx, py = half === 't' ? CY + yy : NETB + yy, sk = CE.cd.charAt(3);
+      if (tk === 'sz') {
+        if (sk === 'S') py = BASEB; else if (sk === 'R') py = CY;
+        ceSet(9, String(zone)); CE.pt.sz = { x: px, y: py, z: String(zone), s: '', d: 1 }; CE.t = 'ez'; CE.dirty = true;
+      } else {
+        ceSet(10, String(zone)); ceSet(11, sub); CE.pt.ez = { x: px, y: py, z: String(zone), s: sub, d: 1 }; CE.t = 'sz'; CE.dirty = true;
+      }
+      ceSync();
+    }
+  });
+  function ceList(k) {
+    var M = CE.c.e.M, sk = CE.cd.charAt(3);
+    if (k === 'num') return cePlayers(CE.cd.charAt(0) === '*' ? 'H' : 'A').map(function (p) { return ('0' + p.num).slice(-2); });
+    if (k === 'cb') { var cm = M.combos && M.combos[sk] ? Object.keys(M.combos[sk]).sort() : []; return [''].concat(cm); }
+    if (k === 'sz' || k === 'ez') return ['', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    if (k === 'sub') return ['', 'A', 'B', 'C', 'D'];
+    if (ceDDList(k)) return ceDDList(k).map(function (o) { return o[0] === '~' ? '' : o[0]; });
+    return null;
+  }
+  $('ce-fields').addEventListener('keydown', function (ev) {
+    var t = ev.target; if (!t || !t.dataset || !t.dataset.k) return;
+    var k = t.dataset.k, ks = CE_IN.map(function (x) { return x.k; }), i = ks.indexOf(k);
+    if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') {
+      var dir = ev.key === 'ArrowRight' ? 1 : -1, ii = i + dir; while (ks[ii] && !ceEn(ks[ii])) ii += dir; var n = ks[ii]; if (!n) { ev.preventDefault(); return; }
+      ev.preventDefault(); var el = $('ce-fields').querySelector('[data-k="' + n + '"]'); if (el) { el.focus(); el.select(); }
+    } else if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
+      ev.preventDefault();
+      var list = ceList(k); if (!list) return;
+      var f = CE_IN[i], cur = k === 'tm' ? CE.cd.charAt(0) : k === 'cb' ? ceGet(6, 2) : k === 'num' ? CE.cd.substr(1, 2) : ceGet(f.pos, f.len);
+      var j = list.indexOf(cur); if (j < 0) j = ev.key === 'ArrowDown' ? -1 : list.length;
+      j += ev.key === 'ArrowDown' ? 1 : -1; j = Math.max(0, Math.min(list.length - 1, j));
+      ceApply(k, list[j]); ceSync(); t.select();
+    }
+  });
+  $('ce-fields').addEventListener('focusin', function (ev) { var t = ev.target; if (t && t.dataset && t.dataset.k) { if (t.select) t.select(); ceDD(t.dataset.k); } });
+  $('ce-fields').addEventListener('click', function (ev) {
+    var o = ev.target.closest ? ev.target.closest('.ce-opt') : null;
+    if (o) {
+      var k = o.dataset.dk; ceApply(k, o.dataset.v === '~' ? '' : o.dataset.v); ceSync(); ceNext(k); return;
+    }
+    var cv = ev.target.closest ? ev.target.closest('.ce-court2') : null;
+    if (cv) {
+      var svg = cv.querySelector('svg'), r = svg.getBoundingClientRect(), x = (ev.clientX - r.left) * CW / r.width, y = (ev.clientY - r.top) * CH / r.height;
+      if (x < CX || x > CX + CWD) return;
+      var half = null, yy;
+      if (y >= CY && y <= CY + CHALF) { half = 't'; yy = y - CY; } else if (y >= CY + CHALF + CNET && y <= CY + 2 * CHALF + CNET) { half = 'b'; yy = y - CY - CHALF - CNET; } else return;
+      var col = Math.min(2, Math.floor((x - CX) / (CWD / 3))), row = Math.min(2, Math.floor(yy / (CHALF / 3)));
+      var zone = (half === 'b' ? CE_OWN : CE_OPP)[row][col];
+      var qx = ((x - CX) % (CWD / 3)) < CWD / 6 ? 0 : 1, qy = (yy % (CHALF / 3)) < CHALF / 6 ? 0 : 1, sub = [['A', 'D'], ['B', 'C']][qy][qx];
+      var cand = ['sz', 'ez'].filter(function (kk) { return cehalf(kk) === half; });
+      if (!cand.length) return;
+      var tk = cand.length === 1 ? cand[0] : (CE.t || 'sz');
+      if (tk === 'sz') { ceSet(9, String(zone)); CE.t = 'ez'; } else { ceSet(10, String(zone)); ceSet(11, sub); CE.t = 'sz'; }
+      ceSync();
+    }
+  });
+  function openCodeEdit(q) {
+    if (theater || q == null || q < 0 || q >= queue.length) return;
+    var c = queue[q]; CE.c = c; CE.q = q; CE.cd = c.code; CE.t = 'sz'; CE.built = false; CE.pt = { sz: null, ez: null }; CE.dirty = false;
+    if (c.sc) { var q1 = dvToPx(c.sc); CE.pt.sz = { x: q1.x, y: q1.y, z: ceGet(9), s: '' }; }
+    if (c.ec) { var q2 = dvToPx(c.ec); CE.pt.ez = { x: q2.x, y: q2.y, z: ceGet(10), s: ceGet(11) }; }
+    if (q !== cur) select(q, false);
+    vid.pause();
+    var ps = tc(c) + ' vs ' + opp(c) + ' · Set ' + c.set + ' · ' + scoreText(c.score) + ' · ' + fmtTime(c.t);
+    $('ce-sub').textContent = ps;
+    try { $('ce-next').checked = localStorage.getItem('reader-scout-video-editnext') === '1'; } catch (x) { $('ce-next').checked = false; }
+    $('ce-err').textContent = '';
+    ceRender();
+    $('dlg-code').hidden = false;
+    setTimeout(function () { var el = $('ce-fields').querySelector('[data-k="ev"]'); if (el) { el.focus(); el.select(); } }, 30);
+  }
+  function closeCodeEdit() { $('dlg-code').hidden = true; CE.c = null; }
+  function codeEditOpen() { return !$('dlg-code').hidden; }
+  function ceCommit() {
+    var c = CE.c; if (!c) return;
+    var code = CE.cd.replace(/[\r\n;]/g, '');
+    if (!/^[*a]\d\d[SREABDF]/.test(code) || code.length < 6) { $('ce-err').textContent = 'Il codice non è valido: serve squadra (* o a), 2 cifre per la maglia e il fondamentale (S R E A B D F).'; return; }
+    var e = c.e, c4 = null, c6 = null, ps = cevalid('sz'), pe = cevalid('ez');
+    if (ps && ps.d) c4 = pxToDv(ps.x, ps.y);
+    if (pe && pe.d && ceEn('ez')) c6 = pxToDv(pe.x, pe.y);
+    var ntext = setScoutLine(e.text, c.ln, code, c4, c6), m2;
+    try { m2 = parseDvw(ntext); } catch (x) { $('ce-err').textContent = 'Codice non valido.'; return; }
+    if (m2.contacts.length !== e.M.contacts.length) { $('ce-err').textContent = 'Con questo codice l’azione non verrebbe più letta: controlla squadra, maglia e fondamentale.'; return; }
+    var q = CE.q, wasNext = $('ce-next').checked;
+    try { localStorage.setItem('reader-scout-video-editnext', wasNext ? '1' : '0'); } catch (x) {}
+    if (code !== c.code || ntext !== e.text) {
+      if (!e.orig) e.orig = e.text;
+      e.text = ntext;
+      m2.contacts.forEach(function (n, i) { var o = e.M.contacts[i]; Object.keys(n).forEach(function (k) { o[k] = n[k]; }); m2.contacts[i] = o; });
+      e.M = m2; markMods(e);
+      if (e.orig === e.text) e.orig = null;
+      if (!e.sample) saveLib();
+      closeCodeEdit();
+      rebuild();
+      if (cur < 0 && queue.length) select(Math.min(q, queue.length - 1), false);
+      toast('Codice modificato: ' + code);
+    } else closeCodeEdit();
+    if (wasNext && cur >= 0 && cur + 1 < queue.length) select(cur + 1, false);
+  }
+  $('ce-orig').addEventListener('click', function () { CE.cd = origCode(CE.c); ceSync(); });
+  $('ce-ok').addEventListener('click', ceCommit);
+  $('ce-no').addEventListener('click', closeCodeEdit);
+  $('ce-exp').addEventListener('click', function () { if (CE.c) exportScout(CE.c.e); });
+  $('dlg-code').addEventListener('click', function (ev) { if (ev.target === $('dlg-code')) closeCodeEdit(); });
+  $('dlg-code').addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); closeCodeEdit(); }
+    else if (ev.key === 'Enter' && ['ce-exp', 'ce-no', 'ce-orig'].indexOf(ev.target.id) < 0) { ev.preventDefault(); ev.stopPropagation(); ceCommit(); }
+  });
+  $('list').addEventListener('dblclick', function (ev) {
+    var b = ev.target.closest ? ev.target.closest('.row') : null; if (!b) return;
+    openCodeEdit(+b.dataset.q);
+  });
+  $('b-edit').addEventListener('click', function () { openCodeEdit(cur); });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter' || ev.ctrlKey || ev.altKey || ev.metaKey || codeEditOpen()) return;
+    var t = ev.target, tg = t && t.tagName;
+    if (tg === 'INPUT' || tg === 'SELECT' || tg === 'TEXTAREA') return;
+    var row = t && t.closest ? t.closest('.row') : null;
+    if (row) { ev.preventDefault(); openCodeEdit(+row.dataset.q); return; }
+    if (tg === 'BODY' || t === document.documentElement) { if (cur >= 0 && !document.querySelector('.dlg:not([hidden])')) { ev.preventDefault(); openCodeEdit(cur); } }
+  });
+
   /* ---------- avvio ---------- */
   var sampleTxt = $('sample-dvw').textContent.replace(/^\s+/, '');
   if (sampleTxt.trim()) sampleEntry = addScout(sampleTxt, '20261024_RSA05_MIL_BUS.dvw', { sample: true });
@@ -3809,7 +4299,7 @@ var FastMon = (function () {
   Promise.all([loadLibStore(), loadDirHandle()]).then(function (r) {
     var items = r[0]; if (r[1]) savedDir = r[1];
     if (items && items.length) {
-      var n = 0; items.forEach(function (it) { if (addScout(it.text, it.name)) n++; });
+      var n = 0; items.forEach(function (it) { if (addScout(it.text, it.name, { orig: it.orig, enc: it.enc, bom: it.bom })) n++; });
       if (n) rebuild();
     }
     try {
