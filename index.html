@@ -826,7 +826,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v96</small></h1>
+      <h1>Reader scout video <small class="ver">v98</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -1883,11 +1883,14 @@ var FastMon = (function () {
     if (who === 'oppteam') return !F.team || tc(x) !== F.team;
     return true;
   }
+  /* alzata: la zona registrata è una sola (quella dove va l'alzata); vale sia come "partenza" sia come "arrivo" */
+  function zoneS(x) { return x.skill === 'E' ? (x.endZ || x.startZ) : x.startZ; }
+  function zoneE(x) { return x.skill === 'E' ? (x.endZ || x.startZ) : x.endZ; }
   function condMatchX(x, k) {
     if (hasKeys(k.sk) && !k.sk[x.skill]) return false;
     if (hasKeys(k.ev) && !k.ev[x.eval]) return false;
-    if (hasKeys(k.zs) && !k.zs[x.startZ]) return false;
-    if (hasKeys(k.ze) && !k.ze[x.endZ]) return false;
+    if (hasKeys(k.zs) && !k.zs[zoneS(x)]) return false;
+    if (hasKeys(k.ze) && !k.ze[zoneE(x)]) return false;
     if (hasKeys(k.cmb) && !k.cmb[x.combo]) return false;
     if (hasKeys(k.tg) && !k.tg[x.code.charAt(8)]) return false;
     if (hasKeys(k.ty) && !k.ty[x.type]) return false;
@@ -1910,7 +1913,7 @@ var FastMon = (function () {
   function advDimVal(x, d) {
     switch (d) {
       case 'sk': return x.skill; case 'ev': return x.eval; case 'ty': return x.type; case 'cmb': return x.combo;
-      case 'tg': return (x.code || '').charAt(8); case 'zs': return x.startZ; case 'ze': return x.endZ; case 'tf': return (x.code || '').charAt(12);
+      case 'tg': return (x.code || '').charAt(8); case 'zs': return zoneS(x); case 'ze': return zoneE(x); case 'tf': return (x.code || '').charAt(12);
     }
     return '';
   }
@@ -1923,7 +1926,7 @@ var FastMon = (function () {
       if (ch === '~') continue;
       if (o && ((i === 3 && o.sk && o.sk.length) || (i === 4 && o.ty && o.ty.length) || (i === 5 && o.ev && o.ev.length) || ((i === 6 || i === 7) && o.cmb && o.cmb.length) ||
         (i === 8 && o.tg && o.tg.length) || (i === 9 && o.zs && o.zs.length) || (i === 10 && o.ze && o.ze.length) || (i === 12 && o.tf && o.tf.length))) continue;
-      if ((code.charAt(i) || '~') !== ch) return false;
+      if (i >= 15 ? (code.charAt(i) || '~').toUpperCase() !== ch.toUpperCase() : (code.charAt(i) || '~') !== ch) return false;
     }
     if (o) for (var q = 0; q < ADV_DIMS.length; q++) {
       d = ADV_DIMS[q][0]; v = o[d];
@@ -2073,6 +2076,7 @@ var FastMon = (function () {
     [['ty', 'tipo '], ['ev', 'esito '], ['cmb', 'combinazione '], ['tg', 'bersaglio '], ['zs', 'da zona '], ['ze', 'a zona '], ['tf', 'colpo ']].forEach(function (d) {
       var l = advDimList(rl, d[0]); if (l.length) parts.push(d[1] + joinOr(l));
     });
+    var cu = (rl.pat || '').substr(15).replace(/~+$/, ''); if (cu) parts.push('testo custom «' + cu + '»');
     return (rl.n ? 'NON deve valere: ' : '') + parts.join(' · ') + ' — ' + (ADV_REL_SHORT[rl.r] || '?');
   }
   function advFormulaIt(f) {
@@ -2265,6 +2269,16 @@ var FastMon = (function () {
       }
       row(C.body, 'Fondamentale', skills.map(function (s) { return { v: s, l: SKILLS[s] }; }), 'sk', '', function () { return true; });
       row(C.body, 'Esito', EVALS.map(function (e2) { return { v: e2, l: '<i>' + e2 + '</i>' + EV_NAME[e2].split(' / ')[0], c: EV_VAR[e2], t: EV_NAME[e2] }; }), 'ev', 'ev');
+      /* testo custom (dal 16° carattere del codice) */
+      var cuw = document.createElement('div'); cuw.className = 'cq-row';
+      var cul = document.createElement('span'); cul.className = 'label'; cul.textContent = 'Testo custom'; cuw.appendChild(cul);
+      var cuIn = document.createElement('input'); cuIn.className = 'field'; cuIn.type = 'text'; cuIn.size = 12; cuIn.maxLength = 20; cuIn.placeholder = 'es. OK2';
+      cuIn.setAttribute('aria-label', 'Testo custom del codice (dal 16° carattere)'); cuIn.value = (rl.pat || '').substr(15).replace(/~+$/, '');
+      cuIn.addEventListener('input', function () {
+        var t = cuIn.value.toUpperCase().replace(/;/g, ''), base = ((rl.pat || '*') + '~~~~~~~~~~~~~~~').substr(0, 15);
+        rl.pat = (base + t).replace(/~+$/, ''); upd(); applyFilters();
+      });
+      cuw.appendChild(cuIn); C.body.appendChild(cuw);
       /* combinazione: campo con autocompletamento + scelte multiple; la zona di partenza si imposta da sola */
       var cw = document.createElement('div'); cw.className = 'cq-row';
       var cl = document.createElement('span'); cl.className = 'label'; cl.textContent = 'Combinazione'; cw.appendChild(cl);
@@ -2431,8 +2445,8 @@ var FastMon = (function () {
     if (hasKeys(G.phases) && !G.phases[c.phase]) return false;
     if (G.adv && !advOk(c, G)) return false;
     if (hasKeys(G.rots) && !G.rots[c.rot]) return false;
-    if (hasKeys(G.zs) && !G.zs[c.startZ]) return false;
-    if (hasKeys(G.ze) && !G.ze[c.endZ]) return false;
+    if (hasKeys(G.zs) && !G.zs[zoneS(c)]) return false;
+    if (hasKeys(G.ze) && !G.ze[zoneE(c)]) return false;
     if (hasKeys(G.cmb) && !G.cmb[c.combo]) return false;
     if (hasKeys(G.tg) && !G.tg[c.code.charAt(8)]) return false;
     if (hasKeys(G.ty) && !G.ty[c.type]) return false;
@@ -3470,8 +3484,8 @@ var FastMon = (function () {
       var sk = (k.Skill || '').replace(/~+$/, '');
       if (sk.length === 1) f.skills[sk] = true;
       else for (var q = 0; q < sk.length; q += 2) { var t2 = sk.substr(q, 2); if (t2.charAt(1) === '~') f.skills[t2.charAt(0)] = true; else { f.skills.A = true; rep.fase = true; } }
-      if (+k.Set > 0) f.sets[String(+k.Set)] = true;
-      if (+k.Rotation > 0) f.rots[String(+k.Rotation)] = true;
+      (k.Set || '').split(',').forEach(function (s) { if (+s > 0) f.sets[String(+s)] = true; });
+      (k.Rotation || '').split(',').forEach(function (s) { if (+s > 0 && +s < 7) f.rots[String(+s)] = true; });
       if (/^\d+$/.test((k.Player || '').trim())) rep.giocatrice = true;
       var ad = (k.Advanced || '').trim();
       if (ad) {
@@ -4001,11 +4015,11 @@ var FastMon = (function () {
     R: [['L', 'Left'], ['R', 'Right'], ['M', 'Middleline'], ['O', 'Overhead'], ['W', 'Low'], ['~', 'nessuno']],
     E: [['1', 'One hand'], ['2', 'Two hands'], ['3', 'Bagher'], ['~', 'nessuno']]
   };
-  var CE_ON = { tpf: 'ARE', gi: 'AB', cb: 'AE', tg: 'E', ez: 'SRABDF', sub: 'SRABDF' };
+  var CE_ON = { tpf: 'ARE', gi: 'AB', cb: 'AE', tg: 'E', ez: 'SRABDFE', sub: 'SRABDFE', sz: 'SRABDF' };
   function ceEn(k) { return !CE_ON[k] || CE_ON[k].indexOf(CE.cd.charAt(3)) >= 0; }
   function ceDDList(k) { return k === 'tpf' ? (CE_TPF[CE.cd.charAt(3)] || null) : CE_DD[k] || null; }
   function cefar() { var s = CE.cd.charAt(3); return s === 'A' || s === 'S' || s === 'F'; }
-  function cehalf(k) { var s = CE.cd.charAt(3); if (k === 'sz') return s === 'R' ? 't' : 'b'; return cefar() ? 't' : 'b'; }
+  function cehalf(k) { var s = CE.cd.charAt(3); if (k === 'ez' && s === 'E') return 'b'; if (k === 'sz') return s === 'R' ? 't' : 'b'; return cefar() ? 't' : 'b'; }
   function ceBuild() {
     function inp(k, cap, w, ph) { var f = CE_IN.filter(function (x) { return x.k === k; })[0]; return '<label class="cb-b"><span>' + cap + '</span><input class="cb-i ' + (w || '') + '" data-k="' + k + '" ' + (f.len ? 'maxlength="' + f.len + '"' : '') + ' autocomplete="off" spellcheck="false"' + (ph ? ' placeholder="' + ph + '"' : '') + '></label>'; }
     $('ce-fields').innerHTML =
@@ -4095,7 +4109,7 @@ var FastMon = (function () {
     $('ce-court').innerHTML = ceCourt();
     var sk = CE.cd.charAt(3), nm = (SKILLS[sk] || '').toUpperCase();
     $('ce-skn').textContent = nm;
-    $('ce-help').innerHTML = ceEn('ez') ? 'click arrivo<br>click partenza e arrivo' : 'click partenza';
+    $('ce-help').innerHTML = !ceEn('sz') ? 'click zona dell\u2019alzata' : 'click arrivo<br>click partenza e arrivo';
     var pn = M.players[side + parseInt(CE.cd.substr(1, 2), 10)];
     $('ce-pname').textContent = pn ? ((pn.surname || '') + ' ' + (pn.name || '')).trim() + (pn.role ? ' (' + pn.role + ')' : '') : 'giocatrice non in elenco';
     $('ce-code').textContent = CE.cd;
