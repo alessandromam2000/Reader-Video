@@ -826,7 +826,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v99</small></h1>
+      <h1>Reader scout video <small class="ver">v100</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -3932,6 +3932,7 @@ var FastMon = (function () {
     $('b-full').textContent = '✕ Esci';
     var el = document.documentElement;
     if (el.requestFullscreen) { try { var p = el.requestFullscreen(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     requestAnimationFrame(markCurrent);
   }
   function exitTheater() {
@@ -4305,7 +4306,7 @@ var FastMon = (function () {
     if (tg === 'INPUT' || tg === 'SELECT' || tg === 'TEXTAREA') return;
     var row = t && t.closest ? t.closest('.row') : null;
     if (row) { ev.preventDefault(); openCodeEdit(+row.dataset.q); return; }
-    if (tg === 'BUTTON' || tg === 'A' || tg === 'SUMMARY') return;
+    if ((tg === 'BUTTON' && !theater) || tg === 'A' || tg === 'SUMMARY') return;
     if (cur >= 0 && !document.querySelector('.dlg:not([hidden])')) { ev.preventDefault(); openCodeEdit(cur); }
   });
 
