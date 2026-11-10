@@ -826,7 +826,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v98</small></h1>
+      <h1>Reader scout video <small class="ver">v99</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -880,6 +880,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
       <button class="chip" type="button" data-tab="azioni" id="t-azioni" aria-pressed="true">Azioni</button>
       <button class="chip" type="button" data-tab="filtri" aria-pressed="false">Filtri</button>
       <button class="chip" type="button" data-tab="tempi" aria-pressed="false">Tempi</button>
+      <button class="chip" type="button" id="t-edit" title="Modifica il codice dell'azione (Invio)" aria-label="Modifica il codice">✎</button>
       <button class="chip" type="button" id="t-hide" title="Nascondi il pannello e ingrandisci il video" aria-label="Nascondi il pannello">⟩</button>
     </div>
     <section class="stage" aria-label="Lettore video">
@@ -3560,6 +3561,7 @@ var FastMon = (function () {
   $('ttabs').addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('button') : null;
     if (!b) return;
+    if (b.id === 't-edit') { openCodeEdit(cur); return; }
     if (b.id === 't-hide') { document.body.classList.add('nolist'); poke(); }
     else if (b.getAttribute('data-tab')) setTab(b.getAttribute('data-tab'));
   });
@@ -4241,7 +4243,7 @@ var FastMon = (function () {
     }
   });
   function openCodeEdit(q) {
-    if (theater || q == null || q < 0 || q >= queue.length) return;
+    if (q == null || q < 0 || q >= queue.length) return;
     var c = queue[q]; CE.c = c; CE.q = q; CE.cd = c.code; CE.t = 'sz'; CE.built = false; CE.pt = { sz: null, ez: null }; CE.dirty = false;
     if (c.sc) { var q1 = dvToPx(c.sc); CE.pt.sz = { x: q1.x, y: q1.y, z: ceGet(9), s: '' }; }
     if (c.ec) { var q2 = dvToPx(c.ec); CE.pt.ez = { x: q2.x, y: q2.y, z: ceGet(10), s: ceGet(11) }; }
@@ -4303,7 +4305,8 @@ var FastMon = (function () {
     if (tg === 'INPUT' || tg === 'SELECT' || tg === 'TEXTAREA') return;
     var row = t && t.closest ? t.closest('.row') : null;
     if (row) { ev.preventDefault(); openCodeEdit(+row.dataset.q); return; }
-    if (tg === 'BODY' || t === document.documentElement) { if (cur >= 0 && !document.querySelector('.dlg:not([hidden])')) { ev.preventDefault(); openCodeEdit(cur); } }
+    if (tg === 'BUTTON' || tg === 'A' || tg === 'SUMMARY') return;
+    if (cur >= 0 && !document.querySelector('.dlg:not([hidden])')) { ev.preventDefault(); openCodeEdit(cur); }
   });
 
   /* ---------- avvio ---------- */
