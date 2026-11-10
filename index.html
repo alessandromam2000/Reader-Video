@@ -826,7 +826,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v100</small></h1>
+      <h1>Reader scout video <small class="ver">v101</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -3150,23 +3150,26 @@ var FastMon = (function () {
       MS.mask.steps.map(function (s, i) { return '<li><span>' + esc(s.name) + '</span><small>' + (msCounts[i] != null ? msCounts[i] : 0) + '</small></li>'; }).join('') + '</ol>';
   }
   function baseOf(m) { return JSON.stringify(snapMask(!!m.f.player, false).f); }
+  function maskAsks(m) { return !!m && ((m.steps && m.steps.length > 1) ? m.steps.some(function (x) { return x.f.ask; }) : m.f.ask); }
+  var CHP = ' <button class="btn small" type="button" data-s="pl" title="Scegli un’altra giocatrice senza riselezionare la maschera">👤 Cambia giocatrice</button>';
   function updateMaskStatus() {
     var el = $('mask-stat'); if (!el) return;
     if (!maskActive || MASKS.indexOf(maskActive) < 0) { maskActive = null; el.hidden = true; renderMsBox(); return; }
     if (MS && MS.mask === maskActive) {
       el.hidden = false; el.className = 'maskstat';
-      el.innerHTML = '<span>✓ In uso: <b>' + esc(maskActive.name) + '</b> · ' + maskActive.steps.length + ' passi</span> <button class="btn small" type="button" data-s="off" title="Torna ai filtri normali">Scollega</button>';
+      el.innerHTML = '<span>✓ In uso: <b>' + esc(maskActive.name) + '</b> · ' + maskActive.steps.length + ' passi</span>' + (maskAsks(maskActive) ? CHP : '') + ' <button class="btn small" type="button" data-s="off" title="Torna ai filtri normali">Scollega</button>';
       renderMsBox(); return;
     }
     renderMsBox();
     var dirty = baseOf(maskActive) !== maskBase;
     el.hidden = false;
     el.innerHTML = '<span>' + (dirty ? '✎ Hai modificato i filtri di <b>' + esc(maskActive.name) + '</b>' : '✓ In uso: <b>' + esc(maskActive.name) + '</b>') + '</span>' +
-      (dirty ? ' <button class="btn small" type="button" data-s="upd">Salva le modifiche</button>' : '') + ' <button class="btn small" type="button" data-s="off" title="Smetti di seguire questa maschera (i filtri restano)">Scollega</button>';
+      (dirty ? ' <button class="btn small" type="button" data-s="upd">Salva le modifiche</button>' : '') + (maskAsks(maskActive) ? CHP : '') + ' <button class="btn small" type="button" data-s="off" title="Smetti di seguire questa maschera (i filtri restano)">Scollega</button>';
     el.className = 'maskstat' + (dirty ? ' dirty' : '');
   }
   $('mask-stat').addEventListener('click', function (e) {
     var b2 = e.target.closest('[data-s]'); if (!b2) return;
+    if (b2.dataset.s === 'pl') { reaskPlayer(); return; }
     if (b2.dataset.s === 'off') { var wasMS = !!MS; maskActive = null; MS = null; renderMaskSelect(); if (wasMS) applyFilters(); else updateMaskStatus(); }
     else if (maskActive) { replaceMask(maskActive); toast('Maschera «' + maskActive.name + '» aggiornata.'); }
   });
@@ -3198,12 +3201,17 @@ var FastMon = (function () {
     return g;
   }
   var askCb = null;
-  function askPlayer(cb) {
-    askCb = cb; $('ask-sel').innerHTML = $('f-player').innerHTML; $('ask-sel').value = '';
+  function askPlayer(cb, cur) {
+    askCb = cb; $('ask-sel').innerHTML = $('f-player').innerHTML; $('ask-sel').value = cur || '';
     $('dlg-ask').hidden = false; $('ask-sel').focus();
   }
   $('ask-ok').addEventListener('click', function () { $('dlg-ask').hidden = true; if (askCb) askCb($('ask-sel').value); askCb = null; });
   $('ask-no').addEventListener('click', function () { $('dlg-ask').hidden = true; if (askCb) askCb(''); askCb = null; });
+  function reaskPlayer() {
+    var m = maskActive; if (!m) return;
+    if (MS && MS.mask === m) askPlayer(function (k) { if (MS && MS.mask === m) { MS.player = k; applyFilters(); } }, MS.player);
+    else askPlayer(function (k) { F.player = k; fillPlayers(); applyFilters(); }, F.player);
+  }
   function applyMask(m) {
     if (m.steps && m.steps.length > 1) {
       MS = { mask: m, player: '' };
