@@ -826,7 +826,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v101</small></h1>
+      <h1>Reader scout video <small class="ver">v102</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -2487,7 +2487,7 @@ var FastMon = (function () {
     if (keep && cur < 0) { vid.pause(); clip = null; ended = false; S.all = false; syncAllBtn(); updateNow(); updateBar(0); }
     renderList();
     renderStats();
-    if (everSel && cur < 0 && queue.length && !EDIT && videoFor(queue[0])) select(0, false);   /* si posiziona sulla prima azione, senza far partire il video */
+    if (everSel && cur < 0 && queue.length && !EDIT && videoFor(queue[0])) select(0, false, true);   /* si posiziona sulla prima azione, senza far partire il video */
     if (typeof updateMaskStatus === 'function') updateMaskStatus();
     if (EDIT) $('ed-count').textContent = queue.length + (queue.length === 1 ? ' azione trovata' : ' azioni trovate');
   }
@@ -2598,10 +2598,10 @@ var FastMon = (function () {
       }
     } else if (r.scrollIntoView) r.scrollIntoView({ block: 'nearest' });
   }
-  function markCurrent() {
+  function markCurrent(quiet) {
     var rows = $('list').querySelectorAll('.row');
     Array.prototype.forEach.call(rows, function (r) {
-      if (+r.dataset.q === cur) { r.setAttribute('aria-current', 'true'); keepVisible(r); }
+      if (+r.dataset.q === cur) { r.setAttribute('aria-current', 'true'); if (!quiet) keepVisible(r); }
       else r.removeAttribute('aria-current');
     });
     updateQpos();
@@ -2630,11 +2630,11 @@ var FastMon = (function () {
     vid.addEventListener('loadedmetadata', done);
   }
   var everSel = false;   /* l'utente ha già scelto un'azione: se cambia la ricerca parte la prima della nuova lista */
-  function select(q, autoplay) {
+  function select(q, autoplay, quiet) {
     if (q < 0 || q >= queue.length) return;
     if (q >= rendered) renderMore(q + 60);
     everSel = true; cur = q; var c = queue[q]; clip = range(c); ended = false;
-    markCurrent(); updateNow(); updateBar(clip.start);
+    markCurrent(quiet); updateNow(); updateBar(clip.start);
     updateVideoUI();
     var v = videoFor(c);
     if (!v) { vid.pause(); vid.removeAttribute('src'); vid.dataset.url = ''; toast('Il video di questa partita non è ancora collegato.'); S.all = false; syncAllBtn(); return; }
@@ -3564,7 +3564,7 @@ var FastMon = (function () {
       b.setAttribute('aria-pressed', b.getAttribute('data-tab') === t ? 'true' : 'false');
     });
     if (t === 'tempi') $('setbox').open = true;
-    if (t === 'azioni') requestAnimationFrame(markCurrent);
+    if (t === 'azioni') requestAnimationFrame(function () { markCurrent(); });
   }
   $('ttabs').addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('button') : null;
@@ -3931,7 +3931,7 @@ var FastMon = (function () {
   }
   document.addEventListener('mousemove', poke); document.addEventListener('touchstart', poke, { passive: true });
   document.addEventListener('keydown', poke);
-  $('t-show').addEventListener('click', function () { document.body.classList.remove('nolist'); requestAnimationFrame(markCurrent); });
+  $('t-show').addEventListener('click', function () { document.body.classList.remove('nolist'); requestAnimationFrame(function () { markCurrent(); }); });
   function enterTheater() {
     if (document.body.getAttribute('data-page') !== 'analisi') setPage('analisi');
     var fl = document.querySelector('.filters'); fl.insertBefore($('teambar'), fl.firstChild);
@@ -3941,14 +3941,14 @@ var FastMon = (function () {
     var el = document.documentElement;
     if (el.requestFullscreen) { try { var p = el.requestFullscreen(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    requestAnimationFrame(markCurrent);
+    requestAnimationFrame(function () { markCurrent(); });
   }
   function exitTheater() {
     var pn = document.querySelector('.panes'); pn.parentNode.insertBefore($('teambar'), pn);
     theater = false; document.body.classList.remove('theater', 'nolist', 'ui'); document.body.removeAttribute('data-tab');
     $('setbox').open = setboxWasOpen; $('b-full').textContent = '⛶ Schermo intero';
     if (document.fullscreenElement && document.exitFullscreen) { try { document.exitFullscreen().catch(function () {}); } catch (e) {} }
-    requestAnimationFrame(markCurrent);
+    requestAnimationFrame(function () { markCurrent(); });
   }
   function toggleTheater() { if (theater) exitTheater(); else enterTheater(); }
   $('b-full').addEventListener('click', toggleTheater);
@@ -3972,7 +3972,7 @@ var FastMon = (function () {
     Array.prototype.forEach.call($('pgnav').querySelectorAll('.pg'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-page') === p ? 'true' : 'false'); });
     try { localStorage.setItem('reader-scout-video-page', p); } catch (x) {}
     window.scrollTo(0, 0);
-    if (p === 'analisi') requestAnimationFrame(markCurrent);
+    if (p === 'analisi') requestAnimationFrame(function () { markCurrent(); });
   }
   $('pgnav').addEventListener('click', function (e) { var b = e.target.closest('.pg'); if (b) setPage(b.getAttribute('data-page')); });
   $('pg-back').addEventListener('click', function () { setPage('partite'); });
