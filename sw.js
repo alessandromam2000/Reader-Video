@@ -1,7 +1,7 @@
 /* Reader scout video: funziona anche senza rete.
    Pagina: prima la rete (così gli aggiornamenti arrivano), se non c'e rete quella salvata.
    Caratteri e altri file: dalla copia salvata, aggiornata in silenzio. */
-const CACHE = 'reader-scout-1794483365';
+const CACHE = 'reader-scout-1794492877';
 const BASE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(BASE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

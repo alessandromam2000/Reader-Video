@@ -100,6 +100,13 @@ h1, h2, h3 { margin: 0; font-family: var(--f-display); font-weight: 700; letter-
   position: relative; background: var(--screen); width: 100%;
   aspect-ratio: 16 / 9; max-height: 54vh; margin-inline: auto;
 }
+.scoreov { position: absolute; top: 8px; left: 8px; z-index: 3; display: flex; align-items: center; gap: 5px; padding: 3px 7px; border-radius: 6px; background: rgba(8,20,24,.82); color: #fff; font: 700 clamp(11px, 1.5vw, 15px)/1 'Barlow Condensed', system-ui, sans-serif; pointer-events: none; }
+.scoreov[hidden] { display: none; }
+.scoreov .t { color: #9DB6BC; }
+.scoreov .t.me { color: #5FD0DB; box-shadow: 0 2px 0 #3DB8C4; }
+.scoreov b { background: rgba(255,255,255,.12); border-radius: 3px; padding: 2px 4px; font-weight: 800; font-size: 1.15em; }
+.scoreov em { font-style: normal; background: #3DB8C4; color: #08161A; border-radius: 9px; padding: 2px 6px; font-size: .85em; }
+.btn[aria-pressed="true"]#b-score, .chip[aria-pressed="true"]#t-score { background: var(--accent, #3DB8C4); color: #08161A; }
 .screen-wrap video { width: 100%; height: 100%; object-fit: contain; display: block; background: var(--screen); }
 .empty-screen {
   position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -826,7 +833,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v105</small></h1>
+      <h1>Reader scout video <small class="ver">v109</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -880,6 +887,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
       <button class="chip" type="button" data-tab="azioni" id="t-azioni" aria-pressed="true">Azioni</button>
       <button class="chip" type="button" data-tab="filtri" aria-pressed="false">Filtri</button>
       <button class="chip" type="button" data-tab="tempi" aria-pressed="false">Tempi</button>
+      <button class="chip" type="button" id="t-score" aria-pressed="false" title="Mostra il punteggio sul video">Punt.</button>
       <button class="chip" type="button" id="t-edit" title="Modifica il codice dell'azione (Invio)" aria-label="Modifica il codice">✎</button>
       <button class="chip" type="button" id="t-hide" title="Nascondi il pannello e ingrandisci il video" aria-label="Nascondi il pannello">⟩</button>
     </div>
@@ -887,6 +895,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
       <div class="dock">
       <div class="screen-wrap">
         <video id="vid" playsinline preload="auto"></video>
+        <div class="scoreov" id="scoreov" hidden aria-hidden="true"></div>
         <div class="empty-screen" id="empty-screen">
           <div class="h">Collega il video della partita</div>
           <p id="empty-text">Lo scout indica quale file video usare. Scegli la cartella dei video (DVS_VIDEO): lo cerco da solo per nome. Oppure scegli direttamente il file.</p>
@@ -922,6 +931,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <button class="btn" id="b-all" type="button" aria-pressed="false">Riproduci tutte</button>
         <span class="grow"></span>
         <span class="qpos" id="qpos"></span>
+        <button class="btn small" id="b-score" type="button" aria-pressed="false" title="Mostra il punteggio sul video">Punteggio</button>
         <button class="btn small" id="b-edit" type="button" aria-label="Modifica il codice dell\'azione" title="Invio o doppio clic sul codice">✎ Modifica codice</button>
         <button class="btn small" id="b-full" type="button" aria-label="Schermo intero con lista dei codici" title="Tasto Tab (o F)">⛶ Schermo intero</button>
       </div>
@@ -1063,6 +1073,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <label class="monchk"><input type="radio" name="mon-mode" value="real"> Normale <small>(in tempo reale, più lenta)</small></label>
       </div>
       <label class="monttl" id="mon-mkbox"><span class="label">Azioni da includere</span><select class="field" id="mon-mk"></select></label>
+      <label class="monttl" id="mon-qbox"><span class="label">Qualità del video</span><select class="field" id="mon-q"><option value="std">Standard (file più leggero)</option><option value="high" selected>Alta (consigliata)</option><option value="max">Massima (file molto più grande)</option></select></label>
       <label class="monchk"><input type="checkbox" id="mon-score" checked> Mostra il punteggio</label>
       <label class="monchk" id="mon-stepsbox" hidden><input type="checkbox" id="mon-steps" checked> Pagina con il nome del passo tra una sezione e l’altra</label>
       <label class="monchk"><input type="checkbox" id="mon-intro"> Pagina con il titolo all’inizio</label>
@@ -1085,6 +1096,14 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
       <label class="ce-chk"><input type="checkbox" id="ce-next"> Dopo la conferma passa alla modifica del codice successivo</label>
       <div class="ce-btns"><button class="btn" id="ce-exp" type="button">Esporta scout</button><button class="btn" id="ce-orig" type="button" hidden>Originale</button><button class="btn ce-ok" id="ce-ok" type="button">Ok</button><button class="btn" id="ce-no" type="button">Annulla</button></div>
     </div>
+  </div>
+</div>
+<div class="dlg" id="dlg-mkclr" hidden>
+  <div class="dlg-card" role="dialog" aria-modal="true" aria-labelledby="mc-t">
+    <div class="dlg-head"><h2 id="mc-t">Togli i marker dalla lista</h2></div>
+    <select class="field" id="mc-sel"></select>
+    <p class="hint" id="mc-txt"></p>
+    <div class="dlg-foot"><button class="btn" id="mc-no" type="button">Annulla</button><button class="btn primary" id="mc-ok" type="button">Togli</button></div>
   </div>
 </div>
 <div class="dlg" id="dlg-ask" hidden>
@@ -2719,6 +2738,7 @@ var FastMon = (function () {
       $('now-who').textContent = 'Nessuna azione selezionata';
       $('now-what').textContent = 'Scegli un’azione dalla lista: il video parte da solo.';
       $('now-tc').textContent = '00:00'; $('now-clip').textContent = ''; $('now-code').textContent = '';
+      syncScore();
       $('cm-start').textContent = '−' + S.pre + ' s'; $('cm-end').textContent = durText();
       return;
     }
@@ -2733,7 +2753,19 @@ var FastMon = (function () {
     $('now-tc').textContent = fmtTime(c.t);
     $('now-clip').textContent = clip ? 'clip ' + fmtTime(clip.start) + ' → ' + fmtTime(clip.end) : '';
     $('now-code').textContent = c.code;
+    syncScore();
   }
+  var SCORE_ON = false; try { SCORE_ON = localStorage.getItem('reader-scout-video-showscore') === '1'; } catch (x) {}
+  function syncScore() {
+    var o = $('scoreov'), c = cur >= 0 ? queue[cur] : null;
+    ['b-score', 't-score'].forEach(function (id) { var b = $(id); if (b) b.setAttribute('aria-pressed', SCORE_ON ? 'true' : 'false'); });
+    if (!SCORE_ON || !c || !c.score) { o.hidden = true; return; }
+    var tm = c.e.M.teams, sc = c.score.split('-'), me = c.side === 'H' ? 0 : 1;
+    o.innerHTML = '<span class="t' + (me === 0 ? ' me' : '') + '">' + esc(tm[0].code) + '</span><b>' + esc(sc[0]) + '</b><b>' + esc(sc[1]) + '</b><span class="t' + (me === 1 ? ' me' : '') + '">' + esc(tm[1].code) + '</span><em>Set ' + c.set + '</em>';
+    o.hidden = false;
+  }
+  function toggleScore() { SCORE_ON = !SCORE_ON; try { localStorage.setItem('reader-scout-video-showscore', SCORE_ON ? '1' : '0'); } catch (x) {} syncScore(); }
+  $('b-score').addEventListener('click', toggleScore); $('t-score').addEventListener('click', toggleScore);
   function durText() {
     if (S.dur === 'next') return 'fino al contatto successivo';
     if (S.dur === 'rally') return 'fino a fine scambio';
@@ -3016,10 +3048,42 @@ var FastMon = (function () {
       b.addEventListener('click', function () { toggleMark(m.id); });
       box.appendChild(b);
     });
+    var cl = document.createElement('button'); cl.type = 'button'; cl.className = 'btn small mkclr'; cl.id = 'mk-clear'; cl.textContent = '🗑 Togli marker';
+    cl.title = 'Toglie i marker dalle azioni della lista'; cl.addEventListener('click', openMkClear); box.appendChild(cl);
   }
+  function mkClearItems() {
+    var sel = $('mc-sel').value, out = [];
+    queue.forEach(function (c) {
+      var mm = MARKS[c.uid] || []; if (!mm.length) return;
+      if (sel === 'any' || mm.indexOf(sel) >= 0) out.push(c);
+    });
+    return out;
+  }
+  function openMkClear() {
+    var cnt = {}, any = 0;
+    queue.forEach(function (c) { var mm = MARKS[c.uid] || []; if (mm.length) any++; mm.forEach(function (m) { cnt[m] = (cnt[m] || 0) + 1; }); });
+    if (!any) { toast('Nessuna azione della lista ha marker.'); return; }
+    var h = '<option value="any">Tutti i marker (' + any + ' azioni)</option>';
+    MK.forEach(function (m) { if (cnt[m.id]) h += '<option value="' + m.id + '">Solo il marker ' + m.id + ' (' + cnt[m.id] + ' azioni)</option>'; });
+    $('mc-sel').innerHTML = h; mkClearSync(); $('dlg-mkclr').hidden = false; $('mc-sel').focus();
+  }
+  function mkClearSync() { var n = mkClearItems().length; $('mc-txt').textContent = 'Verranno tolti dalle ' + queue.length + ' azioni della lista (solo quelle visibili adesso, non le altre partite o i filtri esclusi). Interessate: ' + n + '.'; }
+  $('mc-sel').addEventListener('change', mkClearSync);
+  $('mc-no').addEventListener('click', function () { $('dlg-mkclr').hidden = true; });
+  $('mc-ok').addEventListener('click', function () {
+    var sel = $('mc-sel').value, n = 0;
+    mkClearItems().forEach(function (c) {
+      var mm = (MARKS[c.uid] || []).filter(function (m) { return sel !== 'any' && m !== sel; });
+      if (mm.length) MARKS[c.uid] = mm; else delete MARKS[c.uid]; n++;
+    });
+    saveMarks(); $('dlg-mkclr').hidden = true;
+    renderList(); markCurrent(true); syncMarkBtns(); updateMarkCounts();
+    toast('Marker tolti da ' + n + (n === 1 ? ' azione.' : ' azioni.'));
+  });
   function syncMarkBtns() {
     var c = cur >= 0 ? queue[cur] : null, mm = c ? (MARKS[c.uid] || []) : [];
     Array.prototype.forEach.call($('marks').children, function (b) {
+      if (!b.dataset.m) return;
       b.disabled = !c; b.setAttribute('aria-pressed', mm.indexOf(b.dataset.m) >= 0 ? 'true' : 'false');
     });
   }
@@ -3638,7 +3702,7 @@ var FastMon = (function () {
     if (!queue.length) { toast('Nessuna azione nella lista.'); return; }
     $('mon-mk').value = ''; fillMonMk();
     var ok = monItems().length, mode = canFast ? 'fast' : 'real';
-    try { var so = JSON.parse(localStorage.getItem('reader-scout-video-mon') || 'null'); if (so) { $('mon-score').checked = so.score !== false; if (canFast && so.mode === 'real') mode = 'real'; } } catch (e) {}
+    try { var so = JSON.parse(localStorage.getItem('reader-scout-video-mon') || 'null'); if (so) { $('mon-score').checked = so.score !== false; if (so.q) $('mon-q').value = so.q; if (canFast && so.mode === 'real') mode = 'real'; } } catch (e) {}
     document.querySelector('input[name="mon-mode"][value="fast"]').disabled = !canFast;
     document.querySelector('input[name="mon-mode"][value="real"]').disabled = !canReal;
     document.querySelector('input[name="mon-mode"][value="' + (canFast || !canReal ? mode : 'real') + '"]').checked = true;
@@ -3653,38 +3717,61 @@ var FastMon = (function () {
   $('mon-go').addEventListener('click', function () { startMontage(); });
   $('mp-stop').addEventListener('click', function () { monAbort = true; });
   var monVid = null;
-  function monBadge(ctx, cw, ch, curC, showScore) {
-    if (!curC) return;
-    var f = Math.round(ch / 22), x = f * 0.8, y = f * 0.8, hh = f * 2.2;
-    if (showScore) {
-      var tm = curC.e.M.teams, sc = curC.score.split('-'), pad = f * 0.6;
-      ctx.font = '700 ' + f + 'px system-ui, sans-serif'; ctx.textBaseline = 'middle';
-      var parts = [tm[0].code, sc[0], '–', sc[1], tm[1].code], gap = f * 0.7, wTot = 0, ws = parts.map(function (p) { var w = ctx.measureText(p).width; wTot += w; return w; });
-      wTot += gap * (parts.length - 1) + pad * 2;
-      ctx.fillStyle = 'rgba(0,0,0,.72)'; ctx.fillRect(x, y, wTot, hh);
-      ctx.fillStyle = '#3DB8C4'; ctx.fillRect(x, y, f * 0.25, hh);
-      var cx = x + pad + f * 0.25;
-      parts.forEach(function (p, k2) {
-        ctx.fillStyle = (k2 === 1 || k2 === 3) ? '#fff' : (k2 === 2 ? '#8CA2AA' : '#E4EDF0');
-        ctx.font = ((k2 === 1 || k2 === 3) ? '800 ' : '600 ') + (f * (k2 === 1 || k2 === 3 ? 1.15 : 1)) + 'px system-ui, sans-serif';
-        ctx.fillText(p, cx, y + hh / 2); cx += ws[k2] + gap;
-      });
-      ctx.font = '600 ' + Math.round(f * 0.7) + 'px system-ui, sans-serif'; ctx.fillStyle = '#E4EDF0';
-      ctx.fillText('Set ' + curC.set, x + wTot + f * 0.4, y + hh / 2);
-      y += hh + f * 0.4;
-    }
+  var MFONT = "'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', system-ui, sans-serif";
+  function mRound(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2); ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
   }
-  function monIntro(ctx, cw, ch, title) {
-    var g = ctx.createLinearGradient(0, 0, cw, ch); g.addColorStop(0, '#0D1619'); g.addColorStop(1, '#14303A');
+  function monBadge(ctx, cw, ch, curC, showScore) {
+    if (!curC || !showScore) return;
+    var tm = curC.e.M.teams, sc = curC.score.split('-'), f = Math.round(ch / 34), x = f * 0.9, y = f * 0.9, h = f * 2.1, r = f * 0.32;
+    ctx.save(); ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    ctx.font = '700 ' + (f * 1.0) + 'px ' + MFONT; var w0 = ctx.measureText(tm[0].code).width, w1 = ctx.measureText(tm[1].code).width;
+    ctx.font = '800 ' + (f * 1.45) + 'px ' + MFONT; var dw = Math.max(ctx.measureText('88').width, ctx.measureText(sc[0]).width, ctx.measureText(sc[1]).width) + f * 0.8;
+    var pad = f * 0.85, gap = f * 0.75, wTot = pad + w0 + gap + dw * 2 + f * 0.1 + gap + w1 + pad;
+    mRound(ctx, x, y, wTot, h, r); ctx.fillStyle = 'rgba(8,20,24,.9)'; ctx.fill();
+    ctx.lineWidth = Math.max(1, f * 0.05); ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.stroke();
+    var mine = curC.side === 'H' ? 0 : 1, cxs = [x + pad, x + pad + w0 + gap + dw * 2 + f * 0.1 + gap];
+    ctx.font = '700 ' + (f * 1.0) + 'px ' + MFONT;
+    [tm[0].code, tm[1].code].forEach(function (cd, i) {
+      ctx.fillStyle = i === mine ? '#5FD0DB' : '#9DB6BC'; ctx.fillText(cd, cxs[i], y + h / 2);
+      if (i === mine) { ctx.fillStyle = '#3DB8C4'; ctx.fillRect(cxs[i], y + h - f * 0.34, i === 0 ? w0 : w1, Math.max(2, f * 0.1)); }
+    });
+    var sx = x + pad + w0 + gap, ch2 = h - f * 0.5;
+    [0, 1].forEach(function (i) {
+      var bx = sx + i * (dw + f * 0.1); mRound(ctx, bx, y + f * 0.25, dw, ch2, f * 0.2); ctx.fillStyle = 'rgba(255,255,255,.1)'; ctx.fill();
+      ctx.font = '800 ' + (f * 1.45) + 'px ' + MFONT; ctx.textAlign = 'center'; ctx.fillStyle = '#fff'; ctx.fillText(sc[i], bx + dw / 2, y + h / 2 + f * 0.04); ctx.textAlign = 'left';
+    });
+    var st = 'Set ' + curC.set; ctx.font = '700 ' + (f * 0.72) + 'px ' + MFONT; var tw = ctx.measureText(st).width + f * 0.9, th = f * 1.2;
+    mRound(ctx, x + wTot + f * 0.35, y + (h - th) / 2, tw, th, th / 2); ctx.fillStyle = '#3DB8C4'; ctx.fill();
+    ctx.fillStyle = '#08161A'; ctx.fillText(st, x + wTot + f * 0.35 + f * 0.45, y + h / 2 + f * 0.03);
+    ctx.restore();
+  }
+  function monIntro(ctx, cw, ch, title, p) {
+    if (p == null) p = 1;
+    var ease = function (v) { v = Math.max(0, Math.min(1, v)); return 1 - Math.pow(1 - v, 3); };
+    var g = ctx.createLinearGradient(0, 0, cw, ch); g.addColorStop(0, '#0A161A'); g.addColorStop(1, '#123640');
     ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
-    var fs = Math.round(ch / 9), maxW = cw * 0.8, words = title.split(/\s+/), lines = [], line = '';
-    ctx.font = '800 ' + fs + 'px system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+    /* il campo visto dall'alto, grande e tagliato sul bordo destro: le linee si disegnano nel primo secondo */
+    ctx.save(); ctx.translate(cw * 0.7, ch * 0.5); ctx.rotate(-0.08);
+    var W = cw * 0.9, H = W / 2, L = W * 4, lw = Math.max(2, ch / 240);
+    ctx.lineWidth = lw; ctx.strokeStyle = 'rgba(95,208,219,.55)'; ctx.setLineDash([L, L]); ctx.lineDashOffset = L * (1 - ease(p / 0.34));
+    ctx.strokeRect(-W / 2, -H / 2, W, H);
+    ctx.beginPath(); ctx.moveTo(0, -H / 2 - H * 0.08); ctx.lineTo(0, H / 2 + H * 0.08); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-W / 6, -H / 2); ctx.lineTo(-W / 6, H / 2); ctx.moveTo(W / 6, -H / 2); ctx.lineTo(W / 6, H / 2); ctx.stroke();
+    ctx.setLineDash([]); ctx.restore();
+    var gl = ctx.createLinearGradient(0, 0, cw * 0.78, 0); gl.addColorStop(0, 'rgba(10,22,26,.94)'); gl.addColorStop(0.55, 'rgba(10,22,26,.55)'); gl.addColorStop(1, 'rgba(10,22,26,0)');
+    ctx.fillStyle = gl; ctx.fillRect(0, 0, cw, ch);
+    var fs = Math.round(ch / 7.5), maxW = cw * 0.58, words = String(title).split(/\s+/), lines = [], line = '', x0 = cw * 0.075;
+    ctx.font = '800 ' + fs + 'px ' + MFONT; ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
     words.forEach(function (w) { var t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
     if (line) lines.push(line);
-    var lh = fs * 1.25, y0 = ch / 2 - (lines.length - 1) * lh / 2;
-    ctx.fillStyle = '#3DB8C4'; ctx.fillRect(cw / 2 - cw * 0.08, y0 - lh * 0.95, cw * 0.16, Math.max(3, ch / 120));
-    ctx.fillStyle = '#fff'; lines.forEach(function (l, k) { ctx.fillText(l, cw / 2, y0 + k * lh); });
-    ctx.textAlign = 'left';
+    var lh = fs * 1.02, tot = lines.length * lh, y0 = ch / 2 - tot / 2 + fs * 0.82, a = ease((p - 0.08) / 0.3);
+    ctx.globalAlpha = a;
+    ctx.fillStyle = '#3DB8C4'; ctx.fillRect(x0 - cw * 0.022, y0 - fs * 0.82, Math.max(4, ch / 120), tot - (lh - fs) * 0.6);
+    ctx.fillStyle = '#fff'; lines.forEach(function (l, k) { ctx.fillText(l, x0, y0 + k * lh); });
+    ctx.globalAlpha = 1;
   }
 
   var monJobs = [];
@@ -3697,8 +3784,8 @@ var FastMon = (function () {
   function startMontage() {
     var showScore = $('mon-score').checked, title = $('mon-intro').checked ? $('mon-ttl').value.trim() : '';
     try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore })); } catch (e) {}
-    var fast = monMode() === 'fast';
-    try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore, mode: fast ? 'fast' : 'real' })); } catch (e) {}
+    var fast = monMode() === 'fast', qual = $('mon-q').value;
+    try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore, mode: fast ? 'fast' : 'real', q: qual })); } catch (e) {}
     var jl = [], cards = null, lastSt = -1;
     if (qstep && $('mon-steps').checked) cards = {};
     monItems().forEach(function (it) {
@@ -3706,7 +3793,7 @@ var FastMon = (function () {
       if (cards && qstep[q] !== lastSt) { lastSt = qstep[q]; cards[jl.length] = MS.mask.steps[lastSt].name; }
       jl.push(c);
     });
-    var job = { list: jl, showScore: showScore, title: title, fast: fast, cards: cards };
+    var job = { list: jl, showScore: showScore, title: title, fast: fast, cards: cards, q: qual };
     $('dlg-mon').hidden = true;
     var n = job.list.length, mimeX = fast ? 'video/mp4' : monMime(), ext = /mp4/.test(mimeX) ? 'mp4' : 'webm';
     var ttl = job.title.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, '_').slice(0, 40);
@@ -3744,13 +3831,15 @@ var FastMon = (function () {
         if (!sp.supported) throw { fb: 1 };
         readers[u] = rd;
       }
-      var r0 = readers[videoFor(list[0]).url], k0 = Math.min(1, 1920 / r0.width, 1080 / r0.height);   /* risoluzione originale, fino a Full HD (prima era limitata a 1280) */
+      var r0 = readers[videoFor(list[0]).url], k0 = 1;   /* stessa risoluzione dell'originale */
       cw = canvas.width = Math.round(r0.width * k0 / 2) * 2; ch = canvas.height = Math.round(r0.height * k0 / 2) * 2;
       var srcFps = r0.n > 1 ? Math.max(10, Math.min(60, Math.round(1e6 / Math.max(1000, (r0.dts[1] - r0.dts[0]) / r0.timescale * 1e6)))) : 30,
         /* qualità: circa 0,2 bit per pixel e fotogramma (Full HD a 30 fps ≈ 12 Mb/s), senza tetto basso come prima (6 Mb/s) */
-        bps = Math.round(Math.max(8e6, Math.min(sink0() ? 12e6 : 24e6, cw * ch * srcFps * 0.2)));
+        QP = { std: [0.2, 8e6, 12e6, 24e6], high: [0.4, 12e6, 16e6, 40e6], max: [0.8, 20e6, 24e6, 60e6] }[job.q] || [0.4, 12e6, 16e6, 40e6],
+        PX = Math.max(1, cw * ch / 2073600),
+        bps = Math.round(Math.max(QP[1], Math.min((sink0() ? QP[2] : QP[3]) * PX, cw * ch * srcFps * QP[0])));
       ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-      var cands = [['avc', 'avc1.64002a'], ['avc', 'avc1.640028'], ['avc', 'avc1.4d0028'], ['avc', 'avc1.42e028'], ['vp9', 'vp09.00.10.08']], chosen = null;
+      var big = cw * ch > 2200000, cands = (big ? [['avc', 'avc1.640034'], ['avc', 'avc1.640033'], ['avc', 'avc1.64002a']] : [['avc', 'avc1.64002a'], ['avc', 'avc1.640028']]).concat([['avc', 'avc1.4d0028'], ['avc', 'avc1.42e028'], ['vp9', big ? 'vp09.00.50.08' : 'vp09.00.10.08']]), chosen = null;
       for (var ci = 0; ci < cands.length && !chosen; ci++) {
         var cfg = { codec: cands[ci][1], width: cw, height: ch, bitrate: bps, framerate: srcFps, bitrateMode: 'variable', latencyMode: 'quality' };
         if (cands[ci][0] === 'avc') cfg.avc = { format: 'avc' };
@@ -3772,7 +3861,7 @@ var FastMon = (function () {
       enc.configure(chosen.cfg);
       var outBase = 0;
       function card(txt) {
-        for (var t = 0; t < 3000; t += 100) { monIntro(ctx, cw, ch, txt); push(outBase + t * 1000, 100000, t === 0); }
+        for (var t = 0; t < 3000; t += 50) { monIntro(ctx, cw, ch, txt, t / 3000); push(outBase + t * 1000, 50000, t === 0); }
         outBase += 3000000;
       }
       if (title) card(title);
@@ -3854,12 +3943,12 @@ var FastMon = (function () {
     var wq = Promise.resolve(), cw = 0, ch = 0, curC = null, curClip = null, wk = null, lock = null, drawT = null, mr = null, i = 0, guard = null, advancing = false;
     function size() {
       if (cw) return;
-      var w = mv.videoWidth || 1280, h = mv.videoHeight || 720, k = Math.min(1, 1280 / w);
+      var w = mv.videoWidth || 1280, h = mv.videoHeight || 720, k = 1;
       cw = canvas.width = Math.round(w * k / 2) * 2; ch = canvas.height = Math.round(h * k / 2) * 2;
     }
     function badge() { monBadge(ctx, cw, ch, curC, showScore); }
     var introUntil = 0, introStart = 0, introList = [];
-    function drawIntro() { var k = Math.min(introList.length - 1, Math.floor((performance.now() - introStart) / 3000)); monIntro(ctx, cw, ch, introList[Math.max(0, k)]); }
+    function drawIntro() { var k = Math.min(introList.length - 1, Math.floor((performance.now() - introStart) / 3000)); monIntro(ctx, cw, ch, introList[Math.max(0, k)], ((performance.now() - introStart) % 3000) / 3000); }
     function draw() {
       if (!cw) return;
       if (introUntil && performance.now() < introUntil) { drawIntro(); return; }
@@ -3892,10 +3981,11 @@ var FastMon = (function () {
         mr.stop();
       } else if (wr) { try { wr.w.abort(); } catch (e) {} }
     }
+    var RBPS = { std: 8e6, high: 14e6, max: 22e6 }[job.q] || 14e6;
     function startRec() {
       var stream = canvas.captureStream(30);
       if (monAudio) monAudio.dest.stream.getAudioTracks().forEach(function (t) { stream.addTrack(t); });
-      try { mr = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 6000000 } : { videoBitsPerSecond: 6000000 }); }
+      try { mr = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: RBPS } : { videoBitsPerSecond: RBPS }); }
       catch (e) { toast('Non riesco ad avviare la registrazione.'); finish(false); return false; }
       mr.ondataavailable = function (ev) {
         if (!ev.data || !ev.data.size) return;
