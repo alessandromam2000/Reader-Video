@@ -780,7 +780,7 @@ body.theater .row .who .mks i { width: 11px; height: 11px; }
 .cb-i.w2 { width: 44px; } .cb-i.w3 { width: 86px; font-size: 14px; }
 .cb-i:focus { outline: 2px solid #1f5fe0; background: color-mix(in srgb, #1f5fe0 14%, var(--surface)); }
 .ce-pname { font-size: 13px; color: var(--muted); min-height: 18px; }
-.ce-dd { border: 1px solid var(--fg); background: var(--surface); width: 220px; display: flex; flex-direction: column; }
+.ce-dd { border: 1px solid var(--fg); background: var(--surface); width: 220px; display: flex; flex-direction: column; max-height: 300px; overflow-y: auto; }
 .ce-dd[hidden] { display: none; }
 .ce-opt { text-align: left; border: 0; background: transparent; color: var(--fg); padding: 5px 10px; font: 500 14px var(--f-body, sans-serif); cursor: pointer; }
 .ce-opt b { display: inline-block; width: 18px; font-family: var(--f-mono, monospace); }
@@ -826,7 +826,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v102</small></h1>
+      <h1>Reader scout video <small class="ver">v105</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -1062,6 +1062,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <label class="monchk"><input type="radio" name="mon-mode" value="fast" checked> Veloce <small>(consigliata: molto più rapida, senza audio)</small></label>
         <label class="monchk"><input type="radio" name="mon-mode" value="real"> Normale <small>(in tempo reale, più lenta)</small></label>
       </div>
+      <label class="monttl" id="mon-mkbox"><span class="label">Azioni da includere</span><select class="field" id="mon-mk"></select></label>
       <label class="monchk"><input type="checkbox" id="mon-score" checked> Mostra il punteggio</label>
       <label class="monchk" id="mon-stepsbox" hidden><input type="checkbox" id="mon-steps" checked> Pagina con il nome del passo tra una sezione e l’altra</label>
       <label class="monchk"><input type="checkbox" id="mon-intro"> Pagina con il titolo all’inizio</label>
@@ -3600,9 +3601,29 @@ var FastMon = (function () {
   $('mon-auto').addEventListener('click', function () { $('mon-ttl').value = monAutoTitle(); });
   function monClose() { $('dlg-mon').hidden = true; }
   function monMode() { var r2 = document.querySelector('input[name="mon-mode"]:checked'); return r2 ? r2.value : 'real'; }
+  function monSel() { var x = $('mon-mk'); return x ? x.value : ''; }
+  function monItems() {
+    var sel = monSel(), tot = 0, out = [];
+    queue.forEach(function (c, q) {
+      var mm = MARKS[c.uid] || [];
+      if (sel === 'any' && !mm.length) return;
+      if (sel && sel !== 'any' && mm.indexOf(sel) < 0) return;
+      tot++; if (videoFor(c)) out.push({ c: c, q: q });
+    });
+    out.tot = tot; return out;
+  }
+  function fillMonMk() {
+    var x = $('mon-mk'), v = x.value, h = '<option value="">Tutte le azioni della lista (' + queue.length + ')</option>';
+    var cnt = {}, any = 0;
+    queue.forEach(function (c) { var mm = MARKS[c.uid] || []; if (mm.length) any++; mm.forEach(function (m) { cnt[m] = (cnt[m] || 0) + 1; }); });
+    h += '<option value="any">Solo quelle con un marker (' + any + ')</option>';
+    MK.forEach(function (m) { if (cnt[m.id]) h += '<option value="' + m.id + '">Solo marker ' + m.id + ' (' + cnt[m.id] + ')</option>'; });
+    x.innerHTML = h; x.value = v && x.querySelector('option[value="' + v + '"]') ? v : '';
+  }
+  $('mon-mk').addEventListener('change', function () { refreshMonDlg(); $('mon-go').hidden = !monItems().length; });
   function refreshMonDlg() {
-    var ok = queue.filter(function (c) { return !!videoFor(c); }).length, per = S.pre + (isNaN(+S.dur) ? 6 : +S.dur), fast = monMode() === 'fast';
-    $('mon-text').innerHTML = 'Creo un video unico con <b>' + ok + '</b> azioni' + (ok < queue.length ? ' (' + (queue.length - ok) + ' senza video collegato saltate)' : '') +
+    var it = monItems(), ok = it.length, per = S.pre + (isNaN(+S.dur) ? 6 : +S.dur), fast = monMode() === 'fast';
+    $('mon-text').innerHTML = 'Creo un video unico con <b>' + ok + '</b> azioni' + (ok < it.tot ? ' (' + (it.tot - ok) + ' senza video collegato saltate)' : '') + (monSel() ? ' — solo quelle con marker, nell’ordine della lista' : '') +
       ', ognuna con i tempi impostati. Durata del video finale circa <b>' + fmtDur(ok * per) + '</b>.';
     var h = fast ? 'Modalità veloce: il video si crea molto più in fretta della sua durata, senza audio. Nel frattempo puoi continuare a usare il programma. Tieni aperta questa scheda.'
       : 'Il montaggio si registra in tempo reale, con un lettore tutto suo: nel frattempo puoi continuare a usare il programma e guardare altri video. Tieni aperta questa scheda.';
@@ -3615,7 +3636,8 @@ var FastMon = (function () {
     var canFast = FastMon.supported(), canReal = !!(window.MediaRecorder && HTMLCanvasElement.prototype.captureStream);
     if (!canFast && !canReal) { toast('Questo browser non sa creare il montaggio: usa Chrome o Edge.'); return; }
     if (!queue.length) { toast('Nessuna azione nella lista.'); return; }
-    var ok = queue.filter(function (c) { return !!videoFor(c); }).length, mode = canFast ? 'fast' : 'real';
+    $('mon-mk').value = ''; fillMonMk();
+    var ok = monItems().length, mode = canFast ? 'fast' : 'real';
     try { var so = JSON.parse(localStorage.getItem('reader-scout-video-mon') || 'null'); if (so) { $('mon-score').checked = so.score !== false; if (canFast && so.mode === 'real') mode = 'real'; } } catch (e) {}
     document.querySelector('input[name="mon-mode"][value="fast"]').disabled = !canFast;
     document.querySelector('input[name="mon-mode"][value="real"]').disabled = !canReal;
@@ -3679,8 +3701,8 @@ var FastMon = (function () {
     try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore, mode: fast ? 'fast' : 'real' })); } catch (e) {}
     var jl = [], cards = null, lastSt = -1;
     if (qstep && $('mon-steps').checked) cards = {};
-    queue.forEach(function (c, q) {
-      if (!videoFor(c)) return;
+    monItems().forEach(function (it) {
+      var c = it.c, q = it.q;
       if (cards && qstep[q] !== lastSt) { lastSt = qstep[q]; cards[jl.length] = MS.mask.steps[lastSt].name; }
       jl.push(c);
     });
@@ -4028,7 +4050,11 @@ var FastMon = (function () {
   };
   var CE_ON = { tpf: 'ARE', gi: 'AB', cb: 'AE', tg: 'E', ez: 'SRABDFE', sub: 'SRABDFE', sz: 'SRABDF' };
   function ceEn(k) { return !CE_ON[k] || CE_ON[k].indexOf(CE.cd.charAt(3)) >= 0; }
-  function ceDDList(k) { return k === 'tpf' ? (CE_TPF[CE.cd.charAt(3)] || null) : CE_DD[k] || null; }
+  function ceDDList(k) {
+    if (k === 'num') return cePlayers(CE.cd.charAt(0) === '*' ? 'H' : 'A').map(function (p) { return [('0' + p.num).slice(-2), ((p.surname || '') + ' ' + (p.name || '')).trim() + (p.role ? ' (' + p.role + ')' : '')]; });
+    return ceDDList2(k);
+  }
+  function ceDDList2(k) { return k === 'tpf' ? (CE_TPF[CE.cd.charAt(3)] || null) : CE_DD[k] || null; }
   function cefar() { var s = CE.cd.charAt(3); return s === 'A' || s === 'S' || s === 'F'; }
   function cehalf(k) { var s = CE.cd.charAt(3); if (k === 'ez' && s === 'E') return 'b'; if (k === 'sz') return s === 'R' ? 't' : 'b'; return cefar() ? 't' : 'b'; }
   function ceBuild() {
@@ -4105,7 +4131,7 @@ var FastMon = (function () {
   function ceDD(k) {
     var dd = $('ce-dd'), list = ceDDList(k);
     if (!list || !ceEn(k)) { dd.hidden = true; return; }
-    var cur = k === 'tm' ? CE.cd.charAt(0) : ceGet(CE_IN.filter(function (x) { return x.k === k; })[0].pos);
+    var cur = k === 'tm' ? CE.cd.charAt(0) : k === 'num' ? CE.cd.substr(1, 2) : ceGet(CE_IN.filter(function (x) { return x.k === k; })[0].pos);
     dd.innerHTML = list.map(function (o) { return '<button type="button" class="ce-opt' + ((o[0] === cur || (o[0] === '~' && !cur)) ? ' on' : '') + '" data-dk="' + k + '" data-v="' + esc(o[0]) + '"><b>' + (o[0] === '~' ? '·' : esc(o[0])) + '</b> ' + esc(o[1]) + '</button>'; }).join('');
     dd.hidden = false;
   }
@@ -4205,52 +4231,6 @@ var FastMon = (function () {
       ceSync();
     }
   });
-  function ceList(k) {
-    var M = CE.c.e.M, sk = CE.cd.charAt(3);
-    if (k === 'num') return cePlayers(CE.cd.charAt(0) === '*' ? 'H' : 'A').map(function (p) { return ('0' + p.num).slice(-2); });
-    if (k === 'cb') { var cm = M.combos && M.combos[sk] ? Object.keys(M.combos[sk]).sort() : []; return [''].concat(cm); }
-    if (k === 'sz' || k === 'ez') return ['', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    if (k === 'sub') return ['', 'A', 'B', 'C', 'D'];
-    if (ceDDList(k)) return ceDDList(k).map(function (o) { return o[0] === '~' ? '' : o[0]; });
-    return null;
-  }
-  $('ce-fields').addEventListener('keydown', function (ev) {
-    var t = ev.target; if (!t || !t.dataset || !t.dataset.k) return;
-    var k = t.dataset.k, ks = CE_IN.map(function (x) { return x.k; }), i = ks.indexOf(k);
-    if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') {
-      var dir = ev.key === 'ArrowRight' ? 1 : -1, ii = i + dir; while (ks[ii] && !ceEn(ks[ii])) ii += dir; var n = ks[ii]; if (!n) { ev.preventDefault(); return; }
-      ev.preventDefault(); var el = $('ce-fields').querySelector('[data-k="' + n + '"]'); if (el) { el.focus(); el.select(); }
-    } else if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
-      ev.preventDefault();
-      var list = ceList(k); if (!list) return;
-      var f = CE_IN[i], cur = k === 'tm' ? CE.cd.charAt(0) : k === 'cb' ? ceGet(6, 2) : k === 'num' ? CE.cd.substr(1, 2) : ceGet(f.pos, f.len);
-      var j = list.indexOf(cur); if (j < 0) j = ev.key === 'ArrowDown' ? -1 : list.length;
-      j += ev.key === 'ArrowDown' ? 1 : -1; j = Math.max(0, Math.min(list.length - 1, j));
-      ceApply(k, list[j]); ceSync(); t.select();
-    }
-  });
-  $('ce-fields').addEventListener('focusin', function (ev) { var t = ev.target; if (t && t.dataset && t.dataset.k) { if (t.select) t.select(); ceDD(t.dataset.k); } });
-  $('ce-fields').addEventListener('click', function (ev) {
-    var o = ev.target.closest ? ev.target.closest('.ce-opt') : null;
-    if (o) {
-      var k = o.dataset.dk; ceApply(k, o.dataset.v === '~' ? '' : o.dataset.v); ceSync(); ceNext(k); return;
-    }
-    var cv = ev.target.closest ? ev.target.closest('.ce-court2') : null;
-    if (cv) {
-      var svg = cv.querySelector('svg'), r = svg.getBoundingClientRect(), x = (ev.clientX - r.left) * CW / r.width, y = (ev.clientY - r.top) * CH / r.height;
-      if (x < CX || x > CX + CWD) return;
-      var half = null, yy;
-      if (y >= CY && y <= CY + CHALF) { half = 't'; yy = y - CY; } else if (y >= CY + CHALF + CNET && y <= CY + 2 * CHALF + CNET) { half = 'b'; yy = y - CY - CHALF - CNET; } else return;
-      var col = Math.min(2, Math.floor((x - CX) / (CWD / 3))), row = Math.min(2, Math.floor(yy / (CHALF / 3)));
-      var zone = (half === 'b' ? CE_OWN : CE_OPP)[row][col];
-      var qx = ((x - CX) % (CWD / 3)) < CWD / 6 ? 0 : 1, qy = (yy % (CHALF / 3)) < CHALF / 6 ? 0 : 1, sub = [['A', 'D'], ['B', 'C']][qy][qx];
-      var cand = ['sz', 'ez'].filter(function (kk) { return cehalf(kk) === half; });
-      if (!cand.length) return;
-      var tk = cand.length === 1 ? cand[0] : (CE.t || 'sz');
-      if (tk === 'sz') { ceSet(9, String(zone)); CE.t = 'ez'; } else { ceSet(10, String(zone)); ceSet(11, sub); CE.t = 'sz'; }
-      ceSync();
-    }
-  });
   function openCodeEdit(q) {
     if (q == null || q < 0 || q >= queue.length) return;
     var c = queue[q]; CE.c = c; CE.q = q; CE.cd = c.code; CE.t = 'sz'; CE.built = false; CE.pt = { sz: null, ez: null }; CE.dirty = false;
@@ -4278,7 +4258,7 @@ var FastMon = (function () {
     var ntext = setScoutLine(e.text, c.ln, code, c4, c6), m2;
     try { m2 = parseDvw(ntext); } catch (x) { $('ce-err').textContent = 'Codice non valido.'; return; }
     if (m2.contacts.length !== e.M.contacts.length) { $('ce-err').textContent = 'Con questo codice l’azione non verrebbe più letta: controlla squadra, maglia e fondamentale.'; return; }
-    var q = CE.q, wasNext = $('ce-next').checked;
+    var q = CE.q, wasNext = $('ce-next').checked, dropped = false;
     try { localStorage.setItem('reader-scout-video-editnext', wasNext ? '1' : '0'); } catch (x) {}
     if (code !== c.code || ntext !== e.text) {
       if (!e.orig) e.orig = e.text;
@@ -4289,10 +4269,13 @@ var FastMon = (function () {
       if (!e.sample) saveLib();
       closeCodeEdit();
       rebuild();
-      if (cur < 0 && queue.length) select(Math.min(q, queue.length - 1), false);
+      dropped = cur < 0;   /* con il nuovo codice l'azione non rispetta più i filtri: al suo posto c'è già la successiva */
       toast('Codice modificato: ' + code);
     } else closeCodeEdit();
-    if (wasNext && cur >= 0 && cur + 1 < queue.length) select(cur + 1, false);
+    if (!queue.length) return;
+    var tgt = dropped ? Math.min(q, queue.length - 1) : (cur >= 0 ? cur : Math.min(q, queue.length - 1));
+    if (wasNext && !dropped && tgt + 1 < queue.length) tgt++;
+    select(tgt, false);   /* resta dove stavo: la lista non torna in cima */
   }
   $('ce-orig').addEventListener('click', function () { CE.cd = origCode(CE.c); ceSync(); });
   $('ce-ok').addEventListener('click', ceCommit);
