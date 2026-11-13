@@ -854,7 +854,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v116</small></h1>
+      <h1>Reader scout video <small class="ver">v119</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -1107,7 +1107,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
       </div>
       <label class="monttl" id="mon-mkbox"><span class="label">Azioni da includere</span><select class="field" id="mon-mk"></select></label>
       <label class="monttl" id="mon-qbox"><span class="label">Qualità del video</span><select class="field" id="mon-q"><option value="std">Standard (file più leggero)</option><option value="high" selected>Alta (consigliata)</option><option value="max">Massima (file molto più grande)</option></select></label>
-      <label class="monttl" id="mon-snbox" hidden><span class="label">Nome della sintesi</span><input type="text" class="field" id="mon-sname" maxlength="60" placeholder="es. Attacchi Aduna"></label>
+      <label class="monttl" id="mon-snbox" hidden><span class="label">Nome (si aggiunge a SYN_data e squadre)</span><input type="text" class="field" id="mon-sname" maxlength="60" placeholder="es. palle !"></label>
       <label class="monchk"><input type="checkbox" id="mon-score" checked> Mostra il punteggio</label>
       <label class="monchk" id="mon-stepsbox" hidden><input type="checkbox" id="mon-steps" checked> Pagina con il nome del passo tra una sezione e l’altra</label>
       <label class="monchk"><input type="checkbox" id="mon-intro"> Pagina con il titolo all’inizio</label>
@@ -3746,7 +3746,7 @@ var FastMon = (function () {
     $('mon-modebox').hidden = !(canFast && canReal);
     refreshMonDlg();
     try { var kd = localStorage.getItem('reader-scout-video-kind'); document.querySelector('input[name="mon-kind"][value="' + (kd === 'sint' ? 'sint' : 'mont') + '"]').checked = true; } catch (e) {}
-    $('mon-sname').value = monAutoTitle() || ('Sintesi ' + new Date().toLocaleDateString('it-IT').replace(/\//g, '-'));
+    $('mon-sname').value = '';
     monKindUI();
     $('mon-opt').hidden = false; $('mon-intro').checked = false; $('mon-ttlbox').hidden = true;
     $('mon-stepsbox').hidden = !qstep; $('mon-steps').checked = true;
@@ -3844,7 +3844,7 @@ var FastMon = (function () {
     if (b.dataset.sy === 'dvw') {
       var sy = SYN.filter(function (x) { return x.id === b.dataset.id; })[0]; if (!sy) return;
       sy.files.forEach(function (f, i) { setTimeout(function () {
-        var url = URL.createObjectURL(new Blob([encodeDvw(f.text, f.enc || 'utf8', f.bom)], { type: 'application/octet-stream' }));
+        var url = URL.createObjectURL(new Blob([encodeDvw(dvOut(f.text), f.enc || 'utf8', f.bom)], { type: 'application/octet-stream' }));
         var a = document.createElement('a'); a.href = url; a.download = f.name; document.body.appendChild(a); a.click();
         setTimeout(function () { a.remove(); URL.revokeObjectURL(url); }, 4000);
       }, 700 * i); });
@@ -3916,12 +3916,12 @@ var FastMon = (function () {
         f[11] = '1'; f[12] = String(Math.round(x.off)); out.push(f.join(';'));
         prev = x;
       });
-      var txt = out.join(eol) + eol, nm = stem + (groups.length > 1 ? '_' + (g.e.name || ('partita' + (gi + 1))).replace(/\.dvw$/i, '') : '') + '.dvw';
+      var txt = out.join(eol) + eol, nm = '&' + stem + (groups.length > 1 ? '_' + (g.e.name || ('partita' + (gi + 1))).replace(/\.dvw$/i, '') : '') + '.dvw';
       files.push({ name: nm, text: txt, enc: g.e.enc || 'utf8', bom: !!g.e.bom, match: g.e.M.teams[0].code + '–' + g.e.M.teams[1].code, date: g.e.M.date || '', n: g.it.length });
     });
     (async function () {
       for (var q = 0; q < files.length; q++) {
-        var f = files[q], bytes = encodeDvw(f.text, f.enc, f.bom), done = false;
+        var f = files[q], bytes = encodeDvw(dvOut(f.text), f.enc, f.bom), done = false;
         if (job.sub) {
           try { var fh = await job.sub.getFileHandle(f.name, { create: true }), w = await fh.createWritable(); await w.write(bytes); await w.close(); done = true; } catch (x) {}
         }
@@ -3941,6 +3941,13 @@ var FastMon = (function () {
     if (!mon) { mon = { n: 0 }; startNextJob(); }
     else { toast('Montaggio messo in coda (' + monJobs.length + ' in attesa).'); }
   }
+  function dvOut(txt) {
+    var eol = txt.indexOf('\r\n') >= 0 ? '\r\n' : '\n', ins = false;
+    return txt.split(/\r?\n/).filter(function (l) {
+      if (/^\[3SCOUT\]/.test(l)) { ins = true; return true; }
+      return !(ins && /^[*a]p\d\d:\d\d/.test(l));
+    }).join(eol);
+  }
   function safeName(t) { return String(t || '').replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 50).replace(/ /g, '_'); }
   async function dirHas(d, nm) { try { await d.getDirectoryHandle(nm); return true; } catch (x) { return false; } }
   function startMontage() {
@@ -3955,10 +3962,17 @@ var FastMon = (function () {
       jl.push(c);
     });
     var sname = $('mon-sname').value.trim() || monAutoTitle() || 'Sintesi';
+    var synthBase = '';
+    if (monKind() === 'sint') {
+      var M0 = jl[0] && jl[0].e && jl[0].e.M, dd = M0 && M0.date || '', mt = /^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/.exec(dd), ymd = mt ? mt[3] + '-' + ('0' + mt[2]).slice(-2) + '-' + ('0' + mt[1]).slice(-2) : dd.replace(/\//g, '-');
+      var own = $('mon-sname').value.trim();
+      synthBase = ('SYN_' + ymd + (M0 && M0.teams[0] ? ' ' + M0.teams[0].name + ' vs ' + M0.teams[1].name : '') + (own ? ' ' + own : '')).replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().replace(/[. ]+$/, '');
+      sname = synthBase;
+    }
     var synth = monKind() === 'sint', job = { list: jl, showScore: showScore, title: title, fast: fast, cards: cards, q: qual, synth: synth, sname: sname, offs: [], ends: [] };
     $('dlg-mon').hidden = true;
     var mimeX = fast ? 'video/mp4' : monMime(), ext = /mp4/.test(mimeX) ? 'mp4' : 'webm';
-    var base = safeName(sname) || 'sintesi';
+    var base = synthBase || safeName(sname) || 'sintesi';
     if (synth) job.name = base + '.' + ext;
     else { var ttl = job.title.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, '_').slice(0, 40); job.name = (ttl ? 'montaggio_' + ttl : 'montaggio_' + jl.length + '_azioni') + '.' + ext; }
     function fallback() {
