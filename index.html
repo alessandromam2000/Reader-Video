@@ -100,7 +100,7 @@ h1, h2, h3 { margin: 0; font-family: var(--f-display); font-weight: 700; letter-
   position: relative; background: var(--screen); width: 100%;
   aspect-ratio: 16 / 9; max-height: 54vh; margin-inline: auto;
 }
-.scoreov { position: absolute; top: 8px; left: 8px; z-index: 3; display: flex; align-items: center; gap: 5px; padding: 3px 7px; border-radius: 6px; background: rgba(8,20,24,.82); color: #fff; font: 700 clamp(11px, 1.5vw, 15px)/1 'Barlow Condensed', system-ui, sans-serif; pointer-events: none; }
+.scoreov { position: absolute; top: 8px; left: 8px; z-index: 3; display: flex; align-items: center; gap: 5px; padding: 3px 7px; border-radius: 6px; background: rgba(8,20,24,.82); color: #fff; font: 700 clamp(13px, 1.9vw, 19px)/1 'Barlow Condensed', system-ui, sans-serif; pointer-events: none; }
 .scoreov[hidden] { display: none; }
 .scoreov .t { color: #9DB6BC; }
 .scoreov .t.me { color: #5FD0DB; box-shadow: 0 2px 0 #3DB8C4; }
@@ -811,6 +811,27 @@ body.theater .row .who .mks i { width: 11px; height: 11px; }
 
 .credit { font: 500 11px var(--f-body, sans-serif); color: var(--muted); letter-spacing: .02em; margin-top: -2px; }
 
+/* pagina 3: sintesi */
+.sintpage { display: none; max-width: 860px; margin: 0 auto; padding: 8px 16px 40px; }
+.sintpage h2 { margin: 8px 0 4px; font-size: 22px; }
+body[data-page="sintesi"] .sintpage { display: block; }
+body[data-page="sintesi"] .panes, body[data-page="sintesi"] .app > .teambar { display: none; }
+.synlist { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.synitem { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid var(--line, #ccd6d9); border-radius: 10px; background: var(--surface, #fff); }
+.synitem .syi { flex: 1; min-width: 0; }
+.synitem .syn { font-weight: 700; font-size: 17px; overflow-wrap: anywhere; }
+.synitem .sym { color: var(--muted, #5d7178); font-size: 13px; margin-top: 2px; overflow-wrap: anywhere; }
+.synitem .syb { display: flex; gap: 8px; flex-wrap: wrap; }
+.synempty { padding: 28px 8px; color: var(--muted, #5d7178); }
+#pg-synth { display: none; align-self: center; }
+body[data-page="analisi"] #pg-synth { display: inline-flex; }
+body.theater #pg-synth { display: none; }
+
+/* finestra montaggio/sintesi: se è più alta dello schermo scorre, e «Avvia» resta sempre visibile */
+.dlg.mon .dlg-card { max-height: calc(100vh - 24px); overflow-y: auto; }
+.dlg.mon .dlg-card > * { flex-shrink: 0; }
+.dlg.mon .dlg-foot { position: sticky; bottom: -14px; margin: 0 -14px -14px; padding: 10px 14px; background: var(--surface); border-top: 1px solid var(--line); z-index: 2; }
+
 </style>
 </head><body>
 <div id="gate" style="position:fixed;inset:0;z-index:99999;background:#0D1619;color:#E4EDF0;display:none;align-items:center;justify-content:center;font-family:system-ui,sans-serif">
@@ -833,11 +854,12 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v109</small></h1>
+      <h1>Reader scout video <small class="ver">v116</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
     <button class="btn primary" id="pg-back" type="button">◀ Torna alla selezione</button>
+    <button class="btn" id="pg-synth" type="button">Vai alle sintesi ▶</button>
     <div class="sources">
       <div class="src" id="src-scout">
         <div class="state"><span class="dot ok" id="dot-scout"></span><span id="scout-state">Scout</span>
@@ -861,6 +883,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
   <nav class="pgnav" id="pgnav" aria-label="Pagine">
     <button class="pg" type="button" data-page="partite" aria-pressed="true"><i>1</i> Partite e video</button>
     <button class="pg" type="button" data-page="analisi" aria-pressed="false"><i>2</i> Analisi</button>
+    <button class="pg" type="button" data-page="sintesi" aria-pressed="false"><i>3</i> Sintesi</button>
   </nav>
 
   <div class="teambar" id="teambar">
@@ -881,6 +904,12 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         </div>
         <div class="pg-go"><span class="hint" id="pg-hint"></span><button class="btn primary" id="pg-go" type="button">Vai all’analisi ▶</button></div>
   </div>
+
+  <section class="sintpage" id="sintpage" aria-label="Sintesi">
+    <h2>Le tue sintesi</h2>
+    <p class="hint">Una sintesi è un video con le sole azioni che hai scelto, più il suo file scout. La crei dalla pagina Analisi con «Crea una sintesi».</p>
+    <ul class="synlist" id="synlist"></ul>
+  </section>
 
   <div class="panes">
     <div class="ttabs" id="ttabs" role="group" aria-label="Pannello dello schermo intero">
@@ -1065,15 +1094,20 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="edback" id="ed-back" hidden></div>
 <div class="dlg mon" id="dlg-mon" hidden>
   <div class="dlg-card" role="dialog" aria-modal="true" aria-labelledby="mon-title">
-    <div class="dlg-head"><h2 id="mon-title">Montaggio video</h2></div>
+    <div class="dlg-head"><h2 id="mon-title">Montaggio</h2></div>
     <p id="mon-text"></p>
     <div class="monopt" id="mon-opt">
+      <div class="monmode" id="mon-kindbox"><span class="label">Cosa vuoi fare</span>
+        <label class="monchk"><input type="radio" name="mon-kind" value="mont" checked> Solo un montaggio <small>(il video con le azioni)</small></label>
+        <label class="monchk"><input type="radio" name="mon-kind" value="sint"> Una sintesi <small>(video + file scout, salvata nella pagina Sintesi e nella cartella DVS_VIDEO)</small></label>
+      </div>
       <div class="monmode" id="mon-modebox"><span class="label">Modalità</span>
         <label class="monchk"><input type="radio" name="mon-mode" value="fast" checked> Veloce <small>(consigliata: molto più rapida, senza audio)</small></label>
         <label class="monchk"><input type="radio" name="mon-mode" value="real"> Normale <small>(in tempo reale, più lenta)</small></label>
       </div>
       <label class="monttl" id="mon-mkbox"><span class="label">Azioni da includere</span><select class="field" id="mon-mk"></select></label>
       <label class="monttl" id="mon-qbox"><span class="label">Qualità del video</span><select class="field" id="mon-q"><option value="std">Standard (file più leggero)</option><option value="high" selected>Alta (consigliata)</option><option value="max">Massima (file molto più grande)</option></select></label>
+      <label class="monttl" id="mon-snbox" hidden><span class="label">Nome della sintesi</span><input type="text" class="field" id="mon-sname" maxlength="60" placeholder="es. Attacchi Aduna"></label>
       <label class="monchk"><input type="checkbox" id="mon-score" checked> Mostra il punteggio</label>
       <label class="monchk" id="mon-stepsbox" hidden><input type="checkbox" id="mon-steps" checked> Pagina con il nome del passo tra una sezione e l’altra</label>
       <label class="monchk"><input type="checkbox" id="mon-intro"> Pagina con il titolo all’inizio</label>
@@ -1093,7 +1127,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
     <input id="ce-raw" type="hidden">
     <p class="ce-err" id="ce-err" role="alert"></p>
     <div class="ce-bot">
-      <label class="ce-chk"><input type="checkbox" id="ce-next"> Dopo la conferma passa alla modifica del codice successivo</label>
+      <label class="ce-chk"><input type="checkbox" id="ce-next"> Dopo la conferma apri subito la modifica del codice successivo</label>
       <div class="ce-btns"><button class="btn" id="ce-exp" type="button">Esporta scout</button><button class="btn" id="ce-orig" type="button" hidden>Originale</button><button class="btn ce-ok" id="ce-ok" type="button">Ok</button><button class="btn" id="ce-no" type="button">Annulla</button></div>
     </div>
   </div>
@@ -1686,7 +1720,7 @@ var FastMon = (function () {
     if (ex && ex.sample && !(opts && opts.sample)) { dropEntry(ex); sampleEntry = null; ex = null; }
     if (ex) return ex;
     if (m.dupes && m.dupes.length && !(opts && opts.sample)) toast(m.teams[0].code + '–' + m.teams[1].code + ': ' + m.dupes.map(function (d) { return 'due giocatrici con il numero ' + d.num + ' (' + d.team + ': ' + d.names.join(' e ') + ')'; }).join('; ') + '. Le ho unite in un’unica voce, perché nello scout hanno lo stesso numero.');
-    var e = { id: 'm' + (++seq), key: key, name: name, text: text, M: m, active: true, videos: {}, giornata: giornataOf(name, m), sample: !!(opts && opts.sample), orig: (opts && opts.orig) || null, enc: (opts && opts.enc) || 'utf8', bom: !!(opts && opts.bom) };
+    var e = { id: 'm' + (++seq), key: key, name: name, text: text, M: m, active: true, videos: {}, giornata: giornataOf(name, m), sample: !!(opts && opts.sample), synth: (opts && opts.synth) || null, orig: (opts && opts.orig) || null, enc: (opts && opts.enc) || 'utf8', bom: !!(opts && opts.bom) };
     var rl = {};
     m.contacts.forEach(function (c) {
       c.e = e; c.uid = key + ':' + c.i;
@@ -1813,7 +1847,7 @@ var FastMon = (function () {
     if (n) { saveLib(); rebuild(); autoScanSaved(); toast(n === 1 ? 'Scout caricato.' : n + ' scout caricati.'); }
   }
   function saveLib() {
-    var items = LIB.filter(function (e) { return !e.sample; }).map(function (e) { var o = { name: e.name, text: e.text, enc: e.enc, bom: e.bom }; if (e.orig) o.orig = e.orig; return o; });
+    var items = LIB.filter(function (e) { return !e.sample && !e.synth; }).map(function (e) { var o = { name: e.name, text: e.text, enc: e.enc, bom: e.bom }; if (e.orig) o.orig = e.orig; return o; });
     idb(function (st, done) { try { st.put(items, 'lib'); } catch (x) {} done(); });
   }
   function loadLibStore() {
@@ -3664,6 +3698,9 @@ var FastMon = (function () {
   $('mon-intro').addEventListener('change', function () { $('mon-ttlbox').hidden = !this.checked; if (this.checked) $('mon-ttl').focus(); });
   $('mon-auto').addEventListener('click', function () { $('mon-ttl').value = monAutoTitle(); });
   function monClose() { $('dlg-mon').hidden = true; }
+  function monKind() { var r = document.querySelector('input[name="mon-kind"]:checked'); return r ? r.value : 'mont'; }
+  function monKindUI() { var sn = monKind() === 'sint'; $('mon-snbox').hidden = !sn; $('mon-title').textContent = sn ? 'Crea una sintesi' : 'Montaggio'; if (!$('dlg-mon').hidden) refreshMonDlg(); }
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="mon-kind"]'), function (x) { x.addEventListener('change', function () { try { localStorage.setItem('reader-scout-video-kind', monKind()); } catch (e) {} monKindUI(); }); });
   function monMode() { var r2 = document.querySelector('input[name="mon-mode"]:checked'); return r2 ? r2.value : 'real'; }
   function monSel() { var x = $('mon-mk'); return x ? x.value : ''; }
   function monItems() {
@@ -3693,7 +3730,7 @@ var FastMon = (function () {
       : 'Il montaggio si registra in tempo reale, con un lettore tutto suo: nel frattempo puoi continuare a usare il programma e guardare altri video. Tieni aperta questa scheda.';
     h += (window.showSaveFilePicker && !(window.claude && window.claude.use)) ? ' Dopo “Avvia” ti chiedo dove salvare il file.' : ' Questo browser salva il file nella cartella dei download, senza chiedere dove.';
     if (mon) h += ' Un montaggio è già in corso: questo parte appena finisce.';
-    $('mon-hint').textContent = h;
+    $('mon-hint').textContent = (monKind() !== 'sint' ? '' : savedDir ? 'Video e scout vengono salvati in una nuova cartella dentro «' + savedDir.name + '» e compaiono nella pagina Sintesi. ' : (monKind() === 'sint' && window.showDirectoryPicker ? 'Quando premi Avvia ti chiedo di scegliere la cartella DVS_VIDEO: ci creo dentro la cartella della sintesi con video e scout. ' : 'Nessuna cartella video collegata: i file vanno nei Download, ma la sintesi compare comunque nella pagina Sintesi. ')) + h;
   }
   Array.prototype.forEach.call(document.querySelectorAll('input[name="mon-mode"]'), function (x) { x.addEventListener('change', refreshMonDlg); });
   $('mon-open').addEventListener('click', function () {
@@ -3708,6 +3745,9 @@ var FastMon = (function () {
     document.querySelector('input[name="mon-mode"][value="' + (canFast || !canReal ? mode : 'real') + '"]').checked = true;
     $('mon-modebox').hidden = !(canFast && canReal);
     refreshMonDlg();
+    try { var kd = localStorage.getItem('reader-scout-video-kind'); document.querySelector('input[name="mon-kind"][value="' + (kd === 'sint' ? 'sint' : 'mont') + '"]').checked = true; } catch (e) {}
+    $('mon-sname').value = monAutoTitle() || ('Sintesi ' + new Date().toLocaleDateString('it-IT').replace(/\//g, '-'));
+    monKindUI();
     $('mon-opt').hidden = false; $('mon-intro').checked = false; $('mon-ttlbox').hidden = true;
     $('mon-stepsbox').hidden = !qstep; $('mon-steps').checked = true;
     $('mon-go').hidden = !ok; $('mon-go').disabled = false; $('mon-go').textContent = mon ? 'Metti in coda' : 'Avvia';
@@ -3725,7 +3765,7 @@ var FastMon = (function () {
   }
   function monBadge(ctx, cw, ch, curC, showScore) {
     if (!curC || !showScore) return;
-    var tm = curC.e.M.teams, sc = curC.score.split('-'), f = Math.round(ch / 34), x = f * 0.9, y = f * 0.9, h = f * 2.1, r = f * 0.32;
+    var tm = curC.e.M.teams, sc = curC.score.split('-'), f = Math.round(ch / 27), x = f * 0.9, y = f * 0.9, h = f * 2.1, r = f * 0.32;
     ctx.save(); ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
     ctx.font = '700 ' + (f * 1.0) + 'px ' + MFONT; var w0 = ctx.measureText(tm[0].code).width, w1 = ctx.measureText(tm[1].code).width;
     ctx.font = '800 ' + (f * 1.45) + 'px ' + MFONT; var dw = Math.max(ctx.measureText('88').width, ctx.measureText(sc[0]).width, ctx.measureText(sc[1]).width) + f * 0.8;
@@ -3774,16 +3814,137 @@ var FastMon = (function () {
     ctx.globalAlpha = 1;
   }
 
+  /* ---------- sintesi salvate (pagina 3) ---------- */
+  var SYN = [], synOpen = null, synPrev = null;
+  function saveSyn() { idb(function (st, done) { try { st.put(SYN, 'synth'); } catch (x) {} done(); }); }
+  function registerSynth(job, vname, files) {
+    SYN.unshift({
+      id: 's' + Date.now(), name: job.sname, created: Date.now(), n: job.list.length, folder: job.folder || '', dirName: job.dirName || '', vname: vname,
+      matches: files.map(function (f) { return f.match + (f.date ? ' · ' + f.date : ''); }),
+      files: files.map(function (f) { return { name: f.name, text: f.text, enc: f.enc, bom: f.bom }; })
+    });
+    saveSyn(); renderSint();
+    toast('Sintesi «' + job.sname + '» salvata' + (job.folder ? ' in ' + job.dirName + '/' + job.folder : '') + '. La trovi nella pagina Sintesi.');
+  }
+  function renderSint() {
+    var el = $('synlist');
+    if (!SYN.length) { el.innerHTML = '<li class="synempty">Nessuna sintesi per ora. Nella pagina Analisi scegli le azioni (per esempio con una maschera o i marker) e premi «Crea una sintesi».</li>'; return; }
+    el.innerHTML = SYN.map(function (s) {
+      var d = new Date(s.created), ds = d.toLocaleDateString('it-IT') + ' ' + d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+      return '<li class="synitem"><div class="syi"><div class="syn">' + esc(s.name) + '</div><div class="sym">' + s.n + ' azioni · ' + esc(s.matches.join(' · ')) + ' · creata il ' + ds +
+        '</div><div class="sym">' + (s.folder ? 'Cartella: ' + esc(s.dirName) + '/' + esc(s.folder) : 'Video salvato nei Download') + '</div></div><div class="syb">' +
+        '<button class="btn primary small" type="button" data-sy="open" data-id="' + s.id + '">Apri</button>' +
+        '<button class="btn small" type="button" data-sy="dvw" data-id="' + s.id + '">Scarica scout</button>' +
+        '<button class="btn small" type="button" data-sy="del" data-id="' + s.id + '">Elimina</button></div></li>';
+    }).join('');
+  }
+  $('synlist').addEventListener('click', function (ev) {
+    var b = ev.target.closest ? ev.target.closest('button[data-sy]') : null; if (!b) return;
+    if (b.dataset.sy === 'open') { openSynth(b.dataset.id); return; }
+    if (b.dataset.sy === 'dvw') {
+      var sy = SYN.filter(function (x) { return x.id === b.dataset.id; })[0]; if (!sy) return;
+      sy.files.forEach(function (f, i) { setTimeout(function () {
+        var url = URL.createObjectURL(new Blob([encodeDvw(f.text, f.enc || 'utf8', f.bom)], { type: 'application/octet-stream' }));
+        var a = document.createElement('a'); a.href = url; a.download = f.name; document.body.appendChild(a); a.click();
+        setTimeout(function () { a.remove(); URL.revokeObjectURL(url); }, 4000);
+      }, 700 * i); });
+      toast('Scout della sintesi scaricato: ' + sy.files.map(function (f) { return f.name; }).join(', '));
+      return;
+    }
+    if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = 'Elimina davvero?'; setTimeout(function () { if (b.isConnected) { delete b.dataset.sure; b.textContent = 'Elimina'; } }, 3500); return; }
+    SYN = SYN.filter(function (x) { return x.id !== b.dataset.id; }); saveSyn(); renderSint();
+    toast('Sintesi tolta dall’elenco. I file nella cartella video non vengono cancellati.');
+  });
+  function openSynth(id) { return openSynth2(id).catch(function (x) { toast('Non riesco ad aprire la sintesi: ' + (x && x.message ? x.message : x)); }); }
+  async function openSynth2(id) {
+    var s = SYN.filter(function (x) { return x.id === id; })[0]; if (!s) return;
+    var perm = null;
+    if (s.folder && savedDir) { try { perm = savedDir.requestPermission({ mode: 'read' }); } catch (x) { perm = null; } }
+    if (synOpen) closeSynth();
+    synPrev = LIB.filter(function (e) { return e.active; }).map(function (e) { return e.id; });
+    LIB.forEach(function (e) { e.active = false; });
+    var added = [];
+    s.files.forEach(function (f) { var e = addScout(f.text, f.name, { enc: f.enc, bom: f.bom, synth: s.id }); if (e) { e.synth = s.id; e.active = true; added.push(e); } });
+    if (!added.length) { LIB.forEach(function (e) { e.active = synPrev.indexOf(e.id) >= 0; }); rebuild(); toast('Non riesco ad aprire questa sintesi.'); return; }
+    synOpen = s.id; $('pg-back').textContent = '◀ Torna alle sintesi';
+    try { $('f-reset').click(); } catch (x) {}
+    rebuild();
+    setPage('analisi');
+    if (perm) {
+      try {
+        if ((await perm) === 'granted') {
+          var d = await savedDir.getDirectoryHandle(s.folder), fh = await d.getFileHandle(s.vname), file = await fh.getFile();
+          added.forEach(function (e) { attachFile(e, file, neededCams(e)[0]); });
+        }
+      } catch (x) { toast('Non trovo il video della sintesi nella cartella «' + s.folder + '». Collegalo con il pulsante Video.'); }
+    } else if (!hasAll(added[0])) { toast('Scegli il video della sintesi: ' + s.vname); pendingEntry = added[0]; $('in-video').click(); }
+  }
+  function closeSynth() {
+    LIB.filter(function (e) { return e.synth; }).forEach(dropEntry);
+    LIB.forEach(function (e) { e.active = (synPrev || []).indexOf(e.id) >= 0; });
+    synOpen = null; $('pg-back').textContent = '◀ Torna alla selezione';
+    rebuild();
+  }
   var monJobs = [];
+
+  /* ---------- sintesi: file scout (.dvw) con le sole azioni del montaggio, collegate ai tempi del video montato ---------- */
+  function makeSynthesis(job, vname) {
+    var groups = [];
+    job.list.forEach(function (c, ix) {
+      if (job.offs[ix] == null) return;
+      var g = groups.filter(function (x) { return x.e === c.e; })[0];
+      if (!g) { g = { e: c.e, it: [] }; groups.push(g); }
+      g.it.push({ c: c, off: job.offs[ix], end: job.ends[ix] != null ? job.ends[ix] : job.offs[ix] + 4 });
+    });
+    var files = [], stem = vname.replace(/\.[^.]+$/, ''), pad2 = function (v) { return ('0' + v).slice(-2); };
+    groups.forEach(function (g, gi) {
+      var lines = g.e.text.split(/\r?\n/), eol = /\r\n/.test(g.e.text) ? '\r\n' : '\n', out = [], sec = '', vdone = false, k;
+      for (k = 0; k < lines.length; k++) {
+        var l = lines[k];
+        if (/^\[3[A-Z0-9-]+\]/.test(l)) { sec = l.trim(); out.push(l); if (sec === '[3SCOUT]') break; if (sec === '[3VIDEO]' && !vdone) { out.push('Camera0=C:\\DVS_VIDEO\\' + (job.folder ? job.folder + '\\' : '') + vname); vdone = true; } continue; }
+        if (sec === '[3VIDEO]') continue;
+        out.push(l);
+      }
+      var prev = null;
+      g.it.forEach(function (x) {
+        var c = x.c, f = (lines[c.ln] || '').split(';'), sc = c.score.split('-');
+        while (f.length < 14) f.push('');
+        if (!prev || prev.c.rally !== c.rally || prev.c.set !== c.set) {
+          var p = f.slice(); p[0] = '*p' + pad2(sc[0]) + ':' + pad2(sc[1]); p[11] = '1'; p[12] = String(Math.round(prev ? prev.end : x.off)); p[1] = p[2] = p[3] = p[4] = p[5] = p[6] = '';
+          out.push(p.join(';'));
+        }
+        f[11] = '1'; f[12] = String(Math.round(x.off)); out.push(f.join(';'));
+        prev = x;
+      });
+      var txt = out.join(eol) + eol, nm = stem + (groups.length > 1 ? '_' + (g.e.name || ('partita' + (gi + 1))).replace(/\.dvw$/i, '') : '') + '.dvw';
+      files.push({ name: nm, text: txt, enc: g.e.enc || 'utf8', bom: !!g.e.bom, match: g.e.M.teams[0].code + '–' + g.e.M.teams[1].code, date: g.e.M.date || '', n: g.it.length });
+    });
+    (async function () {
+      for (var q = 0; q < files.length; q++) {
+        var f = files[q], bytes = encodeDvw(f.text, f.enc, f.bom), done = false;
+        if (job.sub) {
+          try { var fh = await job.sub.getFileHandle(f.name, { create: true }), w = await fh.createWritable(); await w.write(bytes); await w.close(); done = true; } catch (x) {}
+        }
+        if (!done) {
+          var url = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+          var a = document.createElement('a'); a.href = url; a.download = f.name; document.body.appendChild(a); a.click();
+          setTimeout((function (aa, uu) { return function () { aa.remove(); URL.revokeObjectURL(uu); }; })(a, url), 4000);
+          await new Promise(function (r) { setTimeout(r, 900); });
+        }
+      }
+      registerSynth(job, vname, files);
+    })();
+  }
   function startNextJob() { var x = monJobs.shift(); if (x) { if (x.job.fast) runFast(x.wr, x.job); else runMontage(x.wr, x.job); } else mon = null; }
   function enqueueJob(job, wr) {
     monJobs.push({ job: job, wr: wr });
     if (!mon) { mon = { n: 0 }; startNextJob(); }
     else { toast('Montaggio messo in coda (' + monJobs.length + ' in attesa).'); }
   }
+  function safeName(t) { return String(t || '').replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 50).replace(/ /g, '_'); }
+  async function dirHas(d, nm) { try { await d.getDirectoryHandle(nm); return true; } catch (x) { return false; } }
   function startMontage() {
     var showScore = $('mon-score').checked, title = $('mon-intro').checked ? $('mon-ttl').value.trim() : '';
-    try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore })); } catch (e) {}
     var fast = monMode() === 'fast', qual = $('mon-q').value;
     try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore, mode: fast ? 'fast' : 'real', q: qual })); } catch (e) {}
     var jl = [], cards = null, lastSt = -1;
@@ -3793,16 +3954,37 @@ var FastMon = (function () {
       if (cards && qstep[q] !== lastSt) { lastSt = qstep[q]; cards[jl.length] = MS.mask.steps[lastSt].name; }
       jl.push(c);
     });
-    var job = { list: jl, showScore: showScore, title: title, fast: fast, cards: cards, q: qual };
+    var sname = $('mon-sname').value.trim() || monAutoTitle() || 'Sintesi';
+    var synth = monKind() === 'sint', job = { list: jl, showScore: showScore, title: title, fast: fast, cards: cards, q: qual, synth: synth, sname: sname, offs: [], ends: [] };
     $('dlg-mon').hidden = true;
-    var n = job.list.length, mimeX = fast ? 'video/mp4' : monMime(), ext = /mp4/.test(mimeX) ? 'mp4' : 'webm';
-    var ttl = job.title.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, '_').slice(0, 40);
-    var name = (ttl ? 'montaggio_' + ttl : 'montaggio_' + n + '_azioni') + '.' + ext; job.name = name;
-    if (window.showSaveFilePicker && !(window.claude && window.claude.use)) {
-      window.showSaveFilePicker({ suggestedName: name, types: [{ description: 'Video', accept: ext === 'mp4' ? { 'video/mp4': ['.mp4'] } : { 'video/webm': ['.webm'] } }] })
-        .then(function (h) { return h.createWritable().then(function (w) { enqueueJob(job, { w: w, name: h.name }); }); })
-        .catch(function (e) { if (!e || e.name !== 'AbortError') enqueueJob(job, null); else $('dlg-mon').hidden = false; });
-    } else enqueueJob(job, null);
+    var mimeX = fast ? 'video/mp4' : monMime(), ext = /mp4/.test(mimeX) ? 'mp4' : 'webm';
+    var base = safeName(sname) || 'sintesi';
+    if (synth) job.name = base + '.' + ext;
+    else { var ttl = job.title.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, '_').slice(0, 40); job.name = (ttl ? 'montaggio_' + ttl : 'montaggio_' + jl.length + '_azioni') + '.' + ext; }
+    function fallback() {
+      if (window.showSaveFilePicker && !(window.claude && window.claude.use)) {
+        window.showSaveFilePicker({ suggestedName: job.name, types: [{ description: 'Video', accept: ext === 'mp4' ? { 'video/mp4': ['.mp4'] } : { 'video/webm': ['.webm'] } }] })
+          .then(function (h) { return h.createWritable().then(function (w) { enqueueJob(job, { w: w, name: h.name }); }); })
+          .catch(function (e) { if (!e || e.name !== 'AbortError') enqueueJob(job, null); else $('dlg-mon').hidden = false; });
+      } else enqueueJob(job, null);
+    }
+    var rp = null;
+    if (synth && window.showDirectoryPicker && !(window.claude && window.claude.use)) {
+      try {
+        if (savedDir) rp = savedDir.requestPermission({ mode: 'readwrite' });
+        else rp = window.showDirectoryPicker({ mode: 'readwrite' }).then(function (h) { savedDir = h; saveDirHandle(h); refreshDir(); return 'granted'; });
+      } catch (x) { rp = null; }
+    }
+    if (!rp) { fallback(); return; }
+    rp.then(async function (p) {
+      if (p !== 'granted') throw new Error('permesso');
+      var fname = base, k = 1;
+      while (await dirHas(savedDir, fname)) fname = base + '_' + (++k);
+      var sub = await savedDir.getDirectoryHandle(fname, { create: true });
+      var fh = await sub.getFileHandle(job.name, { create: true }), w = await fh.createWritable();
+      job.sub = sub; job.folder = fname; job.dirName = savedDir.name;
+      enqueueJob(job, { w: w, name: job.name });
+    }).catch(function () { toast('Non posso scrivere nella cartella dei video: salvo dove scegli tu.'); fallback(); });
   }
   /* ---------- montaggio veloce: decodifica e codifica più veloce del tempo reale (WebCodecs), senza audio ---------- */
   function waitDeq(a, b) {
@@ -3870,6 +4052,7 @@ var FastMon = (function () {
         if (!pl) return;
         $('mp-text').textContent = 'Montaggio veloce: azione ' + (idx + 1) + ' di ' + list.length + (monJobs.length ? ' · altri ' + monJobs.length + ' in coda' : '');
         $('mp-fill').style.width = Math.round(idx / list.length * 100) + '%';
+        job.offs[idx] = outBase / 1e6 + (c.t - cl.start);
         var startUs = cl.start * 1e6, endUs = cl.end * 1e6, firstTs = null, lastOut = outBase - 1, derr = null, lastKey = -1e9,
           fd = rd2.n > 1 ? Math.max(1000, (rd2.dts[1] - rd2.dts[0]) / rd2.timescale * 1e6) : 33333;
         var dec = new VideoDecoder({
@@ -3901,7 +4084,7 @@ var FastMon = (function () {
           if (!monAbort) await dec.flush();
           if (derr) throw derr;
         } finally { try { dec.close(); } catch (e) {} }
-        outBase = lastOut + fd;
+        outBase = lastOut + fd; job.ends[idx] = outBase / 1e6;
       }
       for (var ix = 0; ix < list.length && !monAbort; ix++) { if (job.cards && job.cards[ix]) card(job.cards[ix]); await doClip(list[ix], ix); }
       if (monAbort) {
@@ -3913,6 +4096,7 @@ var FastMon = (function () {
       enc.close(); writer.finish();
       if (wr) { await sink.done(); await wr.w.close(); toast('Montaggio salvato: ' + wr.name); }
       else { await saveBlob(job.name || 'montaggio.mp4', sink.blob()); toast('Montaggio pronto: ' + (job.name || 'montaggio.mp4')); }
+      if (job.synth) makeSynthesis(job, wr ? wr.name : (job.name || 'montaggio.mp4'));
       fin();
     } catch (e) {
       try { if (enc && enc.state !== 'closed') enc.close(); } catch (x) {}
@@ -3961,12 +4145,13 @@ var FastMon = (function () {
       draw();
       if (curClip && !advancing && mv.currentTime >= curClip.end) clipDone();
     }
-    function clipDone() { if (advancing) return; advancing = true; clearTimeout(guard); setTimeout(nextClip, 150); }
+    function clipDone() { if (advancing) return; job.ends[i - 1] = (performance.now() - tRec) / 1000; advancing = true; clearTimeout(guard); setTimeout(nextClip, 150); }
     function finish(save) {
       clearInterval(drawT); if (wk) { wk.terminate(); wk = null; } if (lock) { try { lock.release(); } catch (e) {} lock = null; }
       try { mv.pause(); } catch (e) {}
       pill.hidden = true; curClip = null;
       if (monJobs.length) { mon = { n: 0 }; setTimeout(startNextJob, 700); } else mon = null;
+      if (save && job.synth) makeSynthesis(job, wr ? wr.name : (job.name || ('montaggio_' + list.length + '_azioni.' + (/mp4/.test(mime) ? 'mp4' : 'webm'))));
       if (mr && mr.state !== 'inactive') {
         mr.onstop = function () {
           if (wr) {
@@ -3981,6 +4166,7 @@ var FastMon = (function () {
         mr.stop();
       } else if (wr) { try { wr.w.abort(); } catch (e) {} }
     }
+    var tRec = 0;
     var RBPS = { std: 8e6, high: 14e6, max: 22e6 }[job.q] || 14e6;
     function startRec() {
       var stream = canvas.captureStream(30);
@@ -3991,7 +4177,7 @@ var FastMon = (function () {
         if (!ev.data || !ev.data.size) return;
         if (wr) wq = wq.then(function () { return wr.w.write(ev.data); }).catch(function () {}); else chunks.push(ev.data);
       };
-      mr.start(1000);
+      mr.start(1000); tRec = performance.now();
       try {
         wk = new Worker(URL.createObjectURL(new Blob(['setInterval(function(){postMessage(0)},33)'], { type: 'text/javascript' })));
         wk.onmessage = tickMon;
@@ -4018,7 +4204,7 @@ var FastMon = (function () {
           if (il.length) { introList = il; delay = 3000 * il.length; introStart = performance.now(); introUntil = introStart + delay; }
           setTimeout(function () {
             if (monAbort) { clipDone(); return; }
-            curClip = cl; advancing = false;
+            curClip = cl; advancing = false; job.offs[i - 1] = (performance.now() - tRec) / 1000 + (c.t - cl.start);
             var p = mv.play(); if (p && p.catch) p.catch(function () {});
             guard = setTimeout(clipDone, ((cl.end - cl.start) + 10) * 1000);
           }, delay);
@@ -4080,14 +4266,17 @@ var FastMon = (function () {
   })();
   /* ---------- pagine: partite / analisi ---------- */
   function setPage(p) {
+    if (p !== 'analisi' && synOpen) closeSynth();
     document.body.setAttribute('data-page', p);
+    if (p === 'sintesi') renderSint();
     Array.prototype.forEach.call($('pgnav').querySelectorAll('.pg'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-page') === p ? 'true' : 'false'); });
     try { localStorage.setItem('reader-scout-video-page', p); } catch (x) {}
     window.scrollTo(0, 0);
     if (p === 'analisi') requestAnimationFrame(function () { markCurrent(); });
   }
   $('pgnav').addEventListener('click', function (e) { var b = e.target.closest('.pg'); if (b) setPage(b.getAttribute('data-page')); });
-  $('pg-back').addEventListener('click', function () { setPage('partite'); });
+  $('pg-back').addEventListener('click', function () { setPage(synOpen ? 'sintesi' : 'partite'); });
+  $('pg-synth').addEventListener('click', function () { setPage('sintesi'); });
   $('pg-go').addEventListener('click', function () { setPage('analisi'); });
   setPage('partite');
 
@@ -4359,13 +4548,15 @@ var FastMon = (function () {
       if (!e.sample) saveLib();
       closeCodeEdit();
       rebuild();
-      dropped = cur < 0;   /* con il nuovo codice l'azione non rispetta più i filtri: al suo posto c'è già la successiva */
+      dropped = queue.indexOf(c) < 0;   /* con il nuovo codice l'azione non rispetta più i filtri (es. da X5 a C5): al suo posto c'è già la successiva */
       toast('Codice modificato: ' + code);
     } else closeCodeEdit();
     if (!queue.length) return;
-    var tgt = dropped ? Math.min(q, queue.length - 1) : (cur >= 0 ? cur : Math.min(q, queue.length - 1));
-    if (wasNext && !dropped && tgt + 1 < queue.length) tgt++;
-    select(tgt, false);   /* resta dove stavo: la lista non torna in cima */
+    /* dopo la correzione si va sempre all'azione successiva di dove ero arrivato, mai all'inizio della selezione */
+    var tgt = dropped ? q : queue.indexOf(c) + 1;
+    tgt = Math.max(0, Math.min(tgt, queue.length - 1));
+    select(tgt, false);
+    if (wasNext) openCodeEdit(tgt);
   }
   $('ce-orig').addEventListener('click', function () { CE.cd = origCode(CE.c); ceSync(); });
   $('ce-ok').addEventListener('click', ceCommit);
@@ -4395,6 +4586,7 @@ var FastMon = (function () {
   var sampleTxt = $('sample-dvw').textContent.replace(/^\s+/, '');
   if (sampleTxt.trim()) sampleEntry = addScout(sampleTxt, '20261024_RSA05_MIL_BUS.dvw', { sample: true });
   rebuild();
+  idb(function (st, done) { var g = st.get('synth'); g.onsuccess = function () { done(g.result || []); }; g.onerror = function () { done([]); }; }).then(function (x) { if (x && x.length) { SYN = x; renderSint(); } });
   Promise.all([loadLibStore(), loadDirHandle()]).then(function (r) {
     var items = r[0]; if (r[1]) savedDir = r[1];
     if (items && items.length) {
