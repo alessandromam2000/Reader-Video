@@ -831,6 +831,7 @@ body.theater #pg-synth { display: none; }
 .dlg.mon .dlg-card { max-height: calc(100vh - 24px); overflow-y: auto; }
 .dlg.mon .dlg-card > * { flex-shrink: 0; }
 .dlg.mon .dlg-foot { position: sticky; bottom: -14px; margin: 0 -14px -14px; padding: 10px 14px; background: var(--surface); border-top: 1px solid var(--line); z-index: 2; }
+#t-proj[hidden]{display:none!important}#t-proj svg{vertical-align:-3px;margin-right:4px}#t-proj[aria-pressed="true"]{background:var(--accent,#3DB8C4);border-color:var(--accent,#3DB8C4);color:var(--accent-ink,#08161A)}
 
 </style>
 </head><body>
@@ -854,7 +855,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v119</small></h1>
+      <h1>Reader scout video <small class="ver">v121</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -895,6 +896,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
             <span class="libbtn">
               <button class="btn small" id="lib-all" type="button">Tutte</button>
               <button class="btn small" id="lib-none" type="button">Nessuna</button>
+              <button class="btn small" id="lib-exp" type="button" title="Esporta gli scout (anche corretti) tutti insieme o di una squadra">Esporta scout</button>
               <button class="btn small" id="lib-link" type="button" title="Collega i video di tutte le partite dalla cartella DVS_VIDEO">Collega video</button>
             </span>
           </div>
@@ -963,6 +965,8 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <button class="btn small" id="b-score" type="button" aria-pressed="false" title="Mostra il punteggio sul video">Punteggio</button>
         <button class="btn small" id="b-edit" type="button" aria-label="Modifica il codice dell\'azione" title="Invio o doppio clic sul codice">✎ Modifica codice</button>
         <button class="btn small" id="b-full" type="button" aria-label="Schermo intero con lista dei codici" title="Tasto Tab (o F)">⛶ Schermo intero</button>
+        <button class="btn small" id="t-proj" type="button" hidden aria-pressed="false" aria-label="Proietta il video sul secondo schermo" title="Proietta solo il video sul secondo schermo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="13" height="10" rx="1.5"/><path d="M6 18h5M8.5 14v4"/><rect x="14" y="8" width="8" height="12" rx="1.5" fill="currentColor" fill-opacity=".25"/></svg> Secondo schermo</button>
+        <button class="btn small" id="t-lav" type="button" aria-pressed="false" title="Disegna sul video dal tablet">✎ Lavagna tablet</button>
       </div>
       </div>
 
@@ -1188,7 +1192,18 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
     <div class="dlg-foot"><button class="btn primary" id="rm-go" type="button" disabled>Togli scout</button></div>
   </div>
 </div>
+<div class="dlg" id="dlg-exp" hidden>
+  <div class="dlg-card" role="dialog" aria-modal="true" aria-labelledby="exp-title">
+    <div class="dlg-head"><h2 id="exp-title">Esporta scout</h2><button class="btn small" id="exp-close" type="button">Chiudi</button></div>
+    <p class="hint">Scegli quali scout esportare. Se li hai corretti, nei file ci sono le correzioni.</p>
+    <label class="monttl"><span class="label">Quali</span><select class="field" id="exp-team"></select></label>
+    <p class="hint" id="exp-sum"></p>
+    <div class="dlg-foot"><button class="btn" id="exp-dir" type="button">Salva nella cartella SCOUT</button><button class="btn primary" id="exp-zip" type="button">Scarica ZIP</button></div>
+  </div>
+</div>
 <div class="drop-hint" id="drop">Rilascia qui lo scout (.dvw) o il video</div>
+<style>#lav-panel{position:fixed;right:14px;bottom:14px;width:310px;z-index:60;background:var(--surface,#fff);color:var(--fg,#13232A);border:1px solid var(--line,#CAD6DA);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:14px/1.4 var(--f-body,system-ui,sans-serif)}#lav-panel b{font-size:16px}#lav-panel p{margin:6px 0}#lav-link{font-weight:600;word-break:break-all}#lav-code{font:700 38px/1.1 var(--f-mono,ui-monospace,monospace);letter-spacing:.28em;color:var(--accent,#0A6F7A);text-align:center;margin:8px 0;padding-left:.28em}#lav-state{padding:6px 8px;border-radius:8px;background:var(--surface-2,#E3EBED);margin:6px 0 10px}#lav-state.ok{background:#CFEFD9;color:#0E5A2B;font-weight:700}#lav-panel .lavrow{display:flex;gap:6px;flex-wrap:wrap}</style>
+<div id="lav-panel" hidden><b>Lavagna dal tablet</b><p>Sul tablet apri <span id="lav-link"></span> e scrivi questo codice:</p><div id="lav-code">------</div><div id="lav-state">In attesa del tablet…</div><div class="lavrow"><button class="btn small" id="lav-new" type="button">Nuovo codice</button><button class="btn small" id="lav-stop" type="button">Spegni</button><button class="btn small" id="lav-close" type="button">Chiudi</button></div></div>
 <div class="toast" id="toast" hidden></div>
 <script type="text/plain" id="sample-dvw"></script>
 <script>
@@ -2537,6 +2552,8 @@ var FastMon = (function () {
         msCounts.push(n);
       });
     } else { qstep = null; queue = ALL.filter(function (c) { return matches(c, tokens); }); }
+    /* sintesi salvata: le azioni stanno in un file scout per partita, ma il video e' uno solo nell'ordine scelto (per esempio quello della maschera): la lista segue il video */
+    if (synOpen && !MS) queue = queue.map(function (c, i) { return [c, i]; }).sort(function (a, b) { return ((a[0].t || 0) - (b[0].t || 0)) || (a[1] - b[1]); }).map(function (x) { return x[0]; });
     cur = keep ? queue.indexOf(keep) : -1;
     if (keep && cur < 0) { vid.pause(); clip = null; ended = false; S.all = false; syncAllBtn(); updateNow(); updateBar(0); }
     renderList();
@@ -2714,6 +2731,323 @@ var FastMon = (function () {
     if (vid.getAttribute('src')) toast('Il browser non riesce a leggere questo video. Provalo in Chrome o Edge.');
   });
   vid.addEventListener('click', togglePlay);
+
+  /* ---------- Proiezione del solo video su un secondo schermo (HDMI / proiettore) ----------
+     Il lettore principale resta il "regista": lista azioni, codici e comandi restano sul PC.
+     Sul secondo schermo si apre una finestra pulita con il solo video, che segue play, pausa, salti e velocita'. */
+  (function () {
+    var btn = $('t-proj'); if (!btn) return;
+    var pw = null, iv = null, pv = null, audioOnProj = false, savedMuted = false, savedVol = 1;
+    function extended() { try { return !!(window.screen && window.screen.isExtended); } catch (e) { return false; } }
+    function refresh() { btn.hidden = !(extended() || pw); btn.setAttribute('aria-pressed', pw ? 'true' : 'false'); btn.classList.toggle('on', !!pw); btn.title = pw ? 'Smetti di proiettare (il video torna sul PC)' : 'Proietta solo il video sul secondo schermo'; var tx = btn.lastChild; if (tx && tx.nodeType === 3) tx.nodeValue = pw ? ' Smetti di proiettare' : ' Secondo schermo'; }
+    try { window.screen.addEventListener('change', refresh); } catch (e) {}
+    window.addEventListener('resize', refresh); refresh();
+    var PAGE = '<!doctype html><html lang="it"><he' + 'ad><meta charset="utf-8"><title>Video — secondo schermo</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}video{width:100%;height:100%;object-fit:contain;background:#000;display:block}#h{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(20,30,36,.88);color:#fff;font:15px system-ui,sans-serif;padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .3s}#h.on{opacity:1}body.idle{cursor:none}</style></he' + 'ad><body><video id="v" playsinline></video><div id="h"></div></body></html>';
+    function hint(t) { try { var h = pw.document.getElementById('h'); h.textContent = t; h.classList.add('on'); clearTimeout(hint.t); hint.t = setTimeout(function () { h.classList.remove('on'); }, 4000); } catch (e) {} }
+    function sync(force) {
+      if (!pw || pw.closed || !pv) return;
+      var src = vid.currentSrc || vid.getAttribute('src') || '';
+      if (src && pv.src !== src) { pv.src = src; pv.addEventListener('loadedmetadata', function f() { pv.removeEventListener('loadedmetadata', f); sync(true); }); return; }
+      if (pv.readyState < 1) return;
+      if (pv.playbackRate !== vid.playbackRate) pv.playbackRate = vid.playbackRate;
+      var d = Math.abs(pv.currentTime - vid.currentTime);
+      if (force || d > (vid.paused ? 0.05 : 0.35)) { try { pv.currentTime = vid.currentTime; } catch (e) {} }
+      if (vid.paused && !pv.paused) pv.pause();
+      if (!vid.paused && pv.paused) { var p = pv.play(); if (p && p.catch) p.catch(function () { pv.muted = true; var q = pv.play(); if (q && q.catch) q.catch(function () {}); hint('Fai clic su questo schermo per attivare il video e l’audio'); }); }
+      setAudio();
+    }
+    function setAudio() {
+      if (!pv) return;
+      var ok = !pv.muted && !pv.paused;
+      if (ok && !audioOnProj) { audioOnProj = true; savedMuted = vid.muted; vid.muted = true; }
+      if (!ok && audioOnProj && pv.muted) { audioOnProj = false; vid.muted = savedMuted; }
+    }
+    function stop(msg) {
+      clearInterval(iv); iv = null;
+      if (audioOnProj) { audioOnProj = false; vid.muted = savedMuted; }
+      var t = 0; try { if (pv && pv.currentTime && vid.paused) t = pv.currentTime; } catch (e) {}
+      try { if (pw && !pw.closed) pw.close(); } catch (e) {}
+      pw = null; pv = null; refresh(); if (msg) toast(msg);
+    }
+    async function start() {
+      var left = 0, top = 0, w = 1280, h = 720, scr = null;
+      try {
+        if (window.getScreenDetails) {
+          var det = await window.getScreenDetails(), cur = det.currentScreen;
+          scr = det.screens.filter(function (x) { return x !== cur; })[0] || null;
+          if (!scr) { toast('Non vedo un secondo schermo collegato.'); return; }
+          left = scr.availLeft; top = scr.availTop; w = scr.availWidth; h = scr.availHeight;
+        } else { left = window.screenX + window.outerWidth; top = window.screenY; }
+      } catch (e) { toast('Per proiettare serve consentire l’accesso agli schermi (richiesta del browser). Puoi riprovare.'); return; }
+      pw = window.open('', 'mv-proiezione', 'popup=yes,left=' + left + ',top=' + top + ',width=' + w + ',height=' + h);
+      if (!pw) { toast('Il browser ha bloccato la finestra: consenti i popup per questo sito e riprova.'); return; }
+      pw.document.open(); pw.document.write(PAGE); pw.document.close();
+      pv = pw.document.getElementById('v'); pv.muted = false; pv.volume = Math.min(1, vid.volume || 1);
+      var goFs = function () { try { var el = pw.document.documentElement; if (pw.document.fullscreenElement) pw.document.exitFullscreen(); else el.requestFullscreen(scr ? { screen: scr } : undefined).catch(function () {}); } catch (e) {} };
+      pw.document.addEventListener('dblclick', goFs);
+      pw.document.addEventListener('keydown', function (e) { if (e.key === 'f' || e.key === 'F') goFs(); });
+      pw.document.addEventListener('click', function () { if (pv.muted) pv.muted = false; sync(true); });
+      var idle; pw.document.addEventListener('mousemove', function () { pw.document.body.classList.remove('idle'); clearTimeout(idle); idle = setTimeout(function () { try { pw.document.body.classList.add('idle'); } catch (e) {} }, 2500); });
+      try { pw.document.documentElement.requestFullscreen(scr ? { screen: scr } : undefined).catch(function () { hint('Doppio clic (o tasto F) per lo schermo intero'); }); } catch (e) {}
+      hint('Doppio clic o tasto F: schermo intero');
+      pw.addEventListener('pagehide', function () { if (pw && pw.closed !== false) setTimeout(function () { if (pw && pw.closed) stop('Proiezione chiusa: il video resta sul PC.'); }, 50); });
+      iv = setInterval(function () { if (!pw || pw.closed) { stop('Proiezione chiusa: il video resta sul PC.'); return; } sync(false); }, 250);
+      ['play', 'pause', 'seeked', 'ratechange', 'loadstart', 'volumechange'].forEach(function (ev) { vid.addEventListener(ev, function () { if (pw) sync(ev === 'seeked' || ev === 'loadstart'); }); });
+      sync(true); refresh(); toast('Video proiettato sul secondo schermo. I comandi restano qui.');
+    }
+    btn.addEventListener('click', function () { if (pw && !pw.closed) stop('Il video è tornato sul PC.'); else start(); });
+    window.addEventListener('beforeunload', function () { try { if (pw) pw.close(); } catch (e) {} });
+    window.__proiezione = { attiva: function () { return !!pw; }, finestra: function () { return pw; } };
+  })();
+/*@@LAVAGNA-INIZIO@@*/
+/* ---- Lavagna: parti comuni a PC (Reader) e tablet ---- */
+var LAV = (function () {
+  var G = (typeof window !== 'undefined') ? window : {};
+  var RELAY = G.MV_RELAY || 'https://ntfy.sh';
+  var ICE = G.MV_ICE || [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }];
+  function rnd(n, al) { al = al || 'abcdefghjkmnpqrstuvwxyz23456789'; var s = ''; for (var i = 0; i < n; i++) s += al.charAt(Math.floor(Math.random() * al.length)); return s; }
+  function norm(code) { return String(code || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function topic(code, dir) { return 'mvlav-' + norm(code) + '-' + dir; }
+  /* Il servizio di abbinamento serve solo per i primi secondi (scambio dei "biglietti da visita" dei due apparecchi). Poi i segni viaggiano diretti tablet -> PC. */
+  function pub(code, dir, obj) { try { return fetch(RELAY + '/' + topic(code, dir), { method: 'POST', body: JSON.stringify(obj) }).catch(function () {}); } catch (e) {} }
+  function sub(code, dir, cb, onerr) {
+    var es = new EventSource(RELAY + '/' + topic(code, dir) + '/sse');
+    es.onmessage = function (e) { try { var m = JSON.parse(e.data); if (m && m.event === 'message') cb(JSON.parse(m.message)); } catch (x) {} };
+    es.onerror = function () { if (onerr) onerr(); };
+    return es;
+  }
+  function iceBatch(send) {
+    var q = [], t = null;
+    function flush() { t = null; var b = q.splice(0); if (b.length) send(b); }
+    return function (c) { if (c) q.push(c.toJSON ? c.toJSON() : c); if (!c) { clearTimeout(t); flush(); } else if (!t) t = setTimeout(flush, 250); };
+  }
+  function prune(strokes, now) { for (var i = strokes.length - 1; i >= 0; i--) { var s = strokes[i]; if (s.f && s.end && now - s.end >= s.f) strokes.splice(i, 1); } return strokes; }
+  /* Disegna i segni. Coordinate dei segni: da 0 a 1 rispetto al video. W,H = dimensione del video a schermo. */
+  function draw(ctx, W, H, strokes, now) {
+    for (var k = 0; k < strokes.length; k++) {
+      var s = strokes[k], p = s.pts; if (!p || !p.length) continue;
+      var a = 1;
+      if (s.f && s.end) { var age = now - s.end; if (age >= s.f) continue; if (age > s.f - 800) a = (s.f - age) / 800; }
+      var lw = Math.max(2, s.w * H), hl = s.tool === 'hl', wd = hl ? lw * 4.5 : lw;
+      var x0 = p[0][0] * W, y0 = p[0][1] * H, q = p[p.length - 1], x1 = q[0] * W, y1 = q[1] * H;
+      ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      for (var pass = hl ? 1 : 0; pass < 2; pass++) {
+        ctx.globalAlpha = hl ? a * 0.38 : (pass === 0 ? a * 0.5 : a);
+        ctx.strokeStyle = pass === 0 ? '#000' : s.c;
+        ctx.lineWidth = pass === 0 ? wd + Math.max(2, lw * 0.6) : wd;
+        ctx.beginPath();
+        if (s.tool === 'circle') { ctx.ellipse((x0 + x1) / 2, (y0 + y1) / 2, Math.max(1, Math.abs(x1 - x0) / 2), Math.max(1, Math.abs(y1 - y0) / 2), 0, 0, Math.PI * 2); }
+        else if (s.tool === 'line' || s.tool === 'arrow') {
+          ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
+          if (s.tool === 'arrow' && (x1 !== x0 || y1 !== y0)) {
+            var ang = Math.atan2(y1 - y0, x1 - x0), L = Math.max(wd * 4.5, H * 0.035);
+            ctx.moveTo(x1, y1); ctx.lineTo(x1 + L * Math.cos(ang + Math.PI - 0.5), y1 + L * Math.sin(ang + Math.PI - 0.5));
+            ctx.moveTo(x1, y1); ctx.lineTo(x1 + L * Math.cos(ang + Math.PI + 0.5), y1 + L * Math.sin(ang + Math.PI + 0.5));
+          }
+        }
+        else if (p.length === 1) { ctx.moveTo(x0, y0); ctx.lineTo(x0 + 0.01, y0); }
+        else {
+          ctx.moveTo(x0, y0);
+          for (var i = 1; i < p.length - 1; i++) ctx.quadraticCurveTo(p[i][0] * W, p[i][1] * H, (p[i][0] + p[i + 1][0]) / 2 * W, (p[i][1] + p[i + 1][1]) / 2 * H);
+          ctx.lineTo(x1, y1);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+  return { RELAY: RELAY, ICE: ICE, rnd: rnd, norm: norm, pub: pub, sub: sub, iceBatch: iceBatch, prune: prune, draw: draw };
+})();
+
+  /* ---------- Lavagna: dal tablet si disegna sopra il video (anche sulla TV / secondo schermo) ---------- */
+  (function () {
+    var btn = $('t-lav'), panel = $('lav-panel'); if (!btn || !panel) return;
+    var code = '', es = null, pc = null, dc = null, sid = '', offer = null, iceOut = [], pend = [], haveRemote = false;
+    var listening = false, connected = false, S = [], prevOn = true, cop = true, lastQ = '', stIv = null, frIv = null, paintIv = null, dropT = null;
+    var mcv = null, pcv = null, fc = document.createElement('canvas'), vtx = null, live = false, curTrack = null, capStream = null, trIv = null;
+    function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) {} return null; }
+    function setState(t, ok) { var s = $('lav-state'); s.textContent = t; s.className = ok ? 'ok' : ''; }
+    function refresh() {
+      btn.setAttribute('aria-pressed', listening ? 'true' : 'false'); btn.classList.toggle('on', listening);
+      var tx = btn.lastChild; if (tx && tx.nodeType === 3) tx.nodeValue = connected ? ' Lavagna tablet ●' : ' Lavagna tablet';
+    }
+    function tabUrl() { try { var l = window.top.location; if (/^https?:$/.test(l.protocol)) return l.origin + l.pathname.replace(/[^\/]*$/, '') + 'lavagna.html'; } catch (e) {} return ''; }
+    function showPanel() {
+      $('lav-code').textContent = code;
+      var u = tabUrl(); $('lav-link').textContent = u ? u : 'la pagina «lavagna.html» (il link che ti ho dato)';
+      panel.hidden = false;
+    }
+    function send(o) { try { if (dc && dc.readyState === 'open') dc.send(JSON.stringify(o)); } catch (e) {} }
+
+    /* ----- disegno sopra il video ----- */
+    function ensureMain() {
+      var wrap = vid.parentNode; if (!wrap) return null;
+      if (!mcv || mcv.parentNode !== wrap) { mcv = document.createElement('canvas'); mcv.id = 'lav-main'; mcv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2'; wrap.appendChild(mcv); }
+      return mcv;
+    }
+    function ensurePopup() {
+      var w = window.__proiezione && window.__proiezione.finestra(); if (!w || w.closed) { pcv = null; return null; }
+      try {
+        var d = w.document; if (!d.body) return null;
+        var c = d.getElementById('lav-pop');
+        if (!c) { c = d.createElement('canvas'); c.id = 'lav-pop'; c.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:5'; d.body.appendChild(c); }
+        pcv = c; return c;
+      } catch (e) { return null; }
+    }
+    function paintOn(c, cw, ch, dpr, v) {
+      if (!c || cw < 2 || ch < 2) return;
+      var vw = (v && v.videoWidth) || 16, vh = (v && v.videoHeight) || 9, sc = Math.min(cw / vw, ch / vh), W = vw * sc, H = vh * sc;
+      var bw = Math.round(cw * dpr), bh = Math.round(ch * dpr); if (c.width !== bw) c.width = bw; if (c.height !== bh) c.height = bh;
+      var x = c.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, bw, bh);
+      if (!S.length) return;
+      x.setTransform(dpr, 0, 0, dpr, (cw - W) / 2 * dpr, (ch - H) / 2 * dpr);
+      LAV.draw(x, W, H, S, Date.now());
+    }
+    function paint() {
+      LAV.prune(S, Date.now());
+      var m = ensureMain(); if (m) paintOn(m, m.clientWidth, m.clientHeight, window.devicePixelRatio || 1, vid);
+      var p = ensurePopup();
+      if (p) { var w = p.ownerDocument.defaultView, pv = p.ownerDocument.getElementById('v'); paintOn(p, w.innerWidth, w.innerHeight, w.devicePixelRatio || 1, pv && pv.videoWidth ? pv : vid); }
+    }
+    var needPaint = false;
+    function startPaint() { if (!paintIv) paintIv = setInterval(function () { if (S.length || needPaint) { paint(); needPaint = !!S.length; } }, 40); }
+    function dirty() { startPaint(); needPaint = true; paint(); }
+
+    /* ----- dati dal tablet ----- */
+    function findS(id) { for (var i = 0; i < S.length; i++) if (S[i].id === id) return S[i]; return null; }
+    function onData(e) {
+      var m; try { m = JSON.parse(e.data); } catch (x) { return; }
+      if (m.t === 'p') {
+        var s = findS(m.id); if (!s) { s = { id: m.id, tool: m.tool, c: m.c, w: m.w, f: m.f, pts: [], end: 0 }; S.push(s); }
+        s.pts = m.set ? m.pts : s.pts.concat(m.pts); dirty();
+      } else if (m.t === 'e') { var s2 = findS(m.id); if (s2) s2.end = Date.now(); }
+      else if (m.t === 'u') { var s3 = findS(m.id); if (s3) { S.splice(S.indexOf(s3), 1); dirty(); } }
+      else if (m.t === 'x') { S = []; dirty(); }
+      else if (m.t === 'prev') { prevOn = !!m.on; if (curTrack) curTrack.enabled = prevOn; if (prevOn) sendFrame(); }
+      else if (m.t === 'live') { live = !!m.ok; }
+      else if (m.t === 'pg') { send({ t: 'pn', ts: m.ts }); }
+      else if (m.t === 'cfg') { cop = !!m.cop; }
+      else if (m.t === 'cmd') {
+        if (m.a === 'play') togglePlay();
+        else if (m.a === 'seek') { var d = parseFloat(m.d) || 0; try { vid.currentTime = Math.max(0, Math.min(vid.duration || 1e9, vid.currentTime + d)); } catch (x2) {} }
+        else if (m.a === 'prev') { var b1 = $('b-prev'); if (b1) b1.click(); }
+        else if (m.a === 'next') { var b2 = $('b-next'); if (b2) b2.click(); }
+      }
+    }
+    function sendState() {
+      var q = $('qpos'), qt = q ? q.textContent : '';
+      send({ t: 'st', p: vid.paused, ct: vid.currentTime || 0, du: isFinite(vid.duration) ? vid.duration : 0, ar: vid.videoWidth ? vid.videoWidth / vid.videoHeight : 0, q: qt, v: !!vid.getAttribute('src') });
+      if (qt !== lastQ) { lastQ = qt; if (S.length) { S = []; send({ t: 'clr' }); dirty(); } }   /* nuova azione: via i vecchi segni */
+    }
+    function sendFrame() {
+      if (live || !prevOn || !dc || dc.readyState !== 'open' || !vid.videoWidth || dc.bufferedAmount > 200000) return;
+      var W = 960, H = Math.max(2, Math.round(W * vid.videoHeight / vid.videoWidth)); fc.width = W; fc.height = H;
+      try { fc.getContext('2d').drawImage(vid, 0, 0, W, H); } catch (e) { return; }
+      fc.toBlob(function (b) {
+        if (!b || !dc || dc.readyState !== 'open') return;
+        var r = new FileReader(); r.onload = function () {
+          var d = String(r.result).split(',')[1] || '', id = LAV.rnd(5), n = Math.ceil(d.length / 12000);
+          for (var i = 0; i < n; i++) send({ t: 'f', id: id, i: i, n: n, d: d.substr(i * 12000, 12000) });
+        }; r.readAsDataURL(b);
+      }, 'image/jpeg', 0.7);
+    }
+    ['pause', 'seeked', 'loadeddata'].forEach(function (ev) { vid.addEventListener(ev, function () { if (connected) setTimeout(sendFrame, 150); }); });
+    vid.addEventListener('play', function () { if (!connected) return; if (cop && S.length) { S = []; send({ t: 'clr' }); dirty(); } });
+
+    /* ----- video in diretta verso il tablet (se non arriva, ripiego sulle immagini fisse) ----- */
+    function tune() {
+      try {
+        var sd = vtx.sender, p = sd.getParameters(); if (!p.encodings || !p.encodings.length) p.encodings = [{}];
+        p.encodings[0].maxBitrate = 3000000; p.encodings[0].maxFramerate = 30;
+        var vw = vid.videoWidth || 1280; if (vw > 1280) p.encodings[0].scaleResolutionDownBy = vw / 1280;
+        sd.setParameters(p).catch(function () {});
+      } catch (e) {}
+    }
+    function pickTrack() {
+      if (!vtx || !vtx.sender) return;
+      try {
+        if (!capStream || (curTrack && curTrack.readyState === 'ended')) {
+          capStream = vid.captureStream ? vid.captureStream() : (vid.mozCaptureStream ? vid.mozCaptureStream() : null); curTrack = null;
+          if (capStream) capStream.onaddtrack = pickTrack;
+        }
+        var t = capStream && capStream.getVideoTracks()[0];
+        if (t && t !== curTrack) { curTrack = t; t.enabled = prevOn; vtx.sender.replaceTrack(t).then(tune).catch(function () {}); }
+      } catch (e) {}
+    }
+    vid.addEventListener('loadeddata', function () { if (connected) setTimeout(pickTrack, 200); });
+
+    /* ----- collegamento ----- */
+    function closePeer() {
+      clearTimeout(dropT);
+      try { if (dc) { dc.onclose = null; dc.close(); } } catch (e) {} try { if (pc) { pc.onconnectionstatechange = null; pc.close(); } } catch (e) {}
+      pc = null; dc = null; offer = null; iceOut = []; pend = []; haveRemote = false;
+      vtx = null; curTrack = null; capStream = null; live = false; clearInterval(trIv);
+      if (connected) { connected = false; clearInterval(stIv); clearInterval(frIv); refresh(); }
+    }
+    function addIce(c) { try { var p = pc.addIceCandidate(c); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+    function resend() { if (offer) LAV.pub(code, 'tb', offer); iceOut.forEach(function (b) { LAV.pub(code, 'tb', { t: 'ice', sid: sid, c: b }); }); }
+    function onOpen() {
+      connected = true; setState('Tablet collegato ✓', true); refresh(); toast('Tablet collegato: puoi disegnare sopra il video.');
+      clearInterval(stIv); clearInterval(frIv);
+      clearInterval(trIv); trIv = setInterval(pickTrack, 1000); pickTrack();
+      stIv = setInterval(sendState, 500); frIv = setInterval(function () { if (!vid.paused) sendFrame(); }, 1000);
+      sendState(); setTimeout(sendFrame, 200); startPaint();
+    }
+    function onClose() { if (!connected) return; closePeer(); setState('Tablet scollegato. In attesa…'); }
+    function negotiate(s) {
+      closePeer(); sid = s;
+      pc = new RTCPeerConnection({ iceServers: LAV.ICE });
+      var sendIce = LAV.iceBatch(function (b) { iceOut.push(b); LAV.pub(code, 'tb', { t: 'ice', sid: sid, c: b }); });
+      pc.onicecandidate = function (e) { sendIce(e.candidate); };
+      pc.onconnectionstatechange = function () {
+        var st = pc && pc.connectionState;
+        if (st === 'failed' || st === 'closed') onClose();
+        else if (st === 'disconnected') { clearTimeout(dropT); dropT = setTimeout(function () { if (pc && pc.connectionState !== 'connected') onClose(); }, 5000); }
+        else if (st === 'connected') clearTimeout(dropT);
+      };
+      try { vtx = pc.addTransceiver('video', { direction: 'sendonly' }); } catch (e) { vtx = null; }
+      dc = pc.createDataChannel('lav'); dc.onopen = onOpen; dc.onclose = onClose; dc.onmessage = onData;
+      var mine = pc;
+      pc.createOffer().then(function (o) { return mine.setLocalDescription(o).then(function () { offer = { t: 'offer', sid: sid, sdp: o.sdp }; LAV.pub(code, 'tb', offer); }); }).catch(function () {});
+      setState('Il tablet si sta collegando…');
+    }
+    function onMsg(m) {
+      if (!m) return;
+      if (m.t === 'join') { if (m.sid === sid && pc) { resend(); return; } negotiate(m.sid); return; }
+      if (m.sid !== sid || !pc) return;
+      if (m.t === 'answer') {
+        if (pc.signalingState !== 'have-local-offer') return;
+        pc.setRemoteDescription({ type: 'answer', sdp: m.sdp }).then(function () { haveRemote = true; pend.splice(0).forEach(addIce); }).catch(function () {});
+      } else if (m.t === 'ice') {
+        (m.c || []).forEach(function (c) { if (haveRemote) addIce(c); else pend.push(c); });
+      }
+    }
+    function listen() {
+      if (listening) return;
+      if (!window.RTCPeerConnection || !window.EventSource) { setState('Questo browser non supporta il collegamento. Usa Chrome o Edge.'); return; }
+      listening = true; setState('In attesa del tablet…');
+      es = LAV.sub(code, 'pc', onMsg, function () { if (!connected) setState('Non riesco a raggiungere il servizio di collegamento: serve internet (va bene anche l’hotspot del telefono).'); });
+      refresh(); startPaint();
+    }
+    function stopAll() {
+      listening = false; try { if (es) es.close(); } catch (e) {} es = null; closePeer(); S = []; paint();
+      clearInterval(paintIv); paintIv = null; setState('Lavagna spenta.'); refresh();
+      try { if (mcv && mcv.parentNode) mcv.parentNode.removeChild(mcv); } catch (e) {} mcv = null;
+      try { if (pcv && pcv.parentNode) pcv.parentNode.removeChild(pcv); } catch (e) {} pcv = null;
+    }
+    function newCode() { code = LAV.rnd(6, 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'); store('lav_code', code); }
+    btn.addEventListener('click', function () {
+      if (!code) { code = (store('lav_code') || '').toUpperCase(); if (code.length < 6) newCode(); }
+      if (listening && !panel.hidden) { panel.hidden = true; return; }
+      showPanel(); listen();
+    });
+    $('lav-close').addEventListener('click', function () { panel.hidden = true; });
+    $('lav-stop').addEventListener('click', function () { stopAll(); panel.hidden = true; toast('Lavagna spenta.'); });
+    $('lav-new').addEventListener('click', function () { var was = listening; if (was) stopAll(); newCode(); showPanel(); if (was) listen(); });
+    window.addEventListener('beforeunload', function () { try { if (dc) dc.close(); } catch (e) {} });
+    window.__lavagna = { stato: function () { return { ascolto: listening, collegato: connected, segni: S.length, codice: code }; }, segni: function () { return S; } };
+  })();
+/*@@LAVAGNA-FINE@@*/
   function setPlayLabel() {
     var b = $('b-play');
     if (!vid.paused && !vid.ended) b.textContent = '❚❚ Pausa';
@@ -4300,6 +4634,84 @@ var FastMon = (function () {
     e.M.contacts.forEach(function (c) { c.mod = ol ? (ol[c.ln] !== nl[c.ln]) : false; });
   }
   function origCode(c) { return c.e.orig ? (c.e.orig.split(/\r?\n/)[c.ln] || '').split(';')[0] : c.code; }
+
+  /* ---------- esporta scout: tutti insieme o di una squadra (ZIP o cartella SCOUT) ---------- */
+  var CRCT = null;
+  function crc32(u8) {
+    if (!CRCT) { CRCT = []; for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; CRCT[n] = c >>> 0; } }
+    var r = 0xFFFFFFFF; for (var i = 0; i < u8.length; i++) r = CRCT[(r ^ u8[i]) & 255] ^ (r >>> 8); return (r ^ 0xFFFFFFFF) >>> 0;
+  }
+  function makeZip(files) {
+    var enc = new TextEncoder(), parts = [], cen = [], off = 0, d = new Date();
+    var dt = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)) & 0xFFFF, dd = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate()) & 0xFFFF;
+    function u16(v) { return [v & 255, (v >> 8) & 255]; } function u32(v) { return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; }
+    files.forEach(function (f) {
+      var nm = enc.encode(f.name), data = f.bytes, crc = crc32(data);
+      var h = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(dt), u16(dd), u32(crc), u32(data.length), u32(data.length), u16(nm.length), u16(0));
+      parts.push(new Uint8Array(h), nm, data);
+      cen.push([].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(dt), u16(dd), u32(crc), u32(data.length), u32(data.length), u16(nm.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(off)), Array.prototype.slice.call(nm));
+      off += h.length + nm.length + data.length;
+    });
+    var cs = 0, cp = []; cen.forEach(function (c) { cp.push(new Uint8Array(c)); cs += c.length; });
+    var end = new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(cs), u32(off), u16(0)));
+    return new Blob(parts.concat(cp, [end]), { type: 'application/zip' });
+  }
+  function expList() {
+    var t = $('exp-team').value;
+    return LIB.filter(function (e) { return !e.sample && !e.synth && (!t || e.M.teams[0].code === t || e.M.teams[1].code === t); });
+  }
+  function expFiles() {
+    var used = {};
+    return expList().map(function (e) {
+      var nm = e.name.replace(/[\\/:*?"<>|]+/g, '_'); if (!/\.dvw$/i.test(nm)) nm += '.dvw';
+      var base = nm, k = 1; while (used[nm.toLowerCase()]) nm = base.replace(/\.dvw$/i, '') + '_' + (++k) + '.dvw';
+      used[nm.toLowerCase()] = 1;
+      return { name: nm, bytes: encodeDvw(e.text, e.enc || 'utf8', e.bom) };
+    });
+  }
+  function expSum() {
+    var n = expList().length;
+    $('exp-sum').textContent = n ? n + (n === 1 ? ' scout' : ' scout') + ' da esportare.' : 'Nessuno scout da esportare.';
+    $('exp-zip').disabled = $('exp-dir').disabled = !n;
+    $('exp-dir').hidden = !window.showDirectoryPicker;
+  }
+  function openExport() {
+    if (!LIB.some(function (e) { return !e.sample && !e.synth; })) { toast('Non ci sono scout da esportare.'); return; }
+    var teams = {}; LIB.forEach(function (e) { if (e.sample || e.synth) return; e.M.teams.forEach(function (t) { teams[t.code] = t.name; }); });
+    var names = Object.keys(teams).sort(function (a, b) { return teams[a].localeCompare(teams[b]); });
+    $('exp-team').innerHTML = '<option value="">Tutte le partite</option>' + names.map(function (n) { return '<option value="' + esc(n) + '">Solo ' + esc(teams[n]) + ' (' + esc(n) + ')</option>'; }).join('');
+    if (F.team && teams[F.team]) $('exp-team').value = F.team;
+    expSum(); $('dlg-exp').hidden = false;
+  }
+  $('lib-exp').addEventListener('click', openExport);
+  $('exp-close').addEventListener('click', function () { $('dlg-exp').hidden = true; });
+  $('dlg-exp').addEventListener('click', function (ev) { if (ev.target === $('dlg-exp')) $('dlg-exp').hidden = true; });
+  $('exp-team').addEventListener('change', expSum);
+  $('exp-zip').addEventListener('click', function () {
+    var fl = expFiles(); if (!fl.length) return;
+    var t = $('exp-team').value, nm = 'scout_' + (t || 'tutte') + '_' + new Date().toISOString().slice(0, 10) + '.zip';
+    saveBlob(nm, makeZip(fl)); $('dlg-exp').hidden = true;
+    toast(fl.length + ' scout esportati in ' + nm + '.');
+  });
+  $('exp-dir').addEventListener('click', async function () {
+    var fl = expFiles(); if (!fl.length) return;
+    try {
+      if (!savedDir) { savedDir = await window.showDirectoryPicker({ mode: 'readwrite' }); saveDirHandle(savedDir); refreshDir(); }
+      else if ((await savedDir.requestPermission({ mode: 'readwrite' })) !== 'granted') throw new Error('permesso');
+      var sd = await savedDir.getDirectoryHandle('SCOUT', { create: true }), pr = null;
+      for (var i = 0; i < fl.length; i++) {
+        var old = null; try { old = await (await sd.getFileHandle(fl[i].name)).getFile(); } catch (x) {}
+        if (old) {
+          pr = pr || await sd.getDirectoryHandle('_prima', { create: true });
+          var has = false; try { await pr.getFileHandle(fl[i].name); has = true; } catch (x) {}
+          if (!has) { var w0 = await (await pr.getFileHandle(fl[i].name, { create: true })).createWritable(); await w0.write(await old.arrayBuffer()); await w0.close(); }
+        }
+        var w = await (await sd.getFileHandle(fl[i].name, { create: true })).createWritable(); await w.write(fl[i].bytes); await w.close();
+      }
+      $('dlg-exp').hidden = true;
+      toast(fl.length + ' scout salvati in ' + savedDir.name + '/SCOUT. La versione precedente è in SCOUT/_prima.');
+    } catch (x) { if (!x || x.name !== 'AbortError') toast('Non riesco a scrivere nella cartella: usa «Scarica ZIP».'); }
+  });
   function exportScout(e) {
     if (!e) return;
     var bytes = encodeDvw(e.text, e.enc || 'utf8', e.bom);
