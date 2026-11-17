@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lavagna"><meta name="theme-color" content="#0F1D24">
+<title>Lavagna tablet — Data Mampro’s Volley</title>
+<style>
+:root{--bg:#0F1D24;--panel:#162830;--line:#2A4450;--fg:#EAF2F4;--muted:#9DB6BC;--acc:#3DB8C4;--gold:#E3B04B}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:16px system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;touch-action:none}
+[hidden]{display:none!important}
+button{font:inherit;color:var(--fg);background:#1F3944;border:1px solid var(--line);border-radius:12px;min-height:50px;padding:6px 10px;touch-action:manipulation;cursor:pointer}
+button:active{filter:brightness(1.25)}
+button.on{background:var(--acc);border-color:var(--acc);color:#06161A;font-weight:700}
+#gate{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+.logo{width:96px;height:96px}
+h1{margin:0;font-size:28px;letter-spacing:.2px}
+.sub,#gate small{color:var(--muted);max-width:420px;line-height:1.4;margin:0}
+#code{font:700 36px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3em;text-transform:uppercase;text-align:center;width:min(360px,90vw);padding:12px 6px 12px 16px;border-radius:14px;border:2px solid var(--line);background:#0B161C;color:var(--fg);-webkit-user-select:text;user-select:text;touch-action:auto}
+#code:focus{outline:none;border-color:var(--acc)}
+.big{min-width:220px;min-height:58px;font-size:20px;font-weight:700;background:var(--acc);border-color:var(--acc);color:#06161A}
+#gstate{min-height:24px;color:var(--gold);font-weight:600}
+#gate .by{margin-top:8px;font-size:13px}
+#app{height:100%;display:flex}
+#padwrap{flex:1;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px}
+#pad{position:relative;background:#050A0D;border:2px solid var(--line);border-radius:6px;overflow:hidden}
+#pad img,#pad canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#bg{object-fit:fill;opacity:.92}
+#cv{touch-action:none;cursor:crosshair}
+#novid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#52707A;font-size:18px;pointer-events:none}
+#tools{width:236px;flex:none;background:var(--panel);border-left:1px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:9px;overflow-y:auto;touch-action:pan-y}
+.grp{display:flex;gap:6px}.grp>button{flex:1;padding:6px 4px;min-width:0}
+#stat{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+#dot{width:11px;height:11px;border-radius:50%;background:#34C759;flex:none}
+#tm{margin-left:auto;font-variant-numeric:tabular-nums}
+.sw{padding:0!important;min-height:44px}
+.sw i{display:block;width:26px;height:26px;border-radius:50%;margin:auto;border:2px solid rgba(255,255,255,.5)}
+.sw.on{outline:3px solid var(--acc);outline-offset:1px;background:#1F3944;color:inherit}
+.wd i{background:#EAF2F4;border:0}
+.small{font-size:14px;min-height:44px}
+#lost{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#8A2A1E;color:#fff;padding:10px 18px;border-radius:12px;font-weight:600;z-index:9}
+@media (orientation:portrait){
+  #app{flex-direction:column}
+  #tools{width:auto;border-left:0;border-top:1px solid var(--line);flex-direction:row;flex-wrap:wrap;max-height:42vh}
+  #tools>*{flex:1 1 220px}
+}
+</style></head><body>
+<div id="gate">
+  <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128"><title>Data Mampro's Volley - Emblema</title><defs></defs><circle cx="64" cy="64" r="62" fill="#0B2230"/><circle cx="64" cy="64" r="58.5" fill="none" stroke="#E3B04B" stroke-width="2.2"/><circle cx="64" cy="64" r="54" fill="none" stroke="#1B5568" stroke-width="1.2"/><g fill="#E3B04B"><ellipse cx="51.2" cy="104.2" rx="8" ry="3.1" transform="rotate(-16.0 51.2 104.2)"/><ellipse cx="48.9" cy="109.9" rx="8" ry="3.1" transform="rotate(60.0 48.9 109.9)"/><ellipse cx="39.1" cy="98.4" rx="8" ry="3.1" transform="rotate(1.5 39.1 98.4)"/><ellipse cx="35.2" cy="103.1" rx="8" ry="3.1" transform="rotate(77.5 35.2 103.1)"/><ellipse cx="29.3" cy="89.2" rx="8" ry="3.1" transform="rotate(19.0 29.3 89.2)"/><ellipse cx="24.1" cy="92.6" rx="8" ry="3.1" transform="rotate(95.0 24.1 92.6)"/><ellipse cx="22.7" cy="77.5" rx="8" ry="3.1" transform="rotate(36.5 22.7 77.5)"/><ellipse cx="16.8" cy="79.2" rx="8" ry="3.1" transform="rotate(112.5 16.8 79.2)"/><ellipse cx="20.0" cy="64.4" rx="8" ry="3.1" transform="rotate(54.0 20.0 64.4)"/><ellipse cx="13.8" cy="64.2" rx="8" ry="3.1" transform="rotate(130.0 13.8 64.2)"/><ellipse cx="21.3" cy="51.1" rx="8" ry="3.1" transform="rotate(71.5 21.3 51.1)"/><ellipse cx="15.5" cy="49.0" rx="8" ry="3.1" transform="rotate(147.5 15.5 49.0)"/><ellipse cx="26.6" cy="38.7" rx="8" ry="3.1" transform="rotate(89.0 26.6 38.7)"/><ellipse cx="21.6" cy="35.0" rx="8" ry="3.1" transform="rotate(165.0 21.6 35.0)"/><ellipse cx="35.3" cy="28.5" rx="8" ry="3.1" transform="rotate(106.5 35.3 28.5)"/><ellipse cx="31.7" cy="23.5" rx="8" ry="3.1" transform="rotate(182.5 31.7 23.5)"/></g><g transform="translate(128 0) scale(-1 1)" fill="#E3B04B"><ellipse cx="51.2" cy="104.2" rx="8" ry="3.1" transform="rotate(-16.0 51.2 104.2)"/><ellipse cx="48.9" cy="109.9" rx="8" ry="3.1" transform="rotate(60.0 48.9 109.9)"/><ellipse cx="39.1" cy="98.4" rx="8" ry="3.1" transform="rotate(1.5 39.1 98.4)"/><ellipse cx="35.2" cy="103.1" rx="8" ry="3.1" transform="rotate(77.5 35.2 103.1)"/><ellipse cx="29.3" cy="89.2" rx="8" ry="3.1" transform="rotate(19.0 29.3 89.2)"/><ellipse cx="24.1" cy="92.6" rx="8" ry="3.1" transform="rotate(95.0 24.1 92.6)"/><ellipse cx="22.7" cy="77.5" rx="8" ry="3.1" transform="rotate(36.5 22.7 77.5)"/><ellipse cx="16.8" cy="79.2" rx="8" ry="3.1" transform="rotate(112.5 16.8 79.2)"/><ellipse cx="20.0" cy="64.4" rx="8" ry="3.1" transform="rotate(54.0 20.0 64.4)"/><ellipse cx="13.8" cy="64.2" rx="8" ry="3.1" transform="rotate(130.0 13.8 64.2)"/><ellipse cx="21.3" cy="51.1" rx="8" ry="3.1" transform="rotate(71.5 21.3 51.1)"/><ellipse cx="15.5" cy="49.0" rx="8" ry="3.1" transform="rotate(147.5 15.5 49.0)"/><ellipse cx="26.6" cy="38.7" rx="8" ry="3.1" transform="rotate(89.0 26.6 38.7)"/><ellipse cx="21.6" cy="35.0" rx="8" ry="3.1" transform="rotate(165.0 21.6 35.0)"/><ellipse cx="35.3" cy="28.5" rx="8" ry="3.1" transform="rotate(106.5 35.3 28.5)"/><ellipse cx="31.7" cy="23.5" rx="8" ry="3.1" transform="rotate(182.5 31.7 23.5)"/></g><path d="M64.0 10.5 L65.6 14.8 L70.2 15.0 L66.6 17.8 L67.8 22.3 L64.0 19.7 L60.2 22.3 L61.4 17.8 L57.8 15.0 L62.4 14.8Z" fill="#E3B04B"/><g transform="translate(64 55) rotate(0) scale(0.66)"><defs><clipPath id="bc1G"><circle r="50"/></clipPath></defs><circle r="50" fill="#F6F1E3"/><g clip-path="url(#bc1G)" fill="none"><path d="M-70 -2Q0 -52 70 -2" transform="rotate(0)" stroke="#E3B04B" stroke-width="15.666666666666668"/><path d="M-70 -2Q0 -52 70 -2" transform="rotate(120)" stroke="#E3B04B" stroke-width="15.666666666666668"/><path d="M-70 -2Q0 -52 70 -2" transform="rotate(240)" stroke="#E3B04B" stroke-width="15.666666666666668"/><path d="M-70 -2Q0 -52 70 -2" transform="rotate(0)" stroke="#0A6F7A" stroke-width="9"/><path d="M-70 -2Q0 -52 70 -2" transform="rotate(120)" stroke="#0A6F7A" stroke-width="9"/><path d="M-70 -2Q0 -52 70 -2" transform="rotate(240)" stroke="#0A6F7A" stroke-width="9"/></g><circle r="50" fill="none" stroke="#E3B04B" stroke-width="3.3333333333333335"/></g><path d="M26 92H102L96 100L102 108H26L32 100Z" fill="#E3B04B"/><g fill="none" stroke="#0B2230" stroke-width="2.8" stroke-linecap="butt" stroke-linejoin="miter"><path d="M54.5 106L58.75 97L63.0 106M56.2 102.76H61.3"/><path d="M65.4 106V97L69.65 102.22L73.9 97V106"/></g></svg>
+  <h1>Lavagna tattica</h1>
+  <p class="sub">Disegni qui e i segni compaiono sopra il video che si vede sulla TV.</p>
+  <input id="code" maxlength="8" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="CODICE" inputmode="text">
+  <button id="go" class="big" type="button">Collega</button>
+  <div id="gstate" role="status"></div>
+  <small>Il codice è sul PC, nel Reader video: premi «Lavagna tablet».</small>
+  <small class="by">Data Mampro’s Volley · Creato da Alessandro Mamprin</small>
+</div>
+<div id="app" hidden>
+  <div id="padwrap"><div id="pad"><img id="bg" alt=""><div id="novid">Nessun video</div><canvas id="cv"></canvas></div></div>
+  <aside id="tools">
+    <div id="stat"><span id="dot"></span><span id="stxt">Collegato</span><span id="tm"></span></div>
+    <div class="grp"><button data-tool="pen" class="on" type="button">Penna</button><button data-tool="hl" type="button">Evid.</button></div>
+    <div class="grp"><button data-tool="arrow" type="button">Freccia</button><button data-tool="circle" type="button">Cerchio</button></div>
+    <div class="grp" id="g-col">
+      <button class="sw on" data-c="#FF3B30" type="button" aria-label="Rosso"><i style="background:#FF3B30"></i></button>
+      <button class="sw" data-c="#FFD60A" type="button" aria-label="Giallo"><i style="background:#FFD60A"></i></button>
+      <button class="sw" data-c="#FFFFFF" type="button" aria-label="Bianco"><i style="background:#FFFFFF"></i></button>
+      <button class="sw" data-c="#34C759" type="button" aria-label="Verde"><i style="background:#34C759"></i></button>
+      <button class="sw" data-c="#0A84FF" type="button" aria-label="Blu"><i style="background:#0A84FF"></i></button>
+    </div>
+    <div class="grp" id="g-w">
+      <button class="sw wd" data-w="0.004" type="button" aria-label="Sottile"><i style="width:8px;height:8px"></i></button>
+      <button class="sw wd on" data-w="0.008" type="button" aria-label="Medio"><i style="width:14px;height:14px"></i></button>
+      <button class="sw wd" data-w="0.014" type="button" aria-label="Spesso"><i style="width:22px;height:22px"></i></button>
+    </div>
+    <div class="grp"><button id="undo" type="button">↶ Annulla</button><button id="clear" type="button">Cancella tutto</button></div>
+    <button id="fade" class="small" type="button">Sparisce da solo: no</button>
+    <button id="cop" class="small on" type="button">Cancella al play: sì</button>
+    <div class="grp"><button id="b-prev" type="button" aria-label="Azione precedente">⏮</button><button id="b-m5" type="button">−5s</button><button id="b-play" type="button" aria-label="Play o pausa">▶</button><button id="b-p5" type="button">+5s</button><button id="b-next" type="button" aria-label="Azione successiva">⏭</button></div>
+    <button id="prevb" class="small on" type="button">Anteprima video: sì</button>
+    <button id="exit" class="small" type="button">Scollega</button>
+  </aside>
+  <div id="lost" hidden>Collegamento perso… riprovo</div>
+</div>
+<script>
+/* ---- Lavagna: parti comuni a PC (Reader) e tablet ---- */
+var LAV = (function () {
+  var G = (typeof window !== 'undefined') ? window : {};
+  var RELAY = G.MV_RELAY || 'https://ntfy.sh';
+  var ICE = G.MV_ICE || [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }];
+  function rnd(n, al) { al = al || 'abcdefghjkmnpqrstuvwxyz23456789'; var s = ''; for (var i = 0; i < n; i++) s += al.charAt(Math.floor(Math.random() * al.length)); return s; }
+  function norm(code) { return String(code || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function topic(code, dir) { return 'mvlav-' + norm(code) + '-' + dir; }
+  /* Il servizio di abbinamento serve solo per i primi secondi (scambio dei "biglietti da visita" dei due apparecchi). Poi i segni viaggiano diretti tablet -> PC. */
+  function pub(code, dir, obj) { try { return fetch(RELAY + '/' + topic(code, dir), { method: 'POST', body: JSON.stringify(obj) }).catch(function () {}); } catch (e) {} }
+  function sub(code, dir, cb, onerr) {
+    var es = new EventSource(RELAY + '/' + topic(code, dir) + '/sse');
+    es.onmessage = function (e) { try { var m = JSON.parse(e.data); if (m && m.event === 'message') cb(JSON.parse(m.message)); } catch (x) {} };
+    es.onerror = function () { if (onerr) onerr(); };
+    return es;
+  }
+  function iceBatch(send) {
+    var q = [], t = null;
+    function flush() { t = null; var b = q.splice(0); if (b.length) send(b); }
+    return function (c) { if (c) q.push(c.toJSON ? c.toJSON() : c); if (!c) { clearTimeout(t); flush(); } else if (!t) t = setTimeout(flush, 250); };
+  }
+  function prune(strokes, now) { for (var i = strokes.length - 1; i >= 0; i--) { var s = strokes[i]; if (s.f && s.end && now - s.end >= s.f) strokes.splice(i, 1); } return strokes; }
+  /* Disegna i segni. Coordinate dei segni: da 0 a 1 rispetto al video. W,H = dimensione del video a schermo. */
+  function draw(ctx, W, H, strokes, now) {
+    for (var k = 0; k < strokes.length; k++) {
+      var s = strokes[k], p = s.pts; if (!p || !p.length) continue;
+      var a = 1;
+      if (s.f && s.end) { var age = now - s.end; if (age >= s.f) continue; if (age > s.f - 800) a = (s.f - age) / 800; }
+      var lw = Math.max(2, s.w * H), hl = s.tool === 'hl', wd = hl ? lw * 4.5 : lw;
+      var x0 = p[0][0] * W, y0 = p[0][1] * H, q = p[p.length - 1], x1 = q[0] * W, y1 = q[1] * H;
+      ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      for (var pass = hl ? 1 : 0; pass < 2; pass++) {
+        ctx.globalAlpha = hl ? a * 0.38 : (pass === 0 ? a * 0.5 : a);
+        ctx.strokeStyle = pass === 0 ? '#000' : s.c;
+        ctx.lineWidth = pass === 0 ? wd + Math.max(2, lw * 0.6) : wd;
+        ctx.beginPath();
+        if (s.tool === 'circle') { ctx.ellipse((x0 + x1) / 2, (y0 + y1) / 2, Math.max(1, Math.abs(x1 - x0) / 2), Math.max(1, Math.abs(y1 - y0) / 2), 0, 0, Math.PI * 2); }
+        else if (s.tool === 'line' || s.tool === 'arrow') {
+          ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
+          if (s.tool === 'arrow' && (x1 !== x0 || y1 !== y0)) {
+            var ang = Math.atan2(y1 - y0, x1 - x0), L = Math.max(wd * 4.5, H * 0.035);
+            ctx.moveTo(x1, y1); ctx.lineTo(x1 + L * Math.cos(ang + Math.PI - 0.5), y1 + L * Math.sin(ang + Math.PI - 0.5));
+            ctx.moveTo(x1, y1); ctx.lineTo(x1 + L * Math.cos(ang + Math.PI + 0.5), y1 + L * Math.sin(ang + Math.PI + 0.5));
+          }
+        }
+        else if (p.length === 1) { ctx.moveTo(x0, y0); ctx.lineTo(x0 + 0.01, y0); }
+        else {
+          ctx.moveTo(x0, y0);
+          for (var i = 1; i < p.length - 1; i++) ctx.quadraticCurveTo(p[i][0] * W, p[i][1] * H, (p[i][0] + p[i + 1][0]) / 2 * W, (p[i][1] + p[i + 1][1]) / 2 * H);
+          ctx.lineTo(x1, y1);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+  return { RELAY: RELAY, ICE: ICE, rnd: rnd, norm: norm, pub: pub, sub: sub, iceBatch: iceBatch, prune: prune, draw: draw };
+})();
+
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  var code = '', running = false, sid = '', es = null, pc = null, dc = null, connected = false, joinT = null, joinN = 0, lastRx = 0, dropT = null, wd = null;
+  var pend = [], haveRemote = false;
+  var strokes = [], cur = null, cfg = { tool: 'pen', c: '#FF3B30', w: 0.008, fade: 0, cop: true, prev: true }, ar = 16 / 9, penSeen = false, paused = true;
+  var cv = $('cv'), ctx = cv.getContext('2d'), pad = $('pad'), dpr = 1;
+
+  /* ---------- collegamento ---------- */
+  function gstate(t) { $('gstate').textContent = t || ''; }
+  function send(o) { try { if (dc && dc.readyState === 'open') dc.send(JSON.stringify(o)); } catch (e) {} }
+  function stopLink() {
+    clearTimeout(joinT); clearTimeout(dropT); try { if (es) es.close(); } catch (e) {} es = null;
+    try { if (dc) { dc.onclose = null; dc.close(); } } catch (e) {} try { if (pc) { pc.onconnectionstatechange = null; pc.close(); } } catch (e) {}
+    pc = null; dc = null; connected = false; haveRemote = false; pend = [];
+  }
+  function link() {
+    stopLink(); if (!running) return;
+    sid = LAV.rnd(8); joinN = 0;
+    es = LAV.sub(code, 'tb', onMsg, function () { if (!connected) gstate('Non riesco a raggiungere il servizio di collegamento. Serve internet (va bene anche l’hotspot del telefono).'); });
+    join();
+  }
+  function join() {
+    if (!running || connected) return;
+    LAV.pub(code, 'pc', { t: 'join', sid: sid });
+    if (joinN === 2) gstate('Cerco il PC… sul PC premi «Lavagna tablet» nel Reader.');
+    joinT = setTimeout(join, Math.min(15000, 3000 + (joinN++) * 2000));
+  }
+  function addIce(c) { try { var p = pc.addIceCandidate(c); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+  function onMsg(m) {
+    if (!m || m.sid !== sid || !running) return;
+    if (m.t === 'offer') {
+      if (pc) return;
+      clearTimeout(joinT); gstate('Trovato. Mi collego…');
+      pc = new RTCPeerConnection({ iceServers: LAV.ICE });
+      var sendIce = LAV.iceBatch(function (b) { LAV.pub(code, 'pc', { t: 'ice', sid: sid, c: b }); });
+      pc.onicecandidate = function (e) { sendIce(e.candidate); };
+      pc.ondatachannel = function (e) { dc = e.channel; dc.onopen = onOpen; dc.onmessage = onData; dc.onclose = onLost; if (dc.readyState === 'open') onOpen(); };
+      pc.onconnectionstatechange = function () {
+        var s = pc && pc.connectionState;
+        if (s === 'failed' || s === 'closed') onLost();
+        else if (s === 'disconnected') { clearTimeout(dropT); dropT = setTimeout(function () { if (pc && pc.connectionState !== 'connected') onLost(); }, 5000); }
+        else if (s === 'connected') clearTimeout(dropT);
+      };
+      pc.setRemoteDescription({ type: 'offer', sdp: m.sdp }).then(function () {
+        haveRemote = true; pend.splice(0).forEach(addIce);
+        return pc.createAnswer();
+      }).then(function (a) { return pc.setLocalDescription(a); }).then(function () {
+        LAV.pub(code, 'pc', { t: 'answer', sid: sid, sdp: pc.localDescription.sdp });
+      }).catch(function () { onLost(); });
+    } else if (m.t === 'ice') {
+      (m.c || []).forEach(function (c) { if (pc && haveRemote) addIce(c); else pend.push(c); });
+    }
+  }
+  function onOpen() {
+    if (connected) return;
+    connected = true; clearTimeout(joinT); clearTimeout(dropT); try { if (es) es.close(); } catch (e) {} es = null;
+    lastRx = Date.now(); gstate('');
+    $('gate').hidden = true; $('app').hidden = false; $('lost').hidden = true;
+    send({ t: 'prev', on: cfg.prev }); send({ t: 'cfg', cop: cfg.cop });
+    fit(); redraw();
+    try { if (navigator.wakeLock) navigator.wakeLock.request('screen').catch(function () {}); } catch (e) {}
+    clearInterval(wd); wd = setInterval(function () { if (connected && Date.now() - lastRx > 8000) onLost(); }, 2000);
+  }
+  function onLost() {
+    if (!running) return;
+    var was = connected; stopLink(); clearInterval(wd);
+    if (was) { $('lost').hidden = false; } else { gstate('Collegamento non riuscito, riprovo…'); }
+    setTimeout(function () { if (running) link(); }, 1000);
+  }
+  function start() {
+    code = LAV.norm($('code').value).toUpperCase();
+    if (code.length < 4) { gstate('Scrivi il codice che vedi sul PC.'); return; }
+    store.set('lav_code', code); running = true; gstate('Cerco il PC…'); link();
+  }
+  function exit() { running = false; stopLink(); clearInterval(wd); $('app').hidden = true; $('gate').hidden = false; gstate(''); strokes = []; }
+
+  /* ---------- dati dal PC ---------- */
+  var frames = {};
+  function fmt(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+  function onData(e) {
+    lastRx = Date.now(); var m; try { m = JSON.parse(e.data); } catch (x) { return; }
+    if (m.t === 'st') {
+      paused = !!m.p; $('b-play').textContent = paused ? '▶' : '❚❚';
+      $('tm').textContent = fmt(m.ct) + (m.du ? ' / ' + fmt(m.du) : '') + (m.q ? '  ·  ' + m.q : '');
+      $('novid').hidden = !!m.v;
+      if (m.ar && Math.abs(m.ar - ar) > 0.01) { ar = m.ar; fit(); redraw(); }
+    } else if (m.t === 'f') {
+      var f = frames[m.id] || (frames[m.id] = { n: m.n, got: 0, p: [] });
+      if (f.p[m.i] === undefined) { f.p[m.i] = m.d; f.got++; }
+      if (f.got === f.n) { $('bg').src = 'data:image/jpeg;base64,' + f.p.join(''); $('novid').hidden = true; frames = {}; }
+    } else if (m.t === 'clr') { strokes = []; redraw(); }
+  }
+
+  /* ---------- disegno ---------- */
+  function fit() {
+    var wrap = $('padwrap'), w = wrap.clientWidth - 20, h = wrap.clientHeight - 20; if (w < 50 || h < 50) return;
+    var pw = w, ph = w / ar; if (ph > h) { ph = h; pw = h * ar; }
+    pad.style.width = Math.floor(pw) + 'px'; pad.style.height = Math.floor(ph) + 'px';
+    dpr = window.devicePixelRatio || 1; cv.width = Math.round(pw * dpr); cv.height = Math.round(ph * dpr);
+  }
+  function redraw() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+    LAV.prune(strokes, Date.now()); LAV.draw(ctx, cv.width, cv.height, strokes, Date.now());
+  }
+  setInterval(function () { if (strokes.length) redraw(); }, 50);
+  window.addEventListener('resize', function () { fit(); redraw(); });
+  window.addEventListener('orientationchange', function () { setTimeout(function () { fit(); redraw(); }, 200); });
+  function pt(e) { var r = cv.getBoundingClientRect(); return [Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))]; }
+  var out = [], outT = null;
+  function flush() {
+    outT = null; if (!cur) { if (!out.length) return; }
+    var o = out.splice(0); o.forEach(function (m) { send(m); });
+  }
+  function queue(m) { out.push(m); if (!outT) outT = setTimeout(flush, 25); }
+  function msgOf(s, pts, set) { return { t: 'p', id: s.id, tool: s.tool, c: s.c, w: s.w, f: s.f, pts: pts, set: set }; }
+  var shape = function (t) { return t === 'arrow' || t === 'circle' || t === 'line'; };
+  cv.addEventListener('pointerdown', function (e) {
+    if (!connected || cur) return;
+    if (e.pointerType === 'pen') penSeen = true; else if (e.pointerType === 'touch' && penSeen) return;   /* con la matita, la mano appoggiata non disegna */
+    e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (x) {}
+    var p = pt(e); cur = { id: LAV.rnd(6), tool: cfg.tool, c: cfg.c, w: cfg.w, f: cfg.fade, pts: [p], end: 0, pid: e.pointerId };
+    strokes.push(cur); queue(msgOf(cur, shape(cur.tool) ? [p, p] : [p], shape(cur.tool))); redraw();
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (!cur || e.pointerId !== cur.pid) return; e.preventDefault();
+    var evs = (e.getCoalescedEvents && e.getCoalescedEvents().length) ? e.getCoalescedEvents() : [e], add = [];
+    evs.forEach(function (ev) { add.push(pt(ev)); });
+    if (shape(cur.tool)) { cur.pts = [cur.pts[0], add[add.length - 1]]; queue(msgOf(cur, cur.pts, true)); }
+    else { cur.pts = cur.pts.concat(add); queue(msgOf(cur, add, false)); }
+    redraw();
+  });
+  function up(e) {
+    if (!cur || e.pointerId !== cur.pid) return;
+    var s = cur; cur = null; s.end = Date.now(); flush(); send({ t: 'e', id: s.id }); redraw();
+  }
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+
+  /* ---------- pulsanti ---------- */
+  function pick(sel, attr, apply) {
+    var bs = document.querySelectorAll(sel);
+    Array.prototype.forEach.call(bs, function (b) { b.addEventListener('click', function () { Array.prototype.forEach.call(bs, function (x) { x.classList.remove('on'); }); b.classList.add('on'); apply(b.getAttribute(attr)); }); });
+  }
+  pick('[data-tool]', 'data-tool', function (v) { cfg.tool = v; });
+  pick('[data-c]', 'data-c', function (v) { cfg.c = v; });
+  pick('[data-w]', 'data-w', function (v) { cfg.w = parseFloat(v); });
+  $('undo').addEventListener('click', function () { var s = strokes.pop(); if (s) { send({ t: 'u', id: s.id }); redraw(); } });
+  $('clear').addEventListener('click', function () { strokes = []; send({ t: 'x' }); redraw(); });
+  var FADES = [0, 3000, 6000, 10000];
+  function fadeLabel() { $('fade').textContent = 'Sparisce da solo: ' + (cfg.fade ? (cfg.fade / 1000) + ' s' : 'no'); $('fade').classList.toggle('on', !!cfg.fade); }
+  $('fade').addEventListener('click', function () { cfg.fade = FADES[(FADES.indexOf(cfg.fade) + 1) % FADES.length]; store.set('lav_fade', String(cfg.fade)); fadeLabel(); });
+  function copLabel() { $('cop').textContent = 'Cancella al play: ' + (cfg.cop ? 'sì' : 'no'); $('cop').classList.toggle('on', cfg.cop); }
+  $('cop').addEventListener('click', function () { cfg.cop = !cfg.cop; store.set('lav_cop', cfg.cop ? '1' : '0'); copLabel(); send({ t: 'cfg', cop: cfg.cop }); });
+  $('prevb').addEventListener('click', function () { cfg.prev = !cfg.prev; $('prevb').textContent = 'Anteprima video: ' + (cfg.prev ? 'sì' : 'no'); $('prevb').classList.toggle('on', cfg.prev); if (!cfg.prev) $('bg').removeAttribute('src'); send({ t: 'prev', on: cfg.prev }); });
+  $('b-play').addEventListener('click', function () { send({ t: 'cmd', a: 'play' }); });
+  $('b-m5').addEventListener('click', function () { send({ t: 'cmd', a: 'seek', d: -5 }); });
+  $('b-p5').addEventListener('click', function () { send({ t: 'cmd', a: 'seek', d: 5 }); });
+  $('b-prev').addEventListener('click', function () { send({ t: 'cmd', a: 'prev' }); });
+  $('b-next').addEventListener('click', function () { send({ t: 'cmd', a: 'next' }); });
+  $('exit').addEventListener('click', exit);
+  $('go').addEventListener('click', start);
+  $('code').addEventListener('keydown', function (e) { if (e.key === 'Enter') start(); });
+  var f0 = parseInt(store.get('lav_fade') || '0', 10); cfg.fade = FADES.indexOf(f0) >= 0 ? f0 : 0; fadeLabel();
+  cfg.cop = store.get('lav_cop') !== '0'; copLabel();
+
+  /* codice: dal link (…/lavagna.html#CODICE) oppure l'ultimo usato */
+  var h = LAV.norm((location.hash || '').slice(1)).toUpperCase(), last = store.get('lav_code') || '';
+  $('code').value = h || last;
+  if (h) { try { history.replaceState(null, '', location.pathname); } catch (e) {} start(); }
+  window.__lav = { strokes: function () { return strokes; }, state: function () { return { connected: connected, running: running }; } };
+})();
+</script>
+</body></html>
