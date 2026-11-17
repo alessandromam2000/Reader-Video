@@ -93,136 +93,115 @@ body.bigmode #tools{display:none}
 var LAV = (function () {
   var G = (typeof window !== 'undefined') ? window : {};
   var RELAY = G.MV_RELAY || 'https://ntfy.sh';
+  var MQTT = G.MV_MQTT || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var ICE = G.MV_ICE || [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }];
+  var CH = 1800;                                   /* ntfy accetta messaggi fino a circa 4000 caratteri: i "biglietti" lunghi si spezzano in pezzi da circa 2000 */
+  var limited = false;                             /* ntfy ha risposto "limite raggiunto" */
   function rnd(n, al) { al = al || 'abcdefghjkmnpqrstuvwxyz23456789'; var s = ''; for (var i = 0; i < n; i++) s += al.charAt(Math.floor(Math.random() * al.length)); return s; }
   function norm(code) { return String(code || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
   function topic(code, dir) { return 'mvlav-' + norm(code) + '-' + dir; }
-  /* Il servizio di abbinamento serve solo per i primi secondi (scambio dei "biglietti da visita" dei due apparecchi). Poi i segni viaggiano diretti tablet -> PC. */
-  var self = {};
-  /* ---- Collegamento tra i due apparecchi: scambio dei "biglietti da visita" (pochi messaggi, solo all'inizio) ----
-     Passa da piu' servizi pubblici insieme (due di tipo MQTT e ntfy.sh): basta che ne funzioni uno. Poi i segni viaggiano diretti. */
-  var BROKERS = G.MV_MQTT || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
-  var USE_NTFY = G.MV_NTFY !== false;
-  var enc = new TextEncoder(), dec = new TextDecoder();
-  function utf(s) { var b = enc.encode(s); var o = new Uint8Array(b.length + 2); o[0] = b.length >> 8; o[1] = b.length & 255; o.set(b, 2); return o; }
-  function cat(a) { var n = 0, i; for (i = 0; i < a.length; i++) n += a[i].length; var o = new Uint8Array(n), p = 0; for (i = 0; i < a.length; i++) { o.set(a[i], p); p += a[i].length; } return o; }
-  function pkt(type, body) {
-    var n = body.length, h = [type];
-    do { var d = n % 128; n = Math.floor(n / 128); h.push(n > 0 ? d | 128 : d); } while (n > 0);
-    return cat([new Uint8Array(h), body]);
-  }
-  function Mq(url) {
-    var me = this; me.url = url; me.ws = null; me.ok = false; me.topics = {}; me.q = []; me.fail = 0; me.cid = 'mv' + rnd(12); me.buf = new Uint8Array(0); me.pi = 0; me.t = null; me.ping = null; me.rc = null;
-    me.open();
-  }
-  Mq.prototype.open = function () {
-    var me = this; clearTimeout(me.rc);
-    try { me.ws = new WebSocket(me.url, 'mqtt'); } catch (e) { me.down(); return; }
-    var ws = me.ws; ws.binaryType = 'arraybuffer'; me.buf = new Uint8Array(0);
-    ws.onopen = function () { ws.send(pkt(0x10, cat([utf('MQTT'), new Uint8Array([4, 2, 0, 30]), utf(me.cid)]))); };
-    ws.onmessage = function (e) { me.feed(new Uint8Array(e.data)); };
-    ws.onclose = ws.onerror = function () { if (me.ws === ws) me.down(); };
+
+  /* ---- piccolo client MQTT su WebSocket (servizi gratuiti, uno o più: ne basta uno che funzioni) ---- */
+  var TE = new TextEncoder(), TD = new TextDecoder();
+  function vlen(n) { var o = []; do { var b = n % 128; n = Math.floor(n / 128); if (n > 0) b |= 128; o.push(b); } while (n > 0); return o; }
+  function ustr(s) { var b = TE.encode(s); var o = new Uint8Array(2 + b.length); o[0] = b.length >> 8; o[1] = b.length & 255; o.set(b, 2); return o; }
+  function cat(parts) { var n = 0, i; for (i = 0; i < parts.length; i++) n += parts[i].length; var o = new Uint8Array(n), p = 0; for (i = 0; i < parts.length; i++) { o.set(parts[i], p); p += parts[i].length; } return o; }
+  function pkt(type, body) { return cat([new Uint8Array([type].concat(vlen(body.length))), body]); }
+  function Mq(url) { this.url = url; this.ws = null; this.open = false; this.subs = {}; this.q = []; this.tries = 0; this.dead = false; this.buf = new Uint8Array(0); this.pingT = null; this.pid = 1; this.connect(); }
+  Mq.prototype.connect = function () {
+    var me = this; if (me.dead) return;
+    var ws; try { ws = new WebSocket(me.url, 'mqtt'); } catch (e) { me.fail(); return; }
+    ws.binaryType = 'arraybuffer'; me.ws = ws; me.buf = new Uint8Array(0);
+    ws.onopen = function () { try { ws.send(pkt(0x10, cat([ustr('MQTT'), new Uint8Array([4, 2, 0, 60]), ustr('mv' + rnd(10))]))); } catch (e) {} };
+    ws.onmessage = function (e) { me.rx(new Uint8Array(e.data)); };
+    ws.onerror = function () {};
+    ws.onclose = function () { if (me.ws !== ws) return; me.ws = null; me.open = false; clearInterval(me.pingT); me.fail(); };
   };
-  Mq.prototype.down = function () {
-    var me = this, was = me.ok; me.ok = false; clearInterval(me.ping); try { if (me.ws) { me.ws.onclose = me.ws.onerror = null; me.ws.close(); } } catch (e) {} me.ws = null; me.fail++;
-    if (self.onstate) self.onstate();
-    clearTimeout(me.rc); me.rc = setTimeout(function () { me.open(); }, Math.min(20000, 1500 * me.fail));
-  };
-  Mq.prototype.feed = function (b) {
-    var me = this; me.buf = cat([me.buf, b]);
+  Mq.prototype.fail = function () { var me = this; if (me.dead) return; if (++me.tries > 5) { me.dead = true; return; } setTimeout(function () { me.connect(); }, Math.min(10000, 1000 * me.tries * me.tries)); };
+  Mq.prototype.rx = function (d) {
+    var me = this; me.buf = cat([me.buf, d]);
     for (;;) {
-      var d = me.buf; if (d.length < 2) return;
-      var n = 0, mul = 1, k = 1, c;
-      do { if (k >= d.length) return; c = d[k++]; n += (c & 127) * mul; mul *= 128; } while (c & 128 && k < 5);
-      if (d.length < k + n) return;
-      var type = d[0], body = d.subarray(k, k + n); me.buf = d.subarray(k + n);
-      if ((type >> 4) === 2) {
+      var b = me.buf; if (b.length < 2) return;
+      var rem = 0, mul = 1, i = 1, c;
+      do { if (i >= b.length) return; c = b[i++]; rem += (c & 127) * mul; mul *= 128; } while ((c & 128) && i < 5);
+      if (b.length < i + rem) return;
+      var body = b.subarray(i, i + rem), type = b[0] >> 4, qos = (b[0] >> 1) & 3;
+      me.buf = b.subarray(i + rem);
+      if (type === 2) {
         if (body[1] === 0) {
-          me.ok = true; me.fail = 0;
-          me.ping = setInterval(function () { try { me.ws.send(new Uint8Array([0xC0, 0])); } catch (e) {} }, 20000);
-          Object.keys(me.topics).forEach(function (t) { me.sendSub(t); });
-          var q = me.q; me.q = []; q.forEach(function (x) { me.send(x[0], x[1]); });
-          if (self.onstate) self.onstate();
-        } else me.down();
-      } else if ((type >> 4) === 3) {
-        var tl = (body[0] << 8) | body[1], topic = dec.decode(body.subarray(2, 2 + tl)), pl = dec.decode(body.subarray(2 + tl));
-        (me.topics[topic] || []).slice().forEach(function (f) { f(pl); });
+          me.open = true; me.tries = 0;
+          Object.keys(me.subs).forEach(function (t) { me.sendSub(t); });
+          me.q.splice(0).forEach(function (m) { me.send(m.t, m.p); });
+          clearInterval(me.pingT); me.pingT = setInterval(function () { try { if (me.open && me.ws) me.ws.send(new Uint8Array([0xC0, 0])); } catch (e) {} }, 30000);
+        } else { try { me.ws.close(); } catch (e) {} }
+      } else if (type === 3) {
+        var tl = (body[0] << 8) | body[1], tp = TD.decode(body.subarray(2, 2 + tl)), off = 2 + tl + (qos ? 2 : 0), cbs = me.subs[tp];
+        if (cbs) { var pl = TD.decode(body.subarray(off)); cbs.slice().forEach(function (f) { try { f(pl); } catch (e) {} }); }
       }
     }
   };
-  Mq.prototype.sendSub = function (t) { try { this.ws.send(pkt(0x82, cat([new Uint8Array([(++this.pi >> 8) & 255, this.pi & 255]), utf(t), new Uint8Array([0])]))); } catch (e) {} };
-  Mq.prototype.sub = function (t, f) { var me = this; (me.topics[t] = me.topics[t] || []).push(f); if (me.ok) me.sendSub(t); };
-  Mq.prototype.unsub = function (t, f) { var a = this.topics[t] || [], i = a.indexOf(f); if (i >= 0) a.splice(i, 1); };
-  Mq.prototype.send = function (t, text) {
-    if (!this.ok) { if (this.q.length < 20) this.q.push([t, text]); return; }
-    try { this.ws.send(pkt(0x30, cat([utf(t), enc.encode(text)]))); } catch (e) {}
-  };
-  var mqs = null;
-  function getMqs() { if (!mqs) mqs = BROKERS.map(function (u) { return new Mq(u); }); return mqs; }
-  function mtopic(code, dir) { return 'mvlav/' + norm(code) + '/' + dir; }
-  function anyMq() { return !!mqs && mqs.some(function (m) { return m.ok; }); }
+  Mq.prototype.sendSub = function (t) { try { var id = this.pid++ & 0xFFFF; this.ws.send(pkt(0x82, cat([new Uint8Array([id >> 8, id & 255]), ustr(t), new Uint8Array([0])]))); } catch (e) {} };
+  Mq.prototype.send = function (t, p) { try { this.ws.send(pkt(0x30, cat([ustr(t), TE.encode(p)]))); } catch (e) {} };
+  Mq.prototype.pub = function (t, p) { if (this.open) this.send(t, p); else if (!this.dead && this.q.length < 60) this.q.push({ t: t, p: p }); };
+  Mq.prototype.sub = function (t, cb) { var first = !this.subs[t]; (this.subs[t] = this.subs[t] || []).push(cb); if (first && this.open) this.sendSub(t); };
+  Mq.prototype.unsub = function (t, cb) { var a = this.subs[t]; if (a) { var i = a.indexOf(cb); if (i >= 0) a.splice(i, 1); } };
+  var MQS = {};
+  function mq(url) { return MQS[url] || (MQS[url] = new Mq(url)); }
 
-  /* ntfy.sh: i messaggi lunghi si spezzano (il servizio accetta circa 4000 caratteri) */
-  var MAXP = 2000;
-  function post(code, dir, text) {
-    return fetch(RELAY + '/' + topic(code, dir), { method: 'POST', body: text }).then(function (r) { if (r && r.status === 429) { self.limited = true; if (self.onlimit && !anyMq()) self.onlimit(); } return r; }).catch(function () {});
+  /* ---- invio: ogni biglietto parte su tutti i servizi insieme, in pezzi se è lungo ---- */
+  function envelopes(obj) {
+    var s = JSON.stringify(obj), id = rnd(8), n = Math.max(1, Math.ceil(s.length / CH)), out = [];
+    for (var i = 0; i < n; i++) out.push(JSON.stringify({ x: id, i: i, n: n, d: s.substr(i * CH, CH) }));
+    return out;
   }
   function pub(code, dir, obj) {
-    try {
-      var t = JSON.stringify(obj);
-      getMqs().forEach(function (m) { m.send(mtopic(code, dir), t); });
-      if (!USE_NTFY || self.limited) return Promise.resolve();
-      if (t.length <= 3000) return post(code, dir, t);
-      var id = rnd(6), n = Math.ceil(t.length / MAXP), ps = [];
-      for (var k = 0; k < n; k++) ps.push(post(code, dir, JSON.stringify({ _p: id, i: k, n: n, d: t.substr(k * MAXP, MAXP) })));
-      return Promise.all(ps);
-    } catch (e) {}
+    var t = topic(code, dir), es = envelopes(obj);
+    es.forEach(function (e) {
+      try { fetch(RELAY + '/' + t, { method: 'POST', body: e }).then(function (r) { if (r && r.status === 429) limited = true; }).catch(function () {}); } catch (x) {}
+      MQTT.forEach(function (u) { try { mq(u).pub('mvlav/' + t, e); } catch (x) {} });
+    });
   }
+  /* ---- ricezione: si ascolta su tutti i servizi insieme; il biglietto doppio si ignora ---- */
   function sub(code, dir, cb, onerr) {
-    var seen = {}, parts = {}, closed = false, nUp = false, es = null;
-    function deliver(o) {
-      if (closed || !o) return;
-      var key = o.t + ':' + o.sid + ':' + (o.t === 'ice' ? JSON.stringify(o.c).length : '');
-      if (o.t === 'offer' || o.t === 'answer') { if (seen[key]) return; seen[key] = 1; }
-      cb(o);
+    var t = topic(code, dir), parts = {}, done = {}, es = null, closed = false, mqcb = null, chk = null;
+    function got(raw) {
+      var e; try { e = JSON.parse(raw); } catch (x) { return; }
+      if (!e || !e.x || done[e.x]) return;
+      var p = parts[e.x] || (parts[e.x] = { n: e.n, a: [], c: 0 });
+      if (p.a[e.i] === undefined) { p.a[e.i] = e.d; p.c++; }
+      if (p.c >= p.n) { done[e.x] = 1; delete parts[e.x]; var m; try { m = JSON.parse(p.a.join('')); } catch (x) { return; } cb(m); }
     }
-    var fs = getMqs().map(function (m) { var f = function (txt) { try { deliver(JSON.parse(txt)); } catch (e) {} }; m.sub(mtopic(code, dir), f); return [m, f]; });
-    var ready = false;
-    function check() { if (ready && !closed && onerr && !nUp && !anyMq()) onerr(); }
-    var prevState = self.onstate; self.onstate = function () { if (prevState) prevState(); check(); };
-    if (USE_NTFY) {
-      es = new EventSource(RELAY + '/' + topic(code, dir) + '/sse');
-      es.onopen = function () { nUp = true; };
-      es.onmessage = function (e) {
-        try {
-          var m = JSON.parse(e.data); if (!m || m.event !== 'message') return;
-          var o = JSON.parse(m.message);
-          if (o && o._p) {
-            var g = parts[o._p] || (parts[o._p] = { n: o.n, got: 0, a: [] });
-            if (g.a[o.i] == null) { g.a[o.i] = o.d; g.got++; }
-            if (g.got === g.n) { delete parts[o._p]; deliver(JSON.parse(g.a.join(''))); }
-            return;
-          }
-          deliver(o);
-        } catch (x) {}
-      };
-      es.onerror = function () { nUp = false; check(); };
+    try {
+      es = new EventSource(RELAY + '/' + t + '/sse');
+      es.onmessage = function (ev) { try { var m = JSON.parse(ev.data); if (m && m.event === 'message') got(m.message); } catch (x) {} };
+      es.onerror = function () { check(); };
+    } catch (x) { es = null; }
+    mqcb = function (pl) { got(pl); };
+    MQTT.forEach(function (u) { try { mq(u).sub('mvlav/' + t, mqcb); } catch (x) {} });
+    function alive() {
+      if (es && es.readyState === 1) return true;
+      for (var i = 0; i < MQTT.length; i++) { if (MQS[MQTT[i]] && MQS[MQTT[i]].open) return true; }
+      return false;
     }
-    setTimeout(function () { ready = true; check(); }, 4000);
-    return { close: function () { closed = true; try { if (es) es.close(); } catch (e) {} fs.forEach(function (x) { x[0].unsub(mtopic(code, dir), x[1]); }); self.onstate = prevState; } };
+    var t0 = Date.now();
+    function check() { if (!closed && onerr && Date.now() - t0 > 5000 && !alive()) onerr(); }
+    chk = setInterval(check, 8000);
+    return { close: function () { closed = true; clearInterval(chk); try { if (es) es.close(); } catch (x) {} MQTT.forEach(function (u) { try { if (MQS[u]) MQS[u].unsub('mvlav/' + t, mqcb); } catch (x) {} }); } };
   }
-  /* aspetta che il telefono/PC abbia raccolto i suoi indirizzi (cosi' tutto parte in un solo biglietto, con meno messaggi) */
+  function why() {
+    return limited ? 'Il servizio ntfy ha raggiunto il limite di messaggi e gli altri due servizi non rispondono. Riprova tra qualche minuto, oppure usa l’hotspot del telefono.'
+      : 'Non riesco a raggiungere i servizi di collegamento. Serve internet (va bene anche l’hotspot del telefono).';
+  }
+  /* aspetta che l'apparecchio conosca i propri indirizzi di rete, cosi' si manda un solo biglietto completo */
   function gathered(pc, ms) {
-    return new Promise(function (ok) {
-      if (pc.iceGatheringState === 'complete') return ok();
-      var t = setTimeout(done, ms || 2500);
-      function done() { clearTimeout(t); try { pc.removeEventListener('icegatheringstatechange', ch); } catch (e) {} ok(); }
+    return new Promise(function (res) {
+      if (pc.iceGatheringState === 'complete') { res(); return; }
+      var t = setTimeout(done, ms || 4000);
+      function done() { clearTimeout(t); try { pc.removeEventListener('icegatheringstatechange', ch); } catch (x) {} res(); }
       function ch() { if (pc.iceGatheringState === 'complete') done(); }
       pc.addEventListener('icegatheringstatechange', ch);
     });
   }
-  function packSdp(s) { return String(s || '').replace(/\r\n/g, '\n'); }
-  function unpackSdp(s) { return String(s || '').replace(/\r?\n/g, '\r\n'); }
   function iceBatch(send) {
     var q = [], t = null;
     function flush() { t = null; var b = q.splice(0); if (b.length) send(b); }
@@ -263,8 +242,7 @@ var LAV = (function () {
       ctx.restore();
     }
   }
-  self.RELAY = RELAY; self.ICE = ICE; self.rnd = rnd; self.norm = norm; self.pub = pub; self.sub = sub; self.iceBatch = iceBatch; self.prune = prune; self.draw = draw; self.gathered = gathered; self.packSdp = packSdp; self.unpackSdp = unpackSdp;
-  return self;
+  return { RELAY: RELAY, MQTT: MQTT, ICE: ICE, rnd: rnd, norm: norm, pub: pub, sub: sub, why: why, gathered: gathered, limited: function () { return limited; }, iceBatch: iceBatch, prune: prune, draw: draw };
 })();
 
 (function () {
@@ -287,16 +265,15 @@ var LAV = (function () {
   function link() {
     stopLink(); if (!running) return;
     sid = LAV.rnd(8); joinN = 0;
-    es = LAV.sub(code, 'tb', onMsg, function () { if (!connected) gstate(LAV.limited ? 'Il servizio gratuito di collegamento ha raggiunto il limite di messaggi (succede dopo molte prove). Riprova tra qualche ora oppure usa un altro internet, per esempio l’hotspot del telefono.' : 'Non riesco a raggiungere il servizio di collegamento. Serve internet (va bene anche l’hotspot del telefono).'); });
+    es = LAV.sub(code, 'tb', onMsg, function () { if (!connected) gstate(LAV.why() + ' Cerco il PC con il codice ' + code + '… Se sul PC il codice è diverso, premi Scollega.'); });
     join();
   }
-  LAV.onlimit = function () { if (!connected) gstate('Il servizio gratuito di collegamento ha raggiunto il limite di messaggi (succede dopo molte prove). Riprova tra qualche ora oppure usa un altro internet, per esempio l’hotspot del telefono.'); };
   function join() {
     if (!running || connected) return;
+    if (joinN >= 6) { running = false; stopLink(); updGo(); gstate('Non ho trovato il PC. Controlla il codice sul PC e premi di nuovo «Collega».'); return; }   /* 6 tentativi, circa un minuto */
     LAV.pub(code, 'pc', { t: 'join', sid: sid });
-    if (joinN === 2 && !LAV.limited) gstate('Cerco il PC con il codice ' + code.toUpperCase() + '… Se sul PC il codice è diverso, premi «Scollega» e scrivi quello del PC.');
-    if (joinN >= 6) { if (!LAV.limited) gstate('Non trovo il PC. Controlla che il codice sia uguale a quello del PC e che il PC abbia il pannello «Lavagna tablet» aperto, poi premi di nuovo «Collega».'); running = false; try { if (es) es.close(); } catch (e) {} es = null; return; }
-    joinT = setTimeout(join, 3000 + (joinN++) * 3000);
+    if (joinN === 2) gstate((LAV.limited() ? LAV.why() + ' ' : '') + 'Cerco il PC con il codice ' + code + '… Se sul PC il codice è diverso, premi Scollega.');
+    joinT = setTimeout(join, 3000 + (joinN++) * 2000);
   }
   function addIce(c) { try { var p = pc.addIceCandidate(c); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
   function onMsg(m) {
@@ -318,12 +295,11 @@ var LAV = (function () {
         else if (s === 'disconnected') { clearTimeout(dropT); dropT = setTimeout(function () { if (pc && pc.connectionState !== 'connected') onLost(); }, 5000); }
         else if (s === 'connected') clearTimeout(dropT);
       };
-      var mine = pc;
-      pc.setRemoteDescription({ type: 'offer', sdp: LAV.unpackSdp(m.sdp) }).then(function () {
+      pc.setRemoteDescription({ type: 'offer', sdp: m.sdp }).then(function () {
         haveRemote = true; pend.splice(0).forEach(addIce);
         return pc.createAnswer();
-      }).then(function (a) { return pc.setLocalDescription(a); }).then(function () { return LAV.gathered(mine, 2500); }).then(function () {
-        if (pc !== mine) return; LAV.pub(code, 'pc', { t: 'answer', sid: sid, sdp: LAV.packSdp(mine.localDescription.sdp) });
+      }).then(function (a) { return pc.setLocalDescription(a); }).then(function () { return LAV.gathered(pc, 4000); }).then(function () {
+        if (!pc) return; LAV.pub(code, 'pc', { t: 'answer', sid: sid, sdp: pc.localDescription.sdp });   /* un solo biglietto, completo */
       }).catch(function () { onLost(); });
     } else if (m.t === 'ice') {
       (m.c || []).forEach(function (c) { if (pc && haveRemote) addIce(c); else pend.push(c); });
@@ -331,7 +307,7 @@ var LAV = (function () {
   }
   function onOpen() {
     if (connected) return;
-    connected = true; clearTimeout(joinT); clearTimeout(dropT); try { if (es) es.close(); } catch (e) {} es = null;
+    connected = true; updGo(); clearTimeout(joinT); clearTimeout(dropT); try { if (es) es.close(); } catch (e) {} es = null;
     lastRx = Date.now(); gstate('');
     $('gate').hidden = true; $('app').hidden = false; $('lost').hidden = true;
     send({ t: 'prev', on: cfg.prev }); send({ t: 'cfg', cop: cfg.cop }); send({ t: 'live', ok: live });
@@ -346,12 +322,13 @@ var LAV = (function () {
     if (was) { $('lost').hidden = false; } else { gstate('Collegamento non riuscito, riprovo…'); }
     setTimeout(function () { if (running) link(); }, 1000);
   }
+  function updGo() { $('go').textContent = running && !connected ? 'Scollega' : 'Collega'; }
   function start() {
     code = LAV.norm($('code').value).toUpperCase();
     if (code.length < 4) { gstate('Scrivi il codice che vedi sul PC.'); return; }
-    store.set('lav_code', code); running = true; LAV.limited = false; gstate('Cerco il PC…'); link();
+    store.set('lav_code', code); running = true; updGo(); gstate('Cerco il PC con il codice ' + code + '…'); link();
   }
-  function exit() { running = false; stopLink(); clearInterval(wd); clearInterval(pingT); document.body.classList.remove('bigmode'); $('app').hidden = true; $('gate').hidden = false; gstate(''); strokes = []; }
+  function exit() { running = false; updGo(); stopLink(); clearInterval(wd); clearInterval(pingT); document.body.classList.remove('bigmode'); $('app').hidden = true; $('gate').hidden = false; gstate(''); strokes = []; }
 
   /* ---------- dati dal PC ---------- */
   var frames = {};
@@ -442,7 +419,7 @@ var LAV = (function () {
   $('fab-menu').addEventListener('click', function () { bigMode(false); });
   $('fab-undo').addEventListener('click', function () { $('undo').click(); });
   $('exit').addEventListener('click', exit);
-  $('go').addEventListener('click', start);
+  $('go').addEventListener('click', function () { if (running && !connected) { exit(); gstate('Scollegato. Scrivi il codice che vedi sul PC e premi «Collega».'); } else start(); });
   $('code').addEventListener('keydown', function (e) { if (e.key === 'Enter') start(); });
   var f0 = parseInt(store.get('lav_fade') || '0', 10); cfg.fade = FADES.indexOf(f0) >= 0 ? f0 : 0; fadeLabel();
   cfg.cop = store.get('lav_cop') !== '0'; copLabel();
