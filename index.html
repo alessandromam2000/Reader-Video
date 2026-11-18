@@ -108,8 +108,9 @@ h1, h2, h3 { margin: 0; font-family: var(--f-display); font-weight: 700; letter-
 .scoreov em { font-style: normal; background: #3DB8C4; color: #08161A; border-radius: 9px; padding: 2px 6px; font-size: .85em; }
 .btn[aria-pressed="true"]#b-score, .chip[aria-pressed="true"]#t-score { background: var(--accent, #3DB8C4); color: #08161A; }
 .screen-wrap video { width: 100%; height: 100%; object-fit: contain; display: block; background: var(--screen); }
+.vcover { position: absolute; inset: 0; z-index: 1; cursor: pointer; }
 .empty-screen {
-  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 2; position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 12px; padding: 16px; text-align: center; color: #C9D6DA; background: var(--screen);
 }
 .empty-screen .need { font: 12px var(--f-mono); color: #8CA2AA; overflow-wrap: anywhere; max-width: 100%; }
@@ -860,7 +861,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v127</small></h1>
+      <h1>Reader scout video <small class="ver">v129</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -930,7 +931,8 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
     <section class="stage" aria-label="Lettore video">
       <div class="dock">
       <div class="screen-wrap">
-        <video id="vid" playsinline preload="auto"></video>
+        <video id="vid" playsinline preload="auto" disablepictureinpicture disableremoteplayback></video>
+        <div class="vcover" id="vcover"></div>
         <div class="scoreov" id="scoreov" hidden aria-hidden="true"></div>
         <div class="empty-screen" id="empty-screen">
           <div class="h">Collega il video della partita</div>
@@ -1208,8 +1210,8 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
   </div>
 </div>
 <div class="drop-hint" id="drop">Rilascia qui lo scout (.dvw) o il video</div>
-<style>#lav-panel{position:fixed;right:14px;bottom:14px;width:310px;z-index:60;background:var(--surface,#fff);color:var(--fg,#13232A);border:1px solid var(--line,#CAD6DA);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:14px/1.4 var(--f-body,system-ui,sans-serif)}#lav-panel b{font-size:16px}#lav-panel p{margin:6px 0}#lav-link{font-weight:600;word-break:break-all}#lav-code{font:700 38px/1.1 var(--f-mono,ui-monospace,monospace);letter-spacing:.28em;color:var(--accent,#0A6F7A);text-align:center;margin:8px 0;padding-left:.28em}#lav-state{padding:6px 8px;border-radius:8px;background:var(--surface-2,#E3EBED);margin:6px 0 10px}#lav-state.ok{background:#CFEFD9;color:#0E5A2B;font-weight:700}#lav-panel .lavrow{display:flex;gap:6px;flex-wrap:wrap}</style>
-<div id="lav-panel" hidden><b>Lavagna dal tablet</b><p>Sul tablet apri <span id="lav-link"></span> e scrivi questo codice:</p><div id="lav-code">------</div><div id="lav-state">In attesa del tablet…</div><div class="lavrow"><button class="btn small" id="lav-new" type="button">Nuovo codice</button><button class="btn small" id="lav-stop" type="button">Spegni</button><button class="btn small" id="lav-close" type="button">Chiudi</button></div></div>
+<style>#lav-panel{position:fixed;right:14px;bottom:14px;width:310px;z-index:60;background:var(--surface,#fff);color:var(--fg,#13232A);border:1px solid var(--line,#CAD6DA);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:14px/1.4 var(--f-body,system-ui,sans-serif)}#lav-panel b{font-size:16px}#lav-panel p{margin:6px 0}#lav-link{font-weight:600;word-break:break-all}#lav-code{font:700 38px/1.1 var(--f-mono,ui-monospace,monospace);letter-spacing:.28em;color:var(--accent,#0A6F7A);text-align:center;margin:8px 0;padding-left:.28em}#lav-state{padding:6px 8px;border-radius:8px;background:var(--surface-2,#E3EBED);margin:6px 0 10px}#lav-diag{font-size:12px;opacity:.75;margin:-4px 0 8px;word-break:break-word}#lav-state.ok{background:#CFEFD9;color:#0E5A2B;font-weight:700}#lav-panel .lavrow{display:flex;gap:6px;flex-wrap:wrap}</style>
+<div id="lav-panel" hidden><b>Lavagna dal tablet</b><p>Sul tablet apri <span id="lav-link"></span> e scrivi questo codice:</p><div id="lav-code">------</div><div id="lav-state">In attesa del tablet…</div><div id="lav-diag"></div><div class="lavrow"><button class="btn small" id="lav-new" type="button">Nuovo codice</button><button class="btn small" id="lav-stop" type="button">Spegni</button><button class="btn small" id="lav-close" type="button">Chiudi</button></div></div>
 <div class="toast" id="toast" hidden></div>
 <script type="text/plain" id="sample-dvw"></script>
 <script>
@@ -2736,7 +2738,7 @@ var FastMon = (function () {
   vid.addEventListener('error', function () {
     if (vid.getAttribute('src')) toast('Il browser non riesce a leggere questo video. Provalo in Chrome o Edge.');
   });
-  vid.addEventListener('click', togglePlay);
+  $('vcover').addEventListener('click', togglePlay);   /* lo strato trasparente sopra il video: il browser non mostra i suoi pulsanti */
 
   /* ---------- Proiezione del solo video su un secondo schermo (HDMI / proiettore) ----------
      Il lettore principale resta il "regista": lista azioni, codici e comandi restano sul PC.
@@ -2748,7 +2750,7 @@ var FastMon = (function () {
     function refresh() { btn.hidden = !(extended() || pw); btn.setAttribute('aria-pressed', pw ? 'true' : 'false'); btn.classList.toggle('on', !!pw); btn.title = pw ? 'Smetti di proiettare (il video torna sul PC)' : 'Proietta solo il video sul secondo schermo'; var tx = btn.lastChild; if (tx && tx.nodeType === 3) tx.nodeValue = pw ? ' Smetti di proiettare' : ' Secondo schermo'; }
     try { window.screen.addEventListener('change', refresh); } catch (e) {}
     window.addEventListener('resize', refresh); refresh();
-    var PAGE = '<!doctype html><html lang="it"><he' + 'ad><meta charset="utf-8"><title>Video — secondo schermo</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}video{width:100%;height:100%;object-fit:contain;background:#000;display:block}#h{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(20,30,36,.88);color:#fff;font:15px system-ui,sans-serif;padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .3s}#h.on{opacity:1}body.idle{cursor:none}</style></he' + 'ad><body><video id="v" playsinline></video><div id="h"></div></body></html>';
+    var PAGE = '<!doctype html><html lang="it"><he' + 'ad><meta charset="utf-8"><title>Video — secondo schermo</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}video{width:100%;height:100%;object-fit:contain;background:#000;display:block}#c{position:fixed;inset:0;z-index:1}#h{z-index:2;position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(20,30,36,.88);color:#fff;font:15px system-ui,sans-serif;padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .3s}#h.on{opacity:1}body.idle{cursor:none}</style></he' + 'ad><body><video id="v" playsinline disablepictureinpicture disableremoteplayback></video><div id="c"></div><div id="h"></div></body></html>';
     function hint(t) { try { var h = pw.document.getElementById('h'); h.textContent = t; h.classList.add('on'); clearTimeout(hint.t); hint.t = setTimeout(function () { h.classList.remove('on'); }, 4000); } catch (e) {} }
     function sync(force) {
       if (!pw || pw.closed || !pv) return;
@@ -2814,6 +2816,7 @@ var LAV = (function () {
   var ICE = G.MV_ICE || [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }];
   var CH = 1800;                                   /* ntfy accetta messaggi fino a circa 4000 caratteri: i "biglietti" lunghi si spezzano in pezzi da circa 2000 */
   var limited = false;                             /* ntfy ha risposto "limite raggiunto" */
+  var ntfyOpen = false, ntfyPost = '';
   function rnd(n, al) { al = al || 'abcdefghjkmnpqrstuvwxyz23456789'; var s = ''; for (var i = 0; i < n; i++) s += al.charAt(Math.floor(Math.random() * al.length)); return s; }
   function norm(code) { return String(code || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
   function topic(code, dir) { return 'mvlav-' + norm(code) + '-' + dir; }
@@ -2874,7 +2877,7 @@ var LAV = (function () {
   function pub(code, dir, obj) {
     var t = topic(code, dir), es = envelopes(obj);
     es.forEach(function (e) {
-      try { fetch(RELAY + '/' + t, { method: 'POST', body: e }).then(function (r) { if (r && r.status === 429) limited = true; }).catch(function () {}); } catch (x) {}
+      try { fetch(RELAY + '/' + t, { method: 'POST', body: e }).then(function (r) { if (r && r.status === 429) limited = true; ntfyPost = r ? (r.ok ? 'ok' : String(r.status)) : ''; }).catch(function () { ntfyPost = 'errore'; }); } catch (x) {}
       MQTT.forEach(function (u) { try { mq(u).pub('mvlav/' + t, e); } catch (x) {} });
     });
   }
@@ -2890,8 +2893,9 @@ var LAV = (function () {
     }
     try {
       es = new EventSource(RELAY + '/' + t + '/sse');
+      es.onopen = function () { ntfyOpen = true; };
       es.onmessage = function (ev) { try { var m = JSON.parse(ev.data); if (m && m.event === 'message') got(m.message); } catch (x) {} };
-      es.onerror = function () { check(); };
+      es.onerror = function () { ntfyOpen = false; check(); };
     } catch (x) { es = null; }
     mqcb = function (pl) { got(pl); };
     MQTT.forEach(function (u) { try { mq(u).sub('mvlav/' + t, mqcb); } catch (x) {} });
@@ -2904,6 +2908,12 @@ var LAV = (function () {
     function check() { if (!closed && onerr && Date.now() - t0 > 5000 && !alive()) onerr(); }
     chk = setInterval(check, 8000);
     return { close: function () { closed = true; clearInterval(chk); try { if (es) es.close(); } catch (x) {} MQTT.forEach(function (u) { try { if (MQS[u]) MQS[u].unsub('mvlav/' + t, mqcb); } catch (x) {} }); } };
+  }
+  /* una riga che dice quali servizi rispondono, per capire dove si blocca */
+  function diag() {
+    var o = ['ntfy ' + (ntfyOpen ? '✓' : '✗') + (ntfyPost && ntfyPost !== 'ok' ? ' (' + ntfyPost + ')' : '')];
+    MQTT.forEach(function (u) { var h = (/\/\/([^:\/]+)/.exec(u) || [])[1] || u, n = /hivemq/.test(h) ? 'HiveMQ' : /emqx/.test(h) ? 'EMQX' : h; o.push(n + ' ' + (MQS[u] && MQS[u].open ? '✓' : '✗')); });
+    return o.join(' · ');
   }
   function why() {
     return limited ? 'Il servizio ntfy ha raggiunto il limite di messaggi e gli altri due servizi non rispondono. Riprova tra qualche minuto, oppure usa l’hotspot del telefono.'
@@ -2959,7 +2969,7 @@ var LAV = (function () {
       ctx.restore();
     }
   }
-  return { RELAY: RELAY, MQTT: MQTT, ICE: ICE, rnd: rnd, norm: norm, pub: pub, sub: sub, why: why, gathered: gathered, limited: function () { return limited; }, iceBatch: iceBatch, prune: prune, draw: draw };
+  return { RELAY: RELAY, MQTT: MQTT, ICE: ICE, rnd: rnd, norm: norm, pub: pub, sub: sub, why: why, diag: diag, gathered: gathered, limited: function () { return limited; }, iceBatch: iceBatch, prune: prune, draw: draw };
 })();
 
   /* ---------- Lavagna: dal tablet si disegna sopra il video (anche sulla TV / secondo schermo) ---------- */
@@ -2975,10 +2985,12 @@ var LAV = (function () {
       var tx = btn.lastChild; if (tx && tx.nodeType === 3) tx.nodeValue = connected ? ' Lavagna tablet ●' : ' Lavagna tablet';
     }
     function tabUrl() { try { var l = window.top.location; if (/^https?:$/.test(l.protocol)) return l.origin + l.pathname.replace(/[^\/]*$/, '') + 'lavagna.html'; } catch (e) {} return ''; }
+    var diagT = null;
     function showPanel() {
       $('lav-code').textContent = code;
       var u = tabUrl(); $('lav-link').textContent = u ? u : 'la pagina «lavagna.html» (il link che ti ho dato)';
       panel.hidden = false;
+      clearInterval(diagT); diagT = setInterval(function () { var d = $('lav-diag'); if (d) d.textContent = listening && !connected ? 'Servizi: ' + LAV.diag() : ''; }, 1000);
     }
     function send(o) { try { if (dc && dc.readyState === 'open') dc.send(JSON.stringify(o)); } catch (e) {} }
 
@@ -3043,7 +3055,7 @@ var LAV = (function () {
       if (qt !== lastQ) { lastQ = qt; if (S.length) { S = []; send({ t: 'clr' }); dirty(); } }   /* nuova azione: via i vecchi segni */
     }
     function sendFrame() {
-      if (live || !prevOn || !dc || dc.readyState !== 'open' || !vid.videoWidth || dc.bufferedAmount > 200000) return;
+      if ((live && !vid.paused) || !prevOn || !dc || dc.readyState !== 'open' || !vid.videoWidth || dc.bufferedAmount > 200000) return;   /* in pausa la foto parte sempre, anche con il video in diretta; in riproduzione solo se la diretta non c'è */
       var W = 1280, H = Math.max(2, Math.round(W * vid.videoHeight / vid.videoWidth)); fc.width = W; fc.height = H;
       try { fc.getContext('2d').drawImage(vid, 0, 0, W, H); } catch (e) { return; }
       fc.toBlob(function (b) {

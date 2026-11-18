@@ -20,13 +20,14 @@ h1{margin:0;font-size:28px;letter-spacing:.2px}
 #code:focus{outline:none;border-color:var(--acc)}
 .big{min-width:220px;min-height:58px;font-size:20px;font-weight:700;background:var(--acc);border-color:var(--acc);color:#06161A}
 #gstate{min-height:24px;color:var(--gold);font-weight:600}
+#gdiag{min-height:18px;font-size:13px;color:var(--muted);max-width:420px;word-break:break-word}
 #gate .by{margin-top:8px;font-size:13px}
 #app{height:100%;display:flex}
 #padwrap{flex:1;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;padding:6px}
 #pad{position:relative;background:#050A0D;border:2px solid var(--line);border-radius:6px;overflow:hidden}
 #pad img,#pad canvas,#pad video{position:absolute;inset:0;width:100%;height:100%;display:block}
 #tv{object-fit:fill;background:#000}
-#bg{object-fit:fill;opacity:.92}
+#bg{object-fit:fill;opacity:1}
 #cv{touch-action:none;cursor:crosshair}
 #novid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#52707A;font-size:18px;pointer-events:none}
 #tools{width:200px;flex:none;background:var(--panel);border-left:1px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:9px;overflow-y:auto;touch-action:pan-y}
@@ -56,8 +57,9 @@ body.bigmode #tools{display:none}
   <input id="code" maxlength="8" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="CODICE" inputmode="text">
   <button id="go" class="big" type="button">Collega</button>
   <div id="gstate" role="status"></div>
+  <div id="gdiag"></div>
   <small>Il codice è sul PC, nel Reader video: premi «Lavagna tablet».</small>
-  <small class="by">Data Mampro’s Volley · Creato da Alessandro Mamprin</small>
+  <small class="by">Data Mampro’s Volley · Creato da Alessandro Mamprin · lavagna v129</small>
 </div>
 <div id="app" hidden>
   <div id="padwrap"><div id="pad"><video id="tv" muted playsinline autoplay hidden></video><img id="bg" alt=""><div id="novid">Nessun video</div><canvas id="cv"></canvas></div></div>
@@ -97,6 +99,7 @@ var LAV = (function () {
   var ICE = G.MV_ICE || [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun.cloudflare.com:3478' }];
   var CH = 1800;                                   /* ntfy accetta messaggi fino a circa 4000 caratteri: i "biglietti" lunghi si spezzano in pezzi da circa 2000 */
   var limited = false;                             /* ntfy ha risposto "limite raggiunto" */
+  var ntfyOpen = false, ntfyPost = '';
   function rnd(n, al) { al = al || 'abcdefghjkmnpqrstuvwxyz23456789'; var s = ''; for (var i = 0; i < n; i++) s += al.charAt(Math.floor(Math.random() * al.length)); return s; }
   function norm(code) { return String(code || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
   function topic(code, dir) { return 'mvlav-' + norm(code) + '-' + dir; }
@@ -157,7 +160,7 @@ var LAV = (function () {
   function pub(code, dir, obj) {
     var t = topic(code, dir), es = envelopes(obj);
     es.forEach(function (e) {
-      try { fetch(RELAY + '/' + t, { method: 'POST', body: e }).then(function (r) { if (r && r.status === 429) limited = true; }).catch(function () {}); } catch (x) {}
+      try { fetch(RELAY + '/' + t, { method: 'POST', body: e }).then(function (r) { if (r && r.status === 429) limited = true; ntfyPost = r ? (r.ok ? 'ok' : String(r.status)) : ''; }).catch(function () { ntfyPost = 'errore'; }); } catch (x) {}
       MQTT.forEach(function (u) { try { mq(u).pub('mvlav/' + t, e); } catch (x) {} });
     });
   }
@@ -173,8 +176,9 @@ var LAV = (function () {
     }
     try {
       es = new EventSource(RELAY + '/' + t + '/sse');
+      es.onopen = function () { ntfyOpen = true; };
       es.onmessage = function (ev) { try { var m = JSON.parse(ev.data); if (m && m.event === 'message') got(m.message); } catch (x) {} };
-      es.onerror = function () { check(); };
+      es.onerror = function () { ntfyOpen = false; check(); };
     } catch (x) { es = null; }
     mqcb = function (pl) { got(pl); };
     MQTT.forEach(function (u) { try { mq(u).sub('mvlav/' + t, mqcb); } catch (x) {} });
@@ -187,6 +191,12 @@ var LAV = (function () {
     function check() { if (!closed && onerr && Date.now() - t0 > 5000 && !alive()) onerr(); }
     chk = setInterval(check, 8000);
     return { close: function () { closed = true; clearInterval(chk); try { if (es) es.close(); } catch (x) {} MQTT.forEach(function (u) { try { if (MQS[u]) MQS[u].unsub('mvlav/' + t, mqcb); } catch (x) {} }); } };
+  }
+  /* una riga che dice quali servizi rispondono, per capire dove si blocca */
+  function diag() {
+    var o = ['ntfy ' + (ntfyOpen ? '✓' : '✗') + (ntfyPost && ntfyPost !== 'ok' ? ' (' + ntfyPost + ')' : '')];
+    MQTT.forEach(function (u) { var h = (/\/\/([^:\/]+)/.exec(u) || [])[1] || u, n = /hivemq/.test(h) ? 'HiveMQ' : /emqx/.test(h) ? 'EMQX' : h; o.push(n + ' ' + (MQS[u] && MQS[u].open ? '✓' : '✗')); });
+    return o.join(' · ');
   }
   function why() {
     return limited ? 'Il servizio ntfy ha raggiunto il limite di messaggi e gli altri due servizi non rispondono. Riprova tra qualche minuto, oppure usa l’hotspot del telefono.'
@@ -242,7 +252,7 @@ var LAV = (function () {
       ctx.restore();
     }
   }
-  return { RELAY: RELAY, MQTT: MQTT, ICE: ICE, rnd: rnd, norm: norm, pub: pub, sub: sub, why: why, gathered: gathered, limited: function () { return limited; }, iceBatch: iceBatch, prune: prune, draw: draw };
+  return { RELAY: RELAY, MQTT: MQTT, ICE: ICE, rnd: rnd, norm: norm, pub: pub, sub: sub, why: why, diag: diag, gathered: gathered, limited: function () { return limited; }, iceBatch: iceBatch, prune: prune, draw: draw };
 })();
 
 (function () {
@@ -322,6 +332,7 @@ var LAV = (function () {
     if (was) { $('lost').hidden = false; } else { gstate('Collegamento non riuscito, riprovo…'); }
     setTimeout(function () { if (running) link(); }, 1000);
   }
+  setInterval(function () { $('gdiag').textContent = running && !connected ? 'Servizi: ' + LAV.diag() : ''; }, 1000);
   function updGo() { $('go').textContent = running && !connected ? 'Scollega' : 'Collega'; }
   function start() {
     code = LAV.norm($('code').value).toUpperCase();
@@ -337,15 +348,16 @@ var LAV = (function () {
     lastRx = Date.now(); var m; try { m = JSON.parse(e.data); } catch (x) { return; }
     if (m.t === 'st') {
       paused = !!m.p; $('b-play').textContent = paused ? '▶' : '❚❚';
+      if (!paused && live) $('bg').hidden = true;   /* in riproduzione sparisce la foto e resta il video in diretta */
       $('tm').textContent = fmt(m.ct) + (m.du ? ' / ' + fmt(m.du) : '') + (m.q ? '  ·  ' + m.q : '');
       $('novid').hidden = !!m.v;
       if (m.ar && Math.abs(m.ar - ar) > 0.01) { ar = m.ar; fit(); redraw(); }
     } else if (m.t === 'pn') { $('stxt').textContent = 'Collegato · ' + Math.max(1, Date.now() - m.ts) + ' ms';
     } else if (m.t === 'f') {
-      if (live) return;
+      if (live && !paused) return;   /* le foto si accettano sempre; con la diretta in riproduzione non servono */
       var f = frames[m.id] || (frames[m.id] = { n: m.n, got: 0, p: [] });
       if (f.p[m.i] === undefined) { f.p[m.i] = m.d; f.got++; }
-      if (f.got === f.n) { $('bg').src = 'data:image/jpeg;base64,' + f.p.join(''); $('novid').hidden = true; frames = {}; }
+      if (f.got === f.n) { $('bg').src = 'data:image/jpeg;base64,' + f.p.join(''); $('bg').hidden = false; $('novid').hidden = true; frames = {}; }
     } else if (m.t === 'clr') { strokes = []; redraw(); }
   }
 
