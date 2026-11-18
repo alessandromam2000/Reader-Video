@@ -861,7 +861,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v130</small></h1>
+      <h1>Reader scout video <small class="ver">v131</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -1710,7 +1710,11 @@ var FastMon = (function () {
     var p = c.e.M.players[c.side + c.num];
     return p && (p.surname || p.name) ? (p.surname + ' ' + p.name).trim() : '#' + c.num;
   }
-  function pkey(c) { return tc(c) + '|' + plain(c); }
+  /* stessa squadra + stesso cognome + stesso numero = stessa giocatrice (anche se il nome cambia da un file all'altro) */
+  function pkey(c) {
+    var p = c.e.M.players[c.side + c.num], sn = p ? String(p.surname || p.name || '').trim().toLowerCase().replace(/\s+/g, ' ') : '';
+    return String(tc(c)).trim().toLowerCase() + '|' + sn + '|' + c.num;
+  }
   function involves(e) { return !F.team || e.M.teams[0].code === F.team || e.M.teams[1].code === F.team; }
   function scope(c, G) {
     G = G || F;
