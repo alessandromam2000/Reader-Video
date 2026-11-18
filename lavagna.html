@@ -59,7 +59,7 @@ body.bigmode #tools{display:none}
   <div id="gstate" role="status"></div>
   <div id="gdiag"></div>
   <small>Il codice è sul PC, nel Reader video: premi «Lavagna tablet».</small>
-  <small class="by">Data Mampro’s Volley · Creato da Alessandro Mamprin · lavagna v129</small>
+  <small class="by">Data Mampro’s Volley · Creato da Alessandro Mamprin · lavagna v133</small>
 </div>
 <div id="app" hidden>
   <div id="padwrap"><div id="pad"><video id="tv" muted playsinline autoplay hidden></video><img id="bg" alt=""><div id="novid">Nessun video</div><canvas id="cv"></canvas></div></div>
@@ -158,7 +158,8 @@ var LAV = (function () {
     return out;
   }
   function pub(code, dir, obj) {
-    var t = topic(code, dir), es = envelopes(obj);
+    /* messaggio corto = testo semplice (lo capiscono anche le versioni precedenti); lungo = a pezzi */
+    var t = topic(code, dir), raw = JSON.stringify(obj), es = raw.length <= 3600 ? [raw] : envelopes(obj);
     es.forEach(function (e) {
       try { fetch(RELAY + '/' + t, { method: 'POST', body: e }).then(function (r) { if (r && r.status === 429) limited = true; ntfyPost = r ? (r.ok ? 'ok' : String(r.status)) : ''; }).catch(function () { ntfyPost = 'errore'; }); } catch (x) {}
       MQTT.forEach(function (u) { try { mq(u).pub('mvlav/' + t, e); } catch (x) {} });
@@ -169,6 +170,7 @@ var LAV = (function () {
     var t = topic(code, dir), parts = {}, done = {}, es = null, closed = false, mqcb = null, chk = null;
     function got(raw) {
       var e; try { e = JSON.parse(raw); } catch (x) { return; }
+      if (e && !e.x && e.t) { var rk = 'r' + raw, nw = Date.now(); if (done[rk] && nw - done[rk] < 2000) return; done[rk] = nw; cb(e); return; }   /* testo semplice (anche dalle versioni precedenti) */
       if (!e || !e.x || done[e.x]) return;
       var p = parts[e.x] || (parts[e.x] = { n: e.n, a: [], c: 0 });
       if (p.a[e.i] === undefined) { p.a[e.i] = e.d; p.c++; }

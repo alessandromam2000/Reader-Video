@@ -861,7 +861,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v131</small></h1>
+      <h1>Reader scout video <small class="ver">v133</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -2879,7 +2879,8 @@ var LAV = (function () {
     return out;
   }
   function pub(code, dir, obj) {
-    var t = topic(code, dir), es = envelopes(obj);
+    /* messaggio corto = testo semplice (lo capiscono anche le versioni precedenti); lungo = a pezzi */
+    var t = topic(code, dir), raw = JSON.stringify(obj), es = raw.length <= 3600 ? [raw] : envelopes(obj);
     es.forEach(function (e) {
       try { fetch(RELAY + '/' + t, { method: 'POST', body: e }).then(function (r) { if (r && r.status === 429) limited = true; ntfyPost = r ? (r.ok ? 'ok' : String(r.status)) : ''; }).catch(function () { ntfyPost = 'errore'; }); } catch (x) {}
       MQTT.forEach(function (u) { try { mq(u).pub('mvlav/' + t, e); } catch (x) {} });
@@ -2890,6 +2891,7 @@ var LAV = (function () {
     var t = topic(code, dir), parts = {}, done = {}, es = null, closed = false, mqcb = null, chk = null;
     function got(raw) {
       var e; try { e = JSON.parse(raw); } catch (x) { return; }
+      if (e && !e.x && e.t) { var rk = 'r' + raw, nw = Date.now(); if (done[rk] && nw - done[rk] < 2000) return; done[rk] = nw; cb(e); return; }   /* testo semplice (anche dalle versioni precedenti) */
       if (!e || !e.x || done[e.x]) return;
       var p = parts[e.x] || (parts[e.x] = { n: e.n, a: [], c: 0 });
       if (p.a[e.i] === undefined) { p.a[e.i] = e.d; p.c++; }
@@ -3139,6 +3141,11 @@ var LAV = (function () {
         else if (st === 'connected') clearTimeout(dropT);
       };
       try { vtx = pc.addTransceiver('video', { direction: 'sendonly' }); } catch (e) { vtx = null; }
+      /* pochi codec (senza rtx/red/fec): il biglietto resta corto e passa anche come testo semplice */
+      try {
+        var caps = RTCRtpSender.getCapabilities('video').codecs, keep = caps.filter(function (c) { return /^video\/(VP8|H264)$/i.test(c.mimeType); }), h = keep.filter(function (c) { return /H264/i.test(c.mimeType); }).slice(0, 2), v = keep.filter(function (c) { return /VP8/i.test(c.mimeType); });
+        if (vtx && v.length + h.length) vtx.setCodecPreferences(v.concat(h));
+      } catch (e) {}
       dc = pc.createDataChannel('lav'); dc.onopen = onOpen; dc.onclose = onClose; dc.onmessage = onData;
       var mine = pc;
       pc.createOffer().then(function (o) { return mine.setLocalDescription(o); })
