@@ -861,7 +861,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v129</small></h1>
+      <h1>Reader scout video <small class="ver">v130</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -1118,7 +1118,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <label class="monchk"><input type="radio" name="mon-mode" value="real"> Normale <small>(in tempo reale, più lenta)</small></label>
       </div>
       <label class="monttl" id="mon-mkbox"><span class="label">Azioni da includere</span><select class="field" id="mon-mk"></select></label>
-      <label class="monttl" id="mon-qbox"><span class="label">Qualità del video</span><select class="field" id="mon-q"><option value="std">Standard (file più leggero)</option><option value="high" selected>Alta (consigliata)</option><option value="max">Massima (file molto più grande)</option></select></label>
+      <label class="monttl" id="mon-qbox"><span class="label">Qualità del video</span><select class="field" id="mon-q"><option value="low">Leggera (file piccolissimo)</option><option value="std" selected>Standard (consigliata)</option><option value="high">Alta (file più grande)</option><option value="max">Massima (file molto grande)</option></select></label>
       <label class="monttl" id="mon-snbox" hidden><span class="label">Nome (si aggiunge a SYN_data e squadre)</span><input type="text" class="field" id="mon-sname" maxlength="60" placeholder="es. palle !"></label>
       <label class="monchk"><input type="checkbox" id="mon-score" checked> Mostra il punteggio</label>
       <label class="monchk" id="mon-stepsbox" hidden><input type="checkbox" id="mon-steps" checked> Pagina con il nome del passo tra una sezione e l’altra</label>
@@ -4217,7 +4217,7 @@ var LAV = (function () {
     if (!queue.length) { toast('Nessuna azione nella lista.'); return; }
     $('mon-mk').value = ''; fillMonMk();
     var ok = monItems().length, mode = canFast ? 'fast' : 'real';
-    try { var so = JSON.parse(localStorage.getItem('reader-scout-video-mon') || 'null'); if (so) { $('mon-score').checked = so.score !== false; if (so.q) $('mon-q').value = so.q; if (canFast && so.mode === 'real') mode = 'real'; } } catch (e) {}
+    try { var so = JSON.parse(localStorage.getItem('reader-scout-video-mon') || 'null'); if (so) { $('mon-score').checked = so.score !== false; if (so.q && so.v === 2) $('mon-q').value = so.q; if (canFast && so.mode === 'real') mode = 'real'; } } catch (e) {}
     document.querySelector('input[name="mon-mode"][value="fast"]').disabled = !canFast;
     document.querySelector('input[name="mon-mode"][value="real"]').disabled = !canReal;
     document.querySelector('input[name="mon-mode"][value="' + (canFast || !canReal ? mode : 'real') + '"]').checked = true;
@@ -4431,7 +4431,7 @@ var LAV = (function () {
   function startMontage() {
     var showScore = $('mon-score').checked, title = $('mon-intro').checked ? $('mon-ttl').value.trim() : '';
     var fast = monMode() === 'fast', qual = $('mon-q').value;
-    try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore, mode: fast ? 'fast' : 'real', q: qual })); } catch (e) {}
+    try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore, mode: fast ? 'fast' : 'real', q: qual, v: 2 })); } catch (e) {}
     var jl = [], cards = null, lastSt = -1;
     if (qstep && $('mon-steps').checked) cards = {};
     monItems().forEach(function (it) {
@@ -4508,10 +4508,9 @@ var LAV = (function () {
       var r0 = readers[videoFor(list[0]).url], k0 = 1;   /* stessa risoluzione dell'originale */
       cw = canvas.width = Math.round(r0.width * k0 / 2) * 2; ch = canvas.height = Math.round(r0.height * k0 / 2) * 2;
       var srcFps = r0.n > 1 ? Math.max(10, Math.min(60, Math.round(1e6 / Math.max(1000, (r0.dts[1] - r0.dts[0]) / r0.timescale * 1e6)))) : 30,
-        /* qualità: circa 0,2 bit per pixel e fotogramma (Full HD a 30 fps ≈ 12 Mb/s), senza tetto basso come prima (6 Mb/s) */
-        QP = { std: [0.2, 8e6, 12e6, 24e6], high: [0.4, 12e6, 16e6, 40e6], max: [0.8, 20e6, 24e6, 60e6] }[job.q] || [0.4, 12e6, 16e6, 40e6],
-        PX = Math.max(1, cw * ch / 2073600),
-        bps = Math.round(Math.max(QP[1], Math.min((sink0() ? QP[2] : QP[3]) * PX, cw * ch * srcFps * QP[0])));
+        /* qualità: bit per pixel e fotogramma, come fa Data Volley (Full HD a 30 fps: Leggera ≈ 2 Mb/s, Standard ≈ 3,5, Alta ≈ 6, Massima ≈ 11) */
+        BPP = { low: 0.032, std: 0.056, high: 0.1, max: 0.18 }[job.q] || 0.056,
+        bps = Math.round(Math.max(600000, cw * ch * Math.min(srcFps, 30) * BPP));
       ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
       var big = cw * ch > 2200000, cands = (big ? [['avc', 'avc1.640034'], ['avc', 'avc1.640033'], ['avc', 'avc1.64002a']] : [['avc', 'avc1.64002a'], ['avc', 'avc1.640028']]).concat([['avc', 'avc1.4d0028'], ['avc', 'avc1.42e028'], ['vp9', big ? 'vp09.00.50.08' : 'vp09.00.10.08']]), chosen = null;
       for (var ci = 0; ci < cands.length && !chosen; ci++) {
@@ -4659,7 +4658,7 @@ var LAV = (function () {
       } else if (wr) { try { wr.w.abort(); } catch (e) {} }
     }
     var tRec = 0;
-    var RBPS = { std: 8e6, high: 14e6, max: 22e6 }[job.q] || 14e6;
+    var RBPS = Math.round(Math.max(800000, canvas.width * canvas.height * 30 * ({ low: 0.04, std: 0.07, high: 0.12, max: 0.2 }[job.q] || 0.07)));
     function startRec() {
       var stream = canvas.captureStream(30);
       if (monAudio) monAudio.dest.stream.getAudioTracks().forEach(function (t) { stream.addTrack(t); });
