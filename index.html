@@ -839,6 +839,10 @@ body.theater #pg-synth { display: none; }
 .edw .seg .chip { flex: none; white-space: nowrap; padding-left: 14px; padding-right: 14px; }
 body.ms-use .teambar .tb-who { opacity: .4; pointer-events: none; }
 
+.msmk { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.msmk .chip { cursor: pointer; }
+.msbox .mswarn { margin: 8px 0 0; padding: 6px 8px; border-radius: 8px; background: var(--accent); color: var(--bg); font-weight: 700; }
+
 </style>
 </head><body>
 <div id="gate" style="position:fixed;inset:0;z-index:99999;background:#0D1619;color:#E4EDF0;display:none;align-items:center;justify-content:center;font-family:system-ui,sans-serif">
@@ -861,7 +865,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v133</small></h1>
+      <h1>Reader scout video <small class="ver">v134</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -979,6 +983,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 
       <details class="setbox" id="setbox" open>
         <summary><span class="label">Tempi della clip</span><span class="sum" id="set-sum"></span></summary>
+      <p class="hint" id="time-lock" hidden style="margin:0 0 8px">🔒 Stai guardando una sintesi: i tempi (secondi prima e durata) sono quelli con cui è stata creata e non si possono cambiare.</p>
       <div class="settings">
         <div class="sgroup">
           <span class="label" id="l-pre">Secondi prima del contatto</span>
@@ -1118,7 +1123,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
         <label class="monchk"><input type="radio" name="mon-mode" value="real"> Normale <small>(in tempo reale, più lenta)</small></label>
       </div>
       <label class="monttl" id="mon-mkbox"><span class="label">Azioni da includere</span><select class="field" id="mon-mk"></select></label>
-      <label class="monttl" id="mon-qbox"><span class="label">Qualità del video</span><select class="field" id="mon-q"><option value="low">Leggera (file piccolissimo)</option><option value="std" selected>Standard (consigliata)</option><option value="high">Alta (file più grande)</option><option value="max">Massima (file molto grande)</option></select></label>
+      <label class="monttl" id="mon-qbox"><span class="label">Qualità del video</span><select class="field" id="mon-q"><option value="lite" selected>Leggera (consigliata · circa 14 MB al minuto)</option><option value="good">Buona (circa 30 MB al minuto)</option><option value="high">Alta (circa 55 MB al minuto)</option><option value="max">Massima (file molto grande)</option></select></label>
       <label class="monttl" id="mon-snbox" hidden><span class="label">Nome (si aggiunge a SYN_data e squadre)</span><input type="text" class="field" id="mon-sname" maxlength="60" placeholder="es. palle !"></label>
       <label class="monchk"><input type="checkbox" id="mon-score" checked> Mostra il punteggio</label>
       <label class="monchk" id="mon-stepsbox" hidden><input type="checkbox" id="mon-steps" checked> Pagina con il nome del passo tra una sezione e l’altra</label>
@@ -1261,6 +1266,13 @@ function setScoutLine(text, ln, code, c4, c6) {
     if (!f[5]) f[5] = '-1-1';
   }
   parts[k] = f.join(';');
+  return parts.join('');
+}
+function setScoutTime(text, ln, t) {
+  var parts = text.split(/(\r?\n)/), k = ln * 2, l = parts[k];
+  if (l == null) return text;
+  var f = l.split(';'); while (f.length < 13) f.push('');
+  f[12] = String(t); parts[k] = f.join(';');
   return parts.join('');
 }
 function setScoutCode(text, ln, code) { return setScoutLine(text, ln, code); }
@@ -1894,9 +1906,11 @@ var FastMon = (function () {
     ts.innerHTML = '<option value="">Tutte le squadre</option>' + names.map(function (n) { return '<option value="' + esc(n) + '">' + esc(teams[n]) + ' (' + esc(n) + ')</option>'; }).join('');
     ts.value = F.team;
     var wh = $('f-who'); wh.innerHTML = '';
-    [{ v: 'team', l: F.team ? esc(F.team) : 'Squadra' }, { v: 'opp', l: 'Avversari' }, { v: 'both', l: 'Entrambe' }].forEach(function (o) {
-      var b = mkChip(o.l); b.setAttribute('role', 'radio'); b.disabled = !F.team;
-      b.setAttribute('aria-checked', F.who === o.v ? 'true' : 'false');
+    (F.team ? [{ v: 'team', l: esc(F.team) }, { v: 'opp', l: 'Avversari' }, { v: 'both', l: 'Entrambe' }]
+      : [{ v: 'team', l: 'Tutte' }]).forEach(function (o) {
+      var b = mkChip(o.l); b.setAttribute('role', 'radio');
+      if (!F.team && o.v === 'team') b.title = 'Per «Squadra» e «Avversari» scegli prima la squadra da analizzare';
+      b.setAttribute('aria-checked', (F.who === o.v || (!F.team && o.v === 'team')) ? 'true' : 'false');
       b.addEventListener('click', function () { F.who = o.v; F.player = ''; buildFilters(); applyFilters(); renderHeader(); });
       wh.appendChild(b);
     });
@@ -2560,7 +2574,7 @@ var FastMon = (function () {
       MS.mask.steps.forEach(function (st, si) {
         var g = fromMaskF(st.f); if (st.f.ask && MS.player) g.player = MS.player;
         var tk = (g.text || '').split(',').map(function (t) { return t.trim().toUpperCase(); }).filter(Boolean), n = 0;
-        ALL.forEach(function (c) { if (matches(c, tk, g)) { queue.push(c); qstep.push(si); n++; } });
+        ALL.forEach(function (c) { if (matches(c, tk, g) && msMarkOk(c)) { queue.push(c); qstep.push(si); n++; } });
         msCounts.push(n);
       });
     } else { qstep = null; queue = ALL.filter(function (c) { return matches(c, tokens); }); }
@@ -2591,11 +2605,14 @@ var FastMon = (function () {
         '<span class="meta" title="' + (c.phase === 'C' ? 'cambio palla' : c.phase === 'T' ? 'transizione' : c.phase === 'F' ? 'freeball' : '') + '">' + (multi() ? 'G' + (c.e.giornata != null ? c.e.giornata : '–') + ' vs ' + esc(opp(c)) + ' · ' : '') + 'S' + c.set + ' · ' + scoreText(c.score) + ' · P' + c.rot +
         (c.phase === 'C' ? ' · CP' : c.phase === 'T' ? ' · TR' : c.phase === 'F' ? ' · FB' : '') + '</span></button></li>';
   }
+  function synCur() { return SYN.filter(function (x) { return x.id === synOpen; })[0] || {}; }
+  function synStepIdx(c) { var st = synCur().steps, r = -1; if (!st || !st.length) return -1; for (var k = 0; k < st.length; k++) if (st[k].off <= (c.t || 0) + 0.6) r = k; return r; }
   function renderMore(upTo) {
     if (rendered >= queue.length) return;
     var end = Math.min(queue.length, Math.max(upTo, rendered + CHUNK)), h = '';
     for (var q = rendered; q < end; q++) {
       if (qstep && (q === 0 || qstep[q] !== qstep[q - 1])) h += '<li class="stephead"><span class="sn">Passo ' + (qstep[q] + 1) + ' di ' + MS.mask.steps.length + '</span><b>' + esc(MS.mask.steps[qstep[q]].name) + '</b><small>' + msCounts[qstep[q]] + (msCounts[qstep[q]] === 1 ? ' azione' : ' azioni') + '</small></li>';
+      if (!qstep && synOpen) { var si2 = synStepIdx(queue[q]); if (si2 >= 0 && (q === 0 || si2 !== synStepIdx(queue[q - 1]))) { var ss = synCur().steps; h += '<li class="stephead"><span class="sn">Passo ' + (si2 + 1) + ' di ' + ss.length + '</span><b>' + esc(ss[si2].name) + '</b></li>'; } }
       h += rowHtml(queue[q], q);
     }
     $('list').insertAdjacentHTML('beforeend', h); rendered = end;
@@ -3718,14 +3735,34 @@ var LAV = (function () {
     h += opts(MASKS.filter(function (m) { return !m.folder; }));
     sel.innerHTML = h; sel.value = maskActive ? maskActive.id : '';
   }
+  function msMarkOk(c) {
+    if (!hasKeys(F.marks)) return true;
+    var mm = MARKS[c.uid] || [];
+    if (F.marks.none && !mm.length) return true;
+    for (var q = 0; q < mm.length; q++) if (F.marks[mm[q]]) return true;
+    return false;
+  }
+  function msMarkRow() {
+    var h = '<div class="msmk"><span class="label">Solo i palloni con marker:</span> ';
+    MK.map(function (m) { return { v: m.id, l: m.id, cls: 'mkc mk' + m.id }; }).concat([{ v: 'none', l: 'Senza marker', cls: '' }]).forEach(function (it) {
+      var n = it.v === 'none' ? ALL.length - markCount('any') : markCount(it.v);
+      h += '<button type="button" class="chip ' + it.cls + '" data-mk="' + it.v + '" aria-pressed="' + (F.marks[it.v] ? 'true' : 'false') + '">' + it.l + ' <small>' + n + '</small></button> ';
+    });
+    return h + '</div>';
+  }
   function renderMsBox() {
     var b = $('ms-box'), fl = document.querySelector('.filters'); if (!b) return;
     document.body.classList.toggle('ms-use', !!MS);
     if (!MS) { b.hidden = true; b.innerHTML = ''; fl.classList.remove('ms-on'); return; }
     fl.classList.add('ms-on'); b.hidden = false;
-    b.innerHTML = '<b>Maschera a ' + MS.mask.steps.length + ' passi</b><span class="hint"> — i passi si guardano uno dopo l’altro, nell’ordine qui sotto. I filtri sono disattivati finché la maschera è in uso.</span><ol>' +
-      MS.mask.steps.map(function (s, i) { return '<li><span>' + esc(s.name) + '</span><small>' + (msCounts[i] != null ? msCounts[i] : 0) + '</small></li>'; }).join('') + '</ol>';
+    b.innerHTML = '<b>Maschera a ' + MS.mask.steps.length + ' passi</b><span class="hint"> — i passi si guardano uno dopo l’altro, nell’ordine qui sotto. I filtri sono disattivati finché la maschera è in uso, ma puoi scegliere un marker per vedere solo quei palloni.</span><ol>' +
+      MS.mask.steps.map(function (s, i) { return '<li><span>' + esc(s.name) + '</span><small>' + (msCounts[i] != null ? msCounts[i] : 0) + '</small></li>'; }).join('') + '</ol>' + msMarkRow() +
+      ((!F.team && MS.mask.steps.some(function (s) { return s.f && (s.f.who === 'opp' || s.f.who === 'team'); })) ? '<p class="mswarn">Per i passi «Squadra» o «Avversari» scegli in alto la squadra da analizzare.</p>' : '');
   }
+  $('ms-box').addEventListener('click', function (e) {
+    var bt = e.target.closest('[data-mk]'); if (!bt) return;
+    F.marks[bt.dataset.mk] = !F.marks[bt.dataset.mk]; buildMarkFilter(); applyFilters();
+  });
   function baseOf(m) { return JSON.stringify(snapMask(!!m.f.player, false).f); }
   function maskAsks(m) { return !!m && ((m.steps && m.steps.length > 1) ? m.steps.some(function (x) { return x.f.ask; }) : m.f.ask); }
   var CHP = ' <button class="btn small" type="button" data-s="pl" title="Scegli un’altra giocatrice senza riselezionare la maschera">👤 Cambia giocatrice</button>';
@@ -3800,7 +3837,7 @@ var LAV = (function () {
     }
     MS = null;
     F = fromMaskF(m.f);
-    if (m.t) { S.pre = m.t.pre; S.dur = m.t.dur; radioRedraws.forEach(function (fn) { fn(); }); onSettingsChanged(false); }
+    if (m.t && !(synOpen && synSaved)) { S.pre = m.t.pre; S.dur = m.t.dur; radioRedraws.forEach(function (fn) { fn(); }); onSettingsChanged(false); }
     $('f-code').value = F.text; buildFilters(); applyFilters(); renderHeader();
     maskActive = m; maskBase = baseOf(m); renderMaskSelect(); updateMaskStatus();
     if (m.f.ask) askPlayer(function (k) { F.player = k; fillPlayers(); applyFilters(); });
@@ -4228,7 +4265,7 @@ var LAV = (function () {
     if (!queue.length) { toast('Nessuna azione nella lista.'); return; }
     $('mon-mk').value = ''; fillMonMk();
     var ok = monItems().length, mode = canFast ? 'fast' : 'real';
-    try { var so = JSON.parse(localStorage.getItem('reader-scout-video-mon') || 'null'); if (so) { $('mon-score').checked = so.score !== false; if (so.q && so.v === 2) $('mon-q').value = so.q; if (canFast && so.mode === 'real') mode = 'real'; } } catch (e) {}
+    try { var so = JSON.parse(localStorage.getItem('reader-scout-video-mon') || 'null'); if (so) { $('mon-score').checked = so.score !== false; if (so.q && so.v === 3 && $('mon-q').querySelector('option[value="' + so.q + '"]')) $('mon-q').value = so.q; if (canFast && so.mode === 'real') mode = 'real'; } } catch (e) {}
     document.querySelector('input[name="mon-mode"][value="fast"]').disabled = !canFast;
     document.querySelector('input[name="mon-mode"][value="real"]').disabled = !canReal;
     document.querySelector('input[name="mon-mode"][value="' + (canFast || !canReal ? mode : 'real') + '"]').checked = true;
@@ -4308,7 +4345,8 @@ var LAV = (function () {
   function saveSyn() { idb(function (st, done) { try { st.put(SYN, 'synth'); } catch (x) {} done(); }); }
   function registerSynth(job, vname, files) {
     SYN.unshift({
-      id: 's' + Date.now(), name: job.sname, created: Date.now(), n: job.list.length, folder: job.folder || '', dirName: job.dirName || '', vname: vname,
+      steps: (job.stepsAt || []).map(function (t) { var o = null, k; for (k = t.ix; k < job.list.length; k++) if (job.offs[k] != null) { o = job.offs[k]; break; } return o == null ? null : { name: t.name, off: o }; }).filter(Boolean),
+      id: 's' + Date.now(), name: job.sname, created: Date.now(), n: job.list.length, pre: job.pre, dur: job.dur, folder: job.folder || '', dirName: job.dirName || '', vname: vname,
       matches: files.map(function (f) { return f.match + (f.date ? ' · ' + f.date : ''); }),
       files: files.map(function (f) { return { name: f.name, text: f.text, enc: f.enc, bom: f.bom }; })
     });
@@ -4357,6 +4395,8 @@ var LAV = (function () {
     if (!added.length) { LIB.forEach(function (e) { e.active = synPrev.indexOf(e.id) >= 0; }); rebuild(); toast('Non riesco ad aprire questa sintesi.'); return; }
     synOpen = s.id; $('pg-back').textContent = '◀ Torna alle sintesi';
     try { $('f-reset').click(); } catch (x) {}
+    synTimes(s);
+    F.team = ''; F.who = 'team'; F.player = '';
     rebuild();
     setPage('analisi');
     if (perm) {
@@ -4368,10 +4408,23 @@ var LAV = (function () {
       } catch (x) { toast('Non trovo il video della sintesi nella cartella «' + s.folder + '». Collegalo con il pulsante Video.'); }
     } else if (!hasAll(added[0])) { toast('Scegli il video della sintesi: ' + s.vname); pendingEntry = added[0]; $('in-video').click(); }
   }
+  /* una sintesi e' un video montato con tempi precisi: finche' e' aperta, secondi prima/durata restano quelli della creazione e i controlli sono bloccati */
+  var synSaved = null;
+  function synTimes(s) {
+    var lock = !!(s && s.pre != null && s.dur != null);
+    if (lock) { if (!synSaved) synSaved = { pre: S.pre, dur: S.dur }; S.pre = s.pre; S.dur = s.dur; }
+    else if (synSaved) { S.pre = synSaved.pre; S.dur = synSaved.dur; synSaved = null; }
+    ['ch-pre', 'ch-dur'].forEach(function (id) { var e = $(id); e.style.pointerEvents = lock ? 'none' : ''; e.style.opacity = lock ? '.5' : ''; e.setAttribute('aria-disabled', lock ? 'true' : 'false'); });
+    $('time-lock').hidden = !lock;
+    radioRedraws.forEach(function (fn) { fn(); });
+    if (cur >= 0 && queue[cur]) { clip = range(queue[cur]); updateNow(); }
+    updateSetSum();
+  }
   function closeSynth() {
     LIB.filter(function (e) { return e.synth; }).forEach(dropEntry);
     LIB.forEach(function (e) { e.active = (synPrev || []).indexOf(e.id) >= 0; });
     synOpen = null; $('pg-back').textContent = '◀ Torna alla selezione';
+    synTimes(null);
     rebuild();
   }
   var monJobs = [];
@@ -4442,11 +4495,12 @@ var LAV = (function () {
   function startMontage() {
     var showScore = $('mon-score').checked, title = $('mon-intro').checked ? $('mon-ttl').value.trim() : '';
     var fast = monMode() === 'fast', qual = $('mon-q').value;
-    try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore, mode: fast ? 'fast' : 'real', q: qual, v: 2 })); } catch (e) {}
-    var jl = [], cards = null, lastSt = -1;
+    try { localStorage.setItem('reader-scout-video-mon', JSON.stringify({ score: showScore, mode: fast ? 'fast' : 'real', q: qual, v: 3 })); } catch (e) {}
+    var jl = [], cards = null, lastSt = -1, lastSt2 = -1, stepsAt = [];
     if (qstep && $('mon-steps').checked) cards = {};
     monItems().forEach(function (it) {
       var c = it.c, q = it.q;
+      if (qstep && qstep[q] !== lastSt2) { lastSt2 = qstep[q]; stepsAt.push({ ix: jl.length, name: MS.mask.steps[lastSt2].name }); }
       if (cards && qstep[q] !== lastSt) { lastSt = qstep[q]; cards[jl.length] = MS.mask.steps[lastSt].name; }
       jl.push(c);
     });
@@ -4458,7 +4512,7 @@ var LAV = (function () {
       synthBase = ('SYN_' + ymd + (M0 && M0.teams[0] ? ' ' + M0.teams[0].name + ' vs ' + M0.teams[1].name : '') + (own ? ' ' + own : '')).replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().replace(/[. ]+$/, '');
       sname = synthBase;
     }
-    var synth = monKind() === 'sint', job = { list: jl, showScore: showScore, title: title, fast: fast, cards: cards, q: qual, synth: synth, sname: sname, offs: [], ends: [] };
+    var synth = monKind() === 'sint', job = { list: jl, showScore: showScore, title: title, fast: fast, cards: cards, q: qual, synth: synth, sname: sname, pre: S.pre, dur: S.dur, stepsAt: stepsAt, offs: [], ends: [] };
     $('dlg-mon').hidden = true;
     var mimeX = fast ? 'video/mp4' : monMime(), ext = /mp4/.test(mimeX) ? 'mp4' : 'webm';
     var base = synthBase || safeName(sname) || 'sintesi';
@@ -4519,8 +4573,8 @@ var LAV = (function () {
       var r0 = readers[videoFor(list[0]).url], k0 = 1;   /* stessa risoluzione dell'originale */
       cw = canvas.width = Math.round(r0.width * k0 / 2) * 2; ch = canvas.height = Math.round(r0.height * k0 / 2) * 2;
       var srcFps = r0.n > 1 ? Math.max(10, Math.min(60, Math.round(1e6 / Math.max(1000, (r0.dts[1] - r0.dts[0]) / r0.timescale * 1e6)))) : 30,
-        /* qualità: bit per pixel e fotogramma, come fa Data Volley (Full HD a 30 fps: Leggera ≈ 2 Mb/s, Standard ≈ 3,5, Alta ≈ 6, Massima ≈ 11) */
-        BPP = { low: 0.032, std: 0.056, high: 0.1, max: 0.18 }[job.q] || 0.056,
+        /* qualità: bit per pixel e fotogramma, come fa Data Volley (Full HD a 30 fps: Leggera ≈ 1,9 Mb/s, Buona ≈ 4, Alta ≈ 7,5, Massima ≈ 12) */
+        BPP = { lite: 0.03, good: 0.065, high: 0.12, max: 0.2 }[job.q] || 0.03,
         bps = Math.round(Math.max(600000, cw * ch * Math.min(srcFps, 30) * BPP));
       ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
       var big = cw * ch > 2200000, cands = (big ? [['avc', 'avc1.640034'], ['avc', 'avc1.640033'], ['avc', 'avc1.64002a']] : [['avc', 'avc1.64002a'], ['avc', 'avc1.640028']]).concat([['avc', 'avc1.4d0028'], ['avc', 'avc1.42e028'], ['vp9', big ? 'vp09.00.50.08' : 'vp09.00.10.08']]), chosen = null;
@@ -4669,7 +4723,7 @@ var LAV = (function () {
       } else if (wr) { try { wr.w.abort(); } catch (e) {} }
     }
     var tRec = 0;
-    var RBPS = Math.round(Math.max(800000, canvas.width * canvas.height * 30 * ({ low: 0.04, std: 0.07, high: 0.12, max: 0.2 }[job.q] || 0.07)));
+    var RBPS = Math.round(Math.max(800000, canvas.width * canvas.height * 30 * ({ lite: 0.035, good: 0.07, high: 0.12, max: 0.2 }[job.q] || 0.035)));
     function startRec() {
       var stream = canvas.captureStream(30);
       if (monAudio) monAudio.dest.stream.getAudioTracks().forEach(function (t) { stream.addTrack(t); });
@@ -5118,6 +5172,8 @@ var LAV = (function () {
     try { m2 = parseDvw(ntext); } catch (x) { $('ce-err').textContent = 'Codice non valido.'; return; }
     if (m2.contacts.length !== e.M.contacts.length) { $('ce-err').textContent = 'Con questo codice l’azione non verrebbe più letta: controlla squadra, maglia e fondamentale.'; return; }
     var q = CE.q, wasNext = $('ce-next').checked, dropped = false;
+    /* l'azione che nella lista veniva subito dopo (e il suo passo, se la maschera ha piu' passi): da li si riparte dopo la correzione */
+    var oldNext = q + 1 < queue.length ? queue[q + 1] : null, oldNextStep = (qstep && oldNext) ? qstep[q + 1] : null;
     try { localStorage.setItem('reader-scout-video-editnext', wasNext ? '1' : '0'); } catch (x) {}
     if (code !== c.code || ntext !== e.text) {
       if (!e.orig) e.orig = e.text;
@@ -5133,7 +5189,12 @@ var LAV = (function () {
     } else closeCodeEdit();
     if (!queue.length) return;
     /* dopo la correzione si va sempre all'azione successiva di dove ero arrivato, mai all'inizio della selezione */
-    var tgt = dropped ? q : queue.indexOf(c) + 1;
+    var tgt = -1;
+    if (oldNext) {
+      /* con una maschera a piu' passi la stessa azione puo' stare in piu' passi, o passare ad un altro dopo la correzione: si resta nel passo dove ero */
+      for (var ti = 0; ti < queue.length; ti++) if (queue[ti] === oldNext && (!qstep || qstep[ti] === oldNextStep)) { tgt = ti; break; }
+    }
+    if (tgt < 0) tgt = oldNext ? (dropped ? q : queue.indexOf(c) + 1) : queue.length - 1;   /* ero all'ultima azione: resto in fondo */
     tgt = Math.max(0, Math.min(tgt, queue.length - 1));
     select(tgt, false);
     if (wasNext) openCodeEdit(tgt);
@@ -5151,6 +5212,34 @@ var LAV = (function () {
     var b = ev.target.closest ? ev.target.closest('.row') : null; if (!b) return;
     openCodeEdit(+b.dataset.q);
   });
+  /* F12 (come in Data Volley): il codice selezionato prende come tempo il punto del video dove sono ora */
+  function syncCodeTime() {
+    if (cur < 0 || cur >= queue.length) { toast('Scegli prima un’azione dalla lista.', true); return; }
+    var c = queue[cur], e = c.e, q0 = cur;
+    if (!vid.getAttribute('src') && !vid.src) { toast('Il video non è collegato.', true); return; }
+    var nt = Math.max(0, Math.round(vid.currentTime || 0)), old = c.t;
+    if (nt === old) { toast('Il tempo del codice è già questo (' + fmtTime(nt) + ').'); return; }
+    var ntext = setScoutTime(e.text, c.ln, nt), m2;
+    try { m2 = parseDvw(ntext); } catch (x) { toast('Non riesco a sincronizzare questo codice.', true); return; }
+    if (m2.contacts.length !== e.M.contacts.length) { toast('Non riesco a sincronizzare questo codice.', true); return; }
+    if (!e.orig) e.orig = e.text;
+    e.text = ntext;
+    m2.contacts.forEach(function (n, i) { var o = e.M.contacts[i]; Object.keys(n).forEach(function (k) { o[k] = n[k]; }); m2.contacts[i] = o; });
+    e.M = m2; markMods(e);
+    if (e.orig === e.text) e.orig = null;
+    if (!e.sample) saveLib();
+    var t0 = vid.currentTime;
+    rebuild();
+    var qi = queue[q0] === c ? q0 : queue.indexOf(c);
+    if (qi >= 0) { cur = qi; clip = range(c); ended = false; markCurrent(true); updateNow(); updateBar(t0); renderList(); }
+    toast('Tempo sincronizzato: ' + fmtTime(old) + ' → ' + fmtTime(nt) + ' · ' + c.code);
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'F12' || e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
+    var tg = e.target && e.target.tagName; if (tg === 'INPUT' || tg === 'SELECT' || tg === 'TEXTAREA') return;
+    if (codeEditOpen()) return;
+    e.preventDefault(); e.stopPropagation(); syncCodeTime();
+  }, true);
   $('b-edit').addEventListener('click', function () { openCodeEdit(cur); });
   document.addEventListener('keydown', function (ev) {
     if (ev.key !== 'Enter' || ev.ctrlKey || ev.altKey || ev.metaKey || codeEditOpen()) return;
