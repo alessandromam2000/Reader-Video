@@ -865,7 +865,7 @@ sha(v).then(function(h){if(H.indexOf(h)>=0){try{localStorage.setItem(K,h)}catch(
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Reader scout video <small class="ver">v134</small></h1>
+      <h1>Reader scout video <small class="ver">v135</small></h1>
       <div class="credit">Creato da Alessandro Mamprin</div>
       <div class="matchline" id="matchline">Carico lo scout…</div>
     </div>
@@ -2730,13 +2730,15 @@ var FastMon = (function () {
     vid.addEventListener('loadedmetadata', done);
   }
   var everSel = false;   /* l'utente ha già scelto un'azione: se cambia la ricerca parte la prima della nuova lista */
-  function select(q, autoplay, quiet) {
+  function select(q, autoplay, quiet, seamless) {
     if (q < 0 || q >= queue.length) return;
     if (q >= rendered) renderMore(q + 60);
     everSel = true; cur = q; var c = queue[q]; clip = range(c); ended = false;
     markCurrent(quiet); updateNow(); updateBar(clip.start);
     updateVideoUI();
     var v = videoFor(c);
+    /* sintesi: i passaggi sono quasi attaccati nel video montato, quindi senza saltare indietro il cambio è fluido */
+    if (v && seamless && autoplay && synOpen && !vid.paused && vid.dataset.url === v.url && Math.abs(clip.start - vid.currentTime) < 1.5) { vid.playbackRate = S.spd; return; }
     if (!v) { vid.pause(); vid.removeAttribute('src'); vid.dataset.url = ''; toast('Il video di questa partita non è ancora collegato.'); S.all = false; syncAllBtn(); return; }
     ensureSrc(v, function () {
       vid.currentTime = clip.start; vid.playbackRate = S.spd;
@@ -2750,7 +2752,7 @@ var FastMon = (function () {
     if ((S.stop === 'stop' || S.stop === 'next') && t >= clip.end) clipEnded();
   }
   function clipEnded() {
-    if ((S.all || S.stop === 'next') && cur < queue.length - 1) { select(cur + 1, true); return; }
+    if ((S.all || S.stop === 'next') && cur < queue.length - 1) { select(cur + 1, true, false, true); return; }
     vid.pause(); ended = true; S.all = false; syncAllBtn(); setPlayLabel();
   }
   vid.addEventListener('play', function () { ended = false; clearInterval(timer); timer = setInterval(tick, 80); setPlayLabel(); });
@@ -3093,11 +3095,26 @@ var LAV = (function () {
     vid.addEventListener('play', function () { if (!connected) return; if (cop && S.length) { S = []; send({ t: 'clr' }); dirty(); } });
 
     /* ----- video in diretta verso il tablet (se non arriva, ripiego sulle immagini fisse) ----- */
+    /* qualità che si adatta: se il wifi o il PC non reggono (ritardo che cresce) il video scende da solo di livello e poi risale piano */
+    var LVL = [{ br: 6000000, fps: 30, w: 1920 }, { br: 3000000, fps: 30, w: 1280 }, { br: 1500000, fps: 24, w: 960 }, { br: 800000, fps: 15, w: 854 }, { br: 400000, fps: 10, w: 640 }], lvl = 0, okN = 0, adIv = null;
+    function adapt() {
+      if (!pc || !connected || !vtx) return;
+      pc.getStats().then(function (st) {
+        var rtt = 0, lim = '';
+        st.forEach(function (r) {
+          if (r.type === 'candidate-pair' && (r.nominated || r.selected) && r.currentRoundTripTime) rtt = Math.max(rtt, r.currentRoundTripTime);
+          if (r.type === 'outbound-rtp' && r.kind === 'video' && r.qualityLimitationReason) lim = r.qualityLimitationReason;
+        });
+        var bad = rtt > 0.25 || lim === 'bandwidth' || lim === 'cpu';
+        if (bad) { okN = 0; if (lvl < LVL.length - 1) { lvl++; tune(); } }
+        else if (++okN >= 6 && lvl > 0) { okN = 0; lvl--; tune(); }
+      }).catch(function () {});
+    }
     function tune() {
       try {
         var sd = vtx.sender, p = sd.getParameters(); if (!p.encodings || !p.encodings.length) p.encodings = [{}];
-        p.encodings[0].maxBitrate = 6000000; p.encodings[0].maxFramerate = 30;
-        var vw = vid.videoWidth || 1280; if (vw > 1920) p.encodings[0].scaleResolutionDownBy = vw / 1920;
+        var L = LVL[lvl]; p.encodings[0].maxBitrate = L.br; p.encodings[0].maxFramerate = L.fps;
+        var vw = vid.videoWidth || 1280; p.encodings[0].scaleResolutionDownBy = vw > L.w ? vw / L.w : 1;
         sd.setParameters(p).catch(function () {});
       } catch (e) {}
     }
@@ -3135,15 +3152,16 @@ var LAV = (function () {
       try { if (dc) { dc.onclose = null; dc.close(); } } catch (e) {} try { if (pc) { pc.onconnectionstatechange = null; pc.close(); } } catch (e) {}
       pc = null; dc = null; offer = null; iceOut = []; pend = []; haveRemote = false;
       vtx = null; curTrack = null; capStream = null; live = false; clearInterval(trIv);
-      if (connected) { connected = false; clearInterval(stIv); clearInterval(frIv); refresh(); }
+      if (connected) { connected = false; clearInterval(stIv); clearInterval(frIv); clearInterval(adIv); refresh(); }
     }
     function addIce(c) { try { var p = pc.addIceCandidate(c); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
     /* il biglietto si rimanda al massimo due volte, non a ogni richiesta del tablet */
     function resend() { if (offer && resends < 2) { resends++; LAV.pub(code, 'tb', offer); } }
     function onOpen() {
       connected = true; setState('Tablet collegato ✓', true); refresh(); toast('Tablet collegato: puoi disegnare sopra il video.');
-      clearInterval(stIv); clearInterval(frIv);
+      clearInterval(stIv); clearInterval(frIv); clearInterval(adIv);
       clearInterval(trIv); trIv = setInterval(pickTrack, 1000); pickTrack();
+      clearInterval(adIv); lvl = 0; okN = 0; adIv = setInterval(adapt, 3000);
       stIv = setInterval(sendState, 500); frIv = setInterval(function () { if (!vid.paused) sendFrame(); }, 1000);
       sendState(); setTimeout(sendFrame, 200); startPaint();
     }
@@ -4396,8 +4414,9 @@ var LAV = (function () {
     synOpen = s.id; $('pg-back').textContent = '◀ Torna alle sintesi';
     try { $('f-reset').click(); } catch (x) {}
     synTimes(s);
-    F.team = ''; F.who = 'team'; F.player = '';
+    F.who = 'both'; F.player = '';
     rebuild();
+    if (!F.team) { var fo = $('f-team').querySelector('option[value]:not([value=""])'); if (fo) { F.team = fo.value; F.who = 'both'; rebuild(); } }
     setPage('analisi');
     if (perm) {
       try {
